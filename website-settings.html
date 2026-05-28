@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Website Settings | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="all-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-categories.html" class="menu-item">
+
+            📂 Categories
+
+          </a>
+
+
+
+
+
+          <a href="admin-contact.html" class="menu-item">
+
+            📞 Contact
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item active">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Website Settings
+
+            </h1>
+
+
+
+            <p>
+
+              Customize boutique branding & website appearance ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-settings.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- SETTINGS FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Website Information
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form
+            class="admin-product-form"
+            id="websiteSettingsForm"
+          >
+
+
+
+
+
+            <!-- WEBSITE NAME -->
+
+            <div class="input-group">
+
+              <label>
+
+                Website Name
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="RD Advance Boutique"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- WEBSITE TAGLINE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Website Tagline
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Luxury Boutique & Tailoring"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- WEBSITE DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Website Description
+
+              </label>
+
+
+
+              <textarea
+                rows="5"
+                placeholder="Write boutique website description..."
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- LOGO UPLOAD -->
+
+            <div class="input-group">
+
+              <label>
+
+                Upload Website Logo
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="logoUpload"
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Upload boutique logo image.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- LOGO PREVIEW -->
+
+            <div
+              class="image-preview-container"
+              id="logoPreviewContainer"
+            >
+
+
+
+              <!-- LOGO PREVIEW -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- FAVICON -->
+
+            <div class="input-group">
+
+              <label>
+
+                Upload Favicon
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="faviconUpload"
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Upload website browser icon.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- PRIMARY COLOR -->
+
+            <div class="input-group">
+
+              <label>
+
+                Primary Theme Color
+
+              </label>
+
+
+
+              <input
+                type="color"
+                value="#ff4d6d"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- SECONDARY COLOR -->
+
+            <div class="input-group">
+
+              <label>
+
+                Secondary Theme Color
+
+              </label>
+
+
+
+              <input
+                type="color"
+                value="#111111"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- WEBSITE STATUS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Website Status
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Live
+
+                </option>
+
+
+
+                <option>
+
+                  Maintenance Mode
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- FOOTER TEXT -->
+
+            <div class="input-group">
+
+              <label>
+
+                Footer Copyright Text
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="© 2026 RD Advance Boutique"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button
+                type="reset"
+                class="secondary-btn"
+              >
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+
+                Save Settings
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- BRANDING NOTES -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Branding Tips
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Premium Identity
+
+              </h3>
+
+
+
+              <p>
+
+                Keep boutique branding
+                elegant & consistent.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                🎨 Matching Colors
+
+              </h3>
+
+
+
+              <p>
+
+                Use matching luxury colors
+                for premium appearance.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💖 Strong Branding
+
+              </h3>
+
+
+
+              <p>
+
+                Beautiful branding improves
+                customer trust & recognition.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    // LOGO PREVIEW
+
+    const logoUpload = document.getElementById(
+
+      "logoUpload"
+
+    );
+
+
+
+
+
+    const logoPreviewContainer = document.getElementById(
+
+      "logoPreviewContainer"
+
+    );
+
+
+
+
+
+    logoUpload.addEventListener("change", function(){
+
+      logoPreviewContainer.innerHTML = "";
+
+
+
+
+
+      const file = this.files[0];
+
+
+
+
+
+      if(file){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement(
+
+            "div"
+
+          );
+
+
+
+
+
+          imageBox.classList.add(
+
+            "preview-image-box"
+
+          );
+
+
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Logo Preview">
+
+          `;
+
+
+
+
+
+          logoPreviewContainer.appendChild(
+
+            imageBox
+
+          );
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(file);
+
+      }
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const websiteSettingsForm = document.getElementById(
+
+      "websiteSettingsForm"
+
+    );
+
+
+
+
+
+    websiteSettingsForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Website Settings Saved Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Save settings into database
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Website Settings Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
