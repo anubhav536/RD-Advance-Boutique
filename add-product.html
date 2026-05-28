@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Add Product | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD SECTION -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item active">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="admin-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Add Product
+
+            </h1>
+
+
+
+            <p>
+
+              Add boutique & affiliate products ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-products.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- PRODUCT FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Product Information
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form class="admin-product-form" id="addProductForm">
+
+
+
+
+
+            <!-- PRODUCT NAME -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Name
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Enter product name"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT CATEGORY -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Category
+
+              </label>
+
+
+
+              <select required>
+
+                <option value="">
+
+                  Select Category
+
+                </option>
+
+
+
+                <option>
+
+                  Blouse
+
+                </option>
+
+
+
+                <option>
+
+                  Kurti
+
+                </option>
+
+
+
+                <option>
+
+                  Bridal Wear
+
+                </option>
+
+
+
+                <option>
+
+                  Kids Wear
+
+                </option>
+
+
+
+                <option>
+
+                  Accessories
+
+                </option>
+
+
+
+                <option>
+
+                  Custom Fashion
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT TYPE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Type
+
+              </label>
+
+
+
+              <select required>
+
+                <option value="">
+
+                  Select Type
+
+                </option>
+
+
+
+                <option>
+
+                  Own Product
+
+                </option>
+
+
+
+                <option>
+
+                  Affiliate Product
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- PRICE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Price
+
+              </label>
+
+
+
+              <input
+                type="number"
+                placeholder="Enter product price"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- DISCOUNT PRICE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Discount Price
+
+              </label>
+
+
+
+              <input
+                type="number"
+                placeholder="Optional discount price"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Description
+
+              </label>
+
+
+
+              <textarea
+                rows="6"
+                placeholder="Write product description"
+                required
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT FEATURES -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Features
+
+              </label>
+
+
+
+              <textarea
+                rows="5"
+                placeholder="Premium fabric, handmade stitching, elegant design etc."
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT TAGS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Tags
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Fashion, Boutique, Kurti, Designer etc."
+              >
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT STOCK -->
+
+            <div class="input-group">
+
+              <label>
+
+                Stock Quantity
+
+              </label>
+
+
+
+              <input
+                type="number"
+                placeholder="Available stock"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- MULTIPLE IMAGES -->
+
+            <div class="input-group">
+
+              <label>
+
+                Upload Product Images
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="productImages"
+                multiple
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                You can upload multiple product photos.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div class="image-preview-container" id="imagePreviewContainer">
+
+
+
+              <!-- MULTIPLE IMAGE PREVIEW HERE -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- PRODUCT LINK -->
+
+            <div class="input-group">
+
+              <label>
+
+                Product Link
+
+              </label>
+
+
+
+              <input
+                type="url"
+                placeholder="Affiliate link or product URL"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button type="reset" class="secondary-btn">
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button type="submit" class="primary-btn">
+
+                Publish Product
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    const imageInput = document.getElementById("productImages");
+
+    const previewContainer = document.getElementById(
+
+      "imagePreviewContainer"
+
+    );
+
+
+
+
+
+    // MULTIPLE IMAGE PREVIEW
+
+    imageInput.addEventListener("change", function(){
+
+      previewContainer.innerHTML = "";
+
+
+
+
+
+      const files = this.files;
+
+
+
+
+
+      for(let i = 0; i < files.length; i++){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement("div");
+
+
+
+          imageBox.classList.add("preview-image-box");
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Preview">
+
+          `;
+
+
+
+
+
+          previewContainer.appendChild(imageBox);
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(files[i]);
+
+      }
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const productForm = document.getElementById(
+
+      "addProductForm"
+
+    );
+
+
+
+
+
+    productForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Product Published Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Save product to database
+
+    });
+
+  </script>
+
+</body>
+</html>
