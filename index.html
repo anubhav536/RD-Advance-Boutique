@@ -1,757 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RD Advance Boutique creates luxury custom boutique outfits and teaches professional tailoring courses in Damoh.">
+  <title>RD Advance Boutique | Luxury Tailoring & Design</title>
 
-  <title>RD Advance Boutique</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- GOOGLE FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- NAVBAR -->
-  <!-- ========================= -->
-
-  <header class="navbar">
-
-    <div class="logo-section">
-
-      <img src="assets/logo.png" alt="RD Logo" class="logo">
-
-      <div class="logo-text">
-
-        <h2>RD Advance</h2>
-
-        <p>Boutique</p>
-
-      </div>
-
-    </div>
-
-
-
-
-
-    <nav>
-
-      <ul class="nav-links">
-
-        <li><a href="index.html" class="active">Home</a></li>
-
-        <li><a href="shop.html">Shop</a></li>
-
-        <li><a href="gallery.html">Gallery</a></li>
-
-        <li><a href="learn.html">Course</a></li>
-
-        <li><a href="contact.html">Contact</a></li>
-
-      </ul>
-
-    </nav>
-
-
-
-
-
-    <a href="https://wa.me/917693849472" class="whatsapp-btn">
-
-      WhatsApp
-
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text">
+        <strong>RD Advance</strong>
+        <span>Boutique</span>
+      </span>
     </a>
 
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link nav__link--active">Home</a>
+      <a href="shop.html" class="nav__link">Shop</a>
+      <a href="gallery.html" class="nav__link">Gallery</a>
+      <a href="learn.html" class="nav__link">Course</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </nav>
+
+    <a href="https://wa.me/917693849472" class="header-cta">Book a Fitting</a>
   </header>
 
-
-
-
-
-  <!-- ========================= -->
-  <!-- HERO SECTION -->
-  <!-- ========================= -->
-
-  <section class="hero">
-
-    <div class="hero-left">
-
-      <span class="tag">
-
-        Premium Boutique Fashion ✨
-
-      </span>
-
-
-
-
-
-      <h1>
-
-        Traditional Elegance <br>
-        With Modern Boutique Style
-
-      </h1>
-
-
-
-
-
-      <p>
-
-        Welcome to RD Advance Boutique,
-        where fashion, creativity, and tailoring
-        expertise come together to create elegant
-        boutique experiences.
-
-      </p>
-
-
-
-
-
-      <div class="hero-buttons">
-
-        <a href="shop.html" class="primary-btn">
-
-          Explore Collection
-
-        </a>
-
-
-
-
-
-        <a href="learn.html" class="secondary-btn">
-
-          Explore Course
-
-        </a>
-
-      </div>
-
-    </div>
-
-
-
-
-
-    <div class="hero-right">
-
-      <img src="assets/hero-bg.jpg" alt="Boutique Fashion">
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- ABOUT SECTION -->
-  <!-- ========================= -->
-
-  <section class="about-section">
-
-    <div class="section-title">
-
-      <h2>
-
-        About RD Advance Boutique
-
-      </h2>
-
-
-
-
-
-      <p>
-
-        Fashion crafted with creativity, perfection & elegance.
-
-      </p>
-
-    </div>
-
-
-
-
-
-    <div class="about-container">
-
-
-
-      <div class="about-image">
-
-        <img src="assets/logo.png" alt="Boutique">
-
-      </div>
-
-
-
-
-
-      <div class="about-content">
-
-        <h3>
-
-          Boutique Fashion With A Personal Touch
-
-        </h3>
-
-
-
-
-
-        <p>
-
-          RD Advance Boutique is built with a passion
-          for premium stitching, elegant fashion,
-          and beautiful handcrafted designs.
-
-        </p>
-
-
-
-
-
-        <p>
-
-          From stylish boutique collections to
-          personalized custom stitching,
-          every outfit is created with attention,
-          creativity, and traditional tailoring expertise.
-
-        </p>
-
-
-
-
-
-        <a href="gallery.html" class="primary-btn">
-
-          View Gallery
-
-        </a>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- WHY CHOOSE US -->
-  <!-- ========================= -->
-
-  <section class="why-section">
-
-    <div class="section-title">
-
-      <h2>
-
-        Why Choose RD Advance?
-
-      </h2>
-
-    </div>
-
-
-
-
-
-    <div class="info-container">
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Premium Stitching
-
-        </h3>
-
-
-
-
-
-        <p>
-
-          Elegant finishing and boutique-level quality.
-
-        </p>
-
-      </div>
-
-
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Custom Fashion
-
-        </h3>
-
-
-
-
-
-        <p>
-
-          Personalized outfits designed for your style.
-
-        </p>
-
-      </div>
-
-
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Modern Boutique
-
-        </h3>
-
-
-
-
-
-        <p>
-
-          Traditional fashion blended with modern elegance.
-
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- SHOP PREVIEW -->
-  <!-- ========================= -->
-
-  <section class="shop-preview">
-
-    <div class="section-title">
-
-      <h2>
-
-        Explore Boutique Collection
-
-      </h2>
-
-
-
-
-
-      <p>
-
-        Discover stylish fashion & handcrafted elegance.
-
-      </p>
-
-    </div>
-
-
-
-
-
-    <div class="gallery-grid">
-
-
-
-      <div class="gallery-card">
-
-        <img src="assets/design1.jpg" alt="">
-
-
-
-        <div class="gallery-overlay">
-
-          <h3>
-
-            Designer Blouses
-
-          </h3>
-
+  <main>
+    <section class="hero" id="home">
+      <div class="hero__content">
+        <p class="eyebrow">Luxury custom tailoring studio</p>
+        <h1>Handcrafted boutique fashion for your signature moments.</h1>
+        <p class="hero__copy">Experience graceful Indian silhouettes, precision stitching, and thoughtful styling designed to make every celebration feel unforgettable.</p>
+        <div class="hero__actions">
+          <a href="shop.html" class="btn btn--primary">Explore Collection</a>
+          <a href="custom.html" class="btn btn--ghost">Start Custom Order</a>
         </div>
-
       </div>
 
+      <div class="hero__card" aria-label="Boutique highlights">
+        <span>Premium Finish</span>
+        <strong>Custom bridal, blouse & occasion wear</strong>
+      </div>
+    </section>
 
+    <section class="section designs" id="designs">
+      <div class="section__intro">
+        <p class="eyebrow">Featured boutique designs</p>
+        <h2>Statement pieces tailored with poise.</h2>
+        <p>Explore refined cuts, delicate detailing, and festive silhouettes crafted for modern elegance.</p>
+      </div>
 
+      <div class="design-grid">
+        <article class="design-card design-card--large">
+          <img src="assets/design1.jpg" alt="Designer blouse with ornate handcrafted details">
+          <div class="design-card__content">
+            <span>Signature Blouses</span>
+            <h3>Intricate neckline and sleeve artistry</h3>
+          </div>
+        </article>
+        <article class="design-card">
+          <img src="assets/design2.jpg" alt="Elegant boutique outfit with premium finish">
+          <div class="design-card__content">
+            <span>Occasion Wear</span>
+            <h3>Graceful designs for celebrations</h3>
+          </div>
+        </article>
+        <article class="design-card">
+          <img src="assets/design3.jpg" alt="Boutique garment with stylish modern tailoring">
+          <div class="design-card__content">
+            <span>Modern Tailoring</span>
+            <h3>Clean silhouettes with luxury fitting</h3>
+          </div>
+        </article>
+        <article class="design-card">
+          <img src="assets/design4.jpg" alt="Detailed boutique fashion design">
+          <div class="design-card__content">
+            <span>Festive Details</span>
+            <h3>Thoughtful embellishment and finishing</h3>
+          </div>
+        </article>
+      </div>
+    </section>
 
-
-      <div class="gallery-card">
-
-        <img src="assets/design2.jpg" alt="">
-
-
-
-        <div class="gallery-overlay">
-
-          <h3>
-
-            Elegant Kurtis
-
-          </h3>
-
+    <section class="section course" id="course">
+      <div class="course__media">
+        <img src="assets/course.jpg" alt="Tailoring course materials and boutique stitching setup">
+      </div>
+      <div class="course__content">
+        <p class="eyebrow">Tailoring course</p>
+        <h2>Learn boutique stitching from basic to advance.</h2>
+        <p>Build professional skills in measuring, cutting, fitting, finishing, and designer construction through practical boutique-focused training.</p>
+        <div class="course-features">
+          <span>Pattern cutting</span>
+          <span>Designer blouse</span>
+          <span>Perfect fitting</span>
+          <span>Finishing skills</span>
         </div>
+        <a href="learn.html" class="btn btn--primary">View Course Details</a>
+      </div>
+    </section>
 
+    <section class="section why" id="why">
+      <div class="section__intro">
+        <p class="eyebrow">Why choose us</p>
+        <h2>Every outfit receives boutique-level attention.</h2>
       </div>
 
+      <div class="why-grid">
+        <article class="why-card">
+          <span>01</span>
+          <h3>Luxury fitting</h3>
+          <p>Measurements are handled with care so each garment sits beautifully and feels comfortable.</p>
+        </article>
+        <article class="why-card">
+          <span>02</span>
+          <h3>Premium finishing</h3>
+          <p>From seams to closures, every detail is refined for a polished boutique look.</p>
+        </article>
+        <article class="why-card">
+          <span>03</span>
+          <h3>Custom creativity</h3>
+          <p>Your inspiration is translated into wearable designs that reflect your taste and occasion.</p>
+        </article>
+      </div>
+    </section>
 
+    <section class="section testimonials" id="testimonials">
+      <div class="section__intro">
+        <p class="eyebrow">Testimonials</p>
+        <h2>Loved for elegance, trusted for fit.</h2>
+      </div>
 
+      <div class="testimonial-grid">
+        <article class="testimonial-card">
+          <p>“The stitching quality is beautiful, and the final fitting looked truly premium.”</p>
+          <h3>Priya Sharma</h3>
+        </article>
+        <article class="testimonial-card testimonial-card--featured">
+          <p>“RD Advance Boutique understood my design perfectly and made it even more elegant.”</p>
+          <h3>Neha Verma</h3>
+        </article>
+        <article class="testimonial-card">
+          <p>“A professional place to learn tailoring and to order stylish custom outfits.”</p>
+          <h3>Ritu Jain</h3>
+        </article>
+      </div>
+    </section>
 
-
-      <div class="gallery-card">
-
-        <img src="assets/design3.jpg" alt="">
-
-
-
-        <div class="gallery-overlay">
-
-          <h3>
-
-            Bridal Collection
-
-          </h3>
-
+    <section class="cta" id="contact">
+      <div class="cta__content">
+        <p class="eyebrow">Ready for your luxury look?</p>
+        <h2>Book a custom consultation or begin your tailoring journey.</h2>
+        <p>Visit RD Advance Boutique in Damoh or connect with us to discuss designs, fittings, courses, and custom orders.</p>
+        <div class="hero__actions">
+          <a href="contact.html" class="btn btn--primary">Contact Us</a>
+          <a href="https://wa.me/917693849472" class="btn btn--ghost">WhatsApp Now</a>
         </div>
-
       </div>
-
-    </div>
-
-
-
-
-
-    <div style="text-align:center; margin-top:40px;">
-
-      <a href="shop.html" class="primary-btn">
-
-        Visit Shop
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- COURSE PREVIEW -->
-  <!-- ========================= -->
-
-  <section class="course-preview">
-
-    <div class="course-section">
-
-
-
-      <div class="course-left">
-
-        <img src="assets/course.jpg" alt="Course">
-
-      </div>
-
-
-
-
-
-      <div class="course-right">
-
-        <span class="course-tag">
-
-          सिलाई सीखें ✂️
-
-        </span>
-
-
-
-
-
-        <h2>
-
-          Learn Boutique Stitching & Designing
-
-        </h2>
-
-
-
-
-
-        <p>
-
-          Join our Basic To Advance tailoring course
-          and learn professional stitching,
-          cutting, fitting, and designing skills.
-
-        </p>
-
-
-
-
-
-        <a href="learn.html" class="primary-btn">
-
-          View Course Details
-
-        </a>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CUSTOM STITCHING -->
-  <!-- ========================= -->
-
-  <section class="custom-stitching-banner">
-
-    <div class="custom-banner-content">
-
-      <h2>
-
-        Want Custom Stitching?
-
-      </h2>
-
-
-
-
-
-      <p>
-
-        Share your favorite design and
-        get premium boutique stitching.
-
-      </p>
-
-
-
-
-
-      <a href="custom.html" class="primary-btn">
-
-        Start Custom Order
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- TESTIMONIALS -->
-  <!-- ========================= -->
-
-  <section class="testimonial-section">
-
-    <div class="section-title">
-
-      <h2>
-
-        Customer Reviews
-
-      </h2>
-
-    </div>
-
-
-
-
-
-    <div class="testimonial-grid">
-
-
-
-      <div class="testimonial-card">
-
-        <p>
-
-          “Beautiful stitching quality and elegant fitting.”
-
-        </p>
-
-
-
-        <h4>
-
-          - Priya Sharma
-
-        </h4>
-
-      </div>
-
-
-
-
-
-      <div class="testimonial-card">
-
-        <p>
-
-          “Boutique collection looks premium and stylish.”
-
-        </p>
-
-
-
-        <h4>
-
-          - Neha Verma
-
-        </h4>
-
-      </div>
-
-
-
-
-
-      <div class="testimonial-card">
-
-        <p>
-
-          “Professional tailoring skills and amazing work.”
-
-        </p>
-
-
-
-        <h4>
-
-          - Ritu Jain
-
-        </h4>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CONTACT CTA -->
-  <!-- ========================= -->
-
-  <section class="shop-contact">
-
-    <div class="contact-card">
-
-      <h2>
-
-        Visit RD Advance Boutique
-
-      </h2>
-
-
-
-
-
-      <p>
-
-        📍 Damoh, Madhya Pradesh
-
-      </p>
-
-
-
-
-
-      <p>
-
-        📞 +91 7693849472
-
-      </p>
-
-
-
-
-
-      <a href="contact.html" class="primary-btn">
-
-        Contact Us
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- FOOTER -->
-  <!-- ========================= -->
+    </section>
+  </main>
 
   <footer class="footer">
+    <div class="footer__brand">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo">
+      <div>
+        <h2>RD Advance Boutique</h2>
+        <p>Luxury tailoring, boutique fashion, and professional stitching courses.</p>
+      </div>
+    </div>
 
-    <p>
+    <div class="footer__links">
+      <a href="shop.html">Shop</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="learn.html">Course</a>
+      <a href="custom.html">Custom Stitching</a>
+    </div>
 
-      © 2026 RD Advance Boutique.
-      All Rights Reserved.
+    <div class="footer__contact">
+      <p>Damoh, Madhya Pradesh</p>
+      <a href="tel:+917693849472">+91 7693849472</a>
+    </div>
 
-    </p>
-
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All rights reserved.</p>
   </footer>
-
 </body>
 </html>
