@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Add Gallery | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD SECTION -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item active">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="admin-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Add Gallery
+
+            </h1>
+
+
+
+            <p>
+
+              Upload boutique fashion collections ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-gallery.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- ADD GALLERY FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Gallery Information
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form class="admin-product-form" id="galleryForm">
+
+
+
+
+
+            <!-- TITLE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Title
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Enter gallery title"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Category
+
+              </label>
+
+
+
+              <select required>
+
+                <option value="">
+
+                  Select Category
+
+                </option>
+
+
+
+                <option>
+
+                  Designer Blouse
+
+                </option>
+
+
+
+                <option>
+
+                  Bridal Collection
+
+                </option>
+
+
+
+                <option>
+
+                  Kurti Design
+
+                </option>
+
+
+
+                <option>
+
+                  Kids Wear
+
+                </option>
+
+
+
+                <option>
+
+                  Boutique Fashion
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- SHORT DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Short Description
+
+              </label>
+
+
+
+              <textarea
+                rows="4"
+                placeholder="Write short gallery description"
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- MULTIPLE IMAGES -->
+
+            <div class="input-group">
+
+              <label>
+
+                Upload Gallery Images
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="galleryImages"
+                multiple
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Multiple boutique images supported.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div
+              class="image-preview-container"
+              id="galleryPreviewContainer"
+            >
+
+
+
+              <!-- PREVIEW IMAGES -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- FEATURED -->
+
+            <div class="input-group">
+
+              <label>
+
+                Featured Gallery
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  No
+
+                </option>
+
+
+
+                <option>
+
+                  Yes
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- TAGS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Tags
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Fashion, Boutique, Elegant etc."
+              >
+
+            </div>
+
+
+
+
+
+            <!-- STATUS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Status
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Active
+
+                </option>
+
+
+
+                <option>
+
+                  Draft
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button type="reset" class="secondary-btn">
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button type="submit" class="primary-btn">
+
+                Publish Gallery
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- GALLERY TIPS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Upload Tips
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                📸 Clear Images
+
+              </h3>
+
+
+
+              <p>
+
+                Upload high quality fashion photos.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Elegant Presentation
+
+              </h3>
+
+
+
+              <p>
+
+                Showcase boutique designs beautifully.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                👗 Organized Categories
+
+              </h3>
+
+
+
+              <p>
+
+                Keep gallery properly categorized.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    const imageInput = document.getElementById(
+
+      "galleryImages"
+
+    );
+
+
+
+
+
+    const previewContainer = document.getElementById(
+
+      "galleryPreviewContainer"
+
+    );
+
+
+
+
+
+    // MULTIPLE IMAGE PREVIEW
+
+    imageInput.addEventListener("change", function(){
+
+      previewContainer.innerHTML = "";
+
+
+
+
+
+      const files = this.files;
+
+
+
+
+
+      for(let i = 0; i < files.length; i++){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement("div");
+
+
+
+          imageBox.classList.add(
+
+            "preview-image-box"
+
+          );
+
+
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Preview">
+
+          `;
+
+
+
+
+
+          previewContainer.appendChild(imageBox);
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(files[i]);
+
+      }
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const galleryForm = document.getElementById(
+
+      "galleryForm"
+
+    );
+
+
+
+
+
+    galleryForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Gallery Published Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Save gallery to database
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Add Gallery Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
