@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Completed Orders | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD SECTION -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="all-orders.html" class="menu-item active">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Completed Orders
+
+            </h1>
+
+
+
+            <p>
+
+              Delivered boutique & readymade fashion orders ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="all-orders.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- ORDER FILTERS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Completed Filters
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="all-products-filters">
+
+
+
+            <input
+              type="text"
+              placeholder="Search completed order..."
+              class="product-search"
+            >
+
+
+
+
+
+            <select class="product-filter-select">
+
+              <option>
+
+                All Order Types
+
+              </option>
+
+
+
+              <option>
+
+                Readymade Clothes
+
+              </option>
+
+
+
+              <option>
+
+                Boutique Product
+
+              </option>
+
+
+
+              <option>
+
+                Affiliate Product
+
+              </option>
+
+
+
+              <option>
+
+                Custom Stitching
+
+              </option>
+
+            </select>
+
+
+
+
+
+            <select class="product-filter-select">
+
+              <option>
+
+                Payment Status
+
+              </option>
+
+
+
+              <option>
+
+                Paid
+
+              </option>
+
+
+
+              <option>
+
+                Delivered
+
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- COMPLETED ORDERS TABLE -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Completed Order List
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="products-table-wrapper">
+
+            <table class="products-table">
+
+
+
+
+
+              <thead>
+
+                <tr>
+
+                  <th>
+
+                    Order ID
+
+                  </th>
+
+
+
+                  <th>
+
+                    Customer
+
+                  </th>
+
+
+
+                  <th>
+
+                    Product
+
+                  </th>
+
+
+
+                  <th>
+
+                    Order Type
+
+                  </th>
+
+
+
+                  <th>
+
+                    Amount
+
+                  </th>
+
+
+
+                  <th>
+
+                    Payment
+
+                  </th>
+
+
+
+                  <th>
+
+                    Delivery Status
+
+                  </th>
+
+
+
+                  <th>
+
+                    Actions
+
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+
+
+
+              <tbody>
+
+
+
+
+
+                <!-- ORDER 1 -->
+
+                <tr>
+
+                  <td>
+
+                    #RD201
+
+                  </td>
+
+
+
+                  <td>
+
+                    Anjali Verma
+
+                  </td>
+
+
+
+                  <td>
+
+                    Premium Kurti Set
+
+                  </td>
+
+
+
+                  <td>
+
+                    Readymade Clothes
+
+                  </td>
+
+
+
+                  <td>
+
+                    ₹2999
+
+                  </td>
+
+
+
+                  <td>
+
+                    Paid
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      Delivered
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Invoice
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- ORDER 2 -->
+
+                <tr>
+
+                  <td>
+
+                    #RD202
+
+                  </td>
+
+
+
+                  <td>
+
+                    Pooja Jain
+
+                  </td>
+
+
+
+                  <td>
+
+                    Bridal Blouse
+
+                  </td>
+
+
+
+                  <td>
+
+                    Boutique Product
+
+                  </td>
+
+
+
+                  <td>
+
+                    ₹4500
+
+                  </td>
+
+
+
+                  <td>
+
+                    Paid
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      Delivered
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Invoice
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- ORDER 3 -->
+
+                <tr>
+
+                  <td>
+
+                    #RD203
+
+                  </td>
+
+
+
+                  <td>
+
+                    Sneha Sharma
+
+                  </td>
+
+
+
+                  <td>
+
+                    Custom Lehenga Stitching
+
+                  </td>
+
+
+
+                  <td>
+
+                    Custom Stitching
+
+                  </td>
+
+
+
+                  <td>
+
+                    ₹12000
+
+                  </td>
+
+
+
+                  <td>
+
+                    Paid
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      Delivered
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Invoice
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- FUTURE DATABASE ORDERS -->
+
+
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- COMPLETED ANALYTICS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Delivery Analytics
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="analytics-grid">
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Total Delivered
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Completed Orders
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Readymade Delivered
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Fashion Deliveries
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Boutique Delivered
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Boutique Orders
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Stitching Completed
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Tailoring Orders
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- CUSTOMER EXPERIENCE -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Customer Experience
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💖 Happy Customers
+
+              </h3>
+
+
+
+              <p>
+
+                Premium boutique experience
+                builds loyal customers.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                🚚 Fast Delivery
+
+              </h3>
+
+
+
+              <p>
+
+                Quick delivery improves
+                customer satisfaction.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Luxury Fashion
+
+              </h3>
+
+
+
+              <p>
+
+                Elegant finishing creates
+                premium brand image.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    // INVOICE BUTTON
+
+    const invoiceButtons = document.querySelectorAll(
+
+      ".primary-btn"
+
+    );
+
+
+
+
+
+    invoiceButtons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        if(button.innerText === "Invoice"){
+
+          alert(
+
+            "Invoice Download Started ✨"
+
+          );
+
+
+
+
+
+          // FUTURE:
+          // Generate PDF invoice
+
+        }
+
+      });
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Completed Orders Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
