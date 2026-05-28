@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Edit Gallery | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD SECTION -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item active">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="admin-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Edit Gallery
+
+            </h1>
+
+
+
+            <p>
+
+              Update boutique gallery collections ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-gallery.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- SEARCH GALLERY -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Find Gallery
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="search-product-box">
+
+            <input
+              type="text"
+              placeholder="Search gallery by title..."
+              id="searchGallery"
+            >
+
+
+
+            <button class="primary-btn">
+
+              Search
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- GALLERY LIST -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Gallery Collection
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="gallery-preview-grid">
+
+
+
+
+
+            <!-- GALLERY CARD -->
+
+            <div class="gallery-preview-card">
+
+
+
+              <img
+                src="assets/gallery/design1.jpg"
+                alt="Gallery"
+              >
+
+
+
+
+
+              <div class="gallery-preview-content">
+
+                <h3>
+
+                  Designer Blouse
+
+                </h3>
+
+
+
+                <p>
+
+                  Boutique Collection
+
+                </p>
+
+
+
+
+
+                <div class="table-action-buttons">
+
+                  <button class="edit-btn">
+
+                    Edit
+
+                  </button>
+
+
+
+
+
+                  <button class="delete-btn">
+
+                    Delete
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+
+
+            <!-- GALLERY CARD -->
+
+            <div class="gallery-preview-card">
+
+
+
+              <img
+                src="assets/gallery/design2.jpg"
+                alt="Gallery"
+              >
+
+
+
+
+
+              <div class="gallery-preview-content">
+
+                <h3>
+
+                  Modern Kurti
+
+                </h3>
+
+
+
+                <p>
+
+                  Fashion Design
+
+                </p>
+
+
+
+
+
+                <div class="table-action-buttons">
+
+                  <button class="edit-btn">
+
+                    Edit
+
+                  </button>
+
+
+
+
+
+                  <button class="delete-btn">
+
+                    Delete
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- EDIT FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Update Gallery Details
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form class="admin-product-form" id="editGalleryForm">
+
+
+
+
+
+            <!-- TITLE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Title
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Update gallery title"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Category
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Select Category
+
+                </option>
+
+
+
+                <option>
+
+                  Designer Blouse
+
+                </option>
+
+
+
+                <option>
+
+                  Kurti Design
+
+                </option>
+
+
+
+                <option>
+
+                  Bridal Collection
+
+                </option>
+
+
+
+                <option>
+
+                  Kids Wear
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Description
+
+              </label>
+
+
+
+              <textarea
+                rows="5"
+                placeholder="Update gallery description"
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- MULTIPLE IMAGES -->
+
+            <div class="input-group">
+
+              <label>
+
+                Update Gallery Images
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="editGalleryImages"
+                multiple
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Multiple boutique images supported.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div
+              class="image-preview-container"
+              id="editGalleryPreviewContainer"
+            >
+
+
+
+              <!-- IMAGE PREVIEW -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- FEATURED -->
+
+            <div class="input-group">
+
+              <label>
+
+                Featured Gallery
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  No
+
+                </option>
+
+
+
+                <option>
+
+                  Yes
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- TAGS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Tags
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Fashion, Elegant, Boutique etc."
+              >
+
+            </div>
+
+
+
+
+
+            <!-- STATUS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Gallery Status
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Active
+
+                </option>
+
+
+
+                <option>
+
+                  Draft
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button
+                type="reset"
+                class="secondary-btn"
+              >
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+
+                Save Changes
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- QUICK TIPS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Gallery Editing Tips
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                📸 Replace Old Images
+
+              </h3>
+
+
+
+              <p>
+
+                Update fashion images regularly
+                for fresh boutique presentation.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Keep Gallery Organized
+
+              </h3>
+
+
+
+              <p>
+
+                Use proper categories and titles.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                👗 Highlight Best Designs
+
+              </h3>
+
+
+
+              <p>
+
+                Mark premium collections as featured.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    const imageInput = document.getElementById(
+
+      "editGalleryImages"
+
+    );
+
+
+
+
+
+    const previewContainer = document.getElementById(
+
+      "editGalleryPreviewContainer"
+
+    );
+
+
+
+
+
+    // MULTIPLE IMAGE PREVIEW
+
+    imageInput.addEventListener("change", function(){
+
+      previewContainer.innerHTML = "";
+
+
+
+
+
+      const files = this.files;
+
+
+
+
+
+      for(let i = 0; i < files.length; i++){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement("div");
+
+
+
+          imageBox.classList.add(
+
+            "preview-image-box"
+
+          );
+
+
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Preview">
+
+          `;
+
+
+
+
+
+          previewContainer.appendChild(imageBox);
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(files[i]);
+
+      }
+
+    });
+
+
+
+
+
+    // DELETE GALLERY
+
+    const deleteButtons = document.querySelectorAll(
+
+      ".delete-btn"
+
+    );
+
+
+
+
+
+    deleteButtons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const confirmDelete = confirm(
+
+          "Are you sure you want to delete this gallery image?"
+
+        );
+
+
+
+
+
+        if(confirmDelete){
+
+          alert(
+
+            "Gallery Deleted Successfully ✨"
+
+          );
+
+        }
+
+      });
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const editGalleryForm = document.getElementById(
+
+      "editGalleryForm"
+
+    );
+
+
+
+
+
+    editGalleryForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Gallery Updated Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Update gallery in database
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Edit Gallery Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
