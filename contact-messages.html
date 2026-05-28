@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Contact Messages | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="all-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-categories.html" class="menu-item">
+
+            📂 Categories
+
+          </a>
+
+
+
+
+
+          <a href="admin-contact.html" class="menu-item active">
+
+            📞 Contact
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Contact Messages
+
+            </h1>
+
+
+
+            <p>
+
+              Manage customer enquiries & boutique messages ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-contact.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- FILTERS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Message Filters
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="all-products-filters">
+
+
+
+            <input
+              type="text"
+              placeholder="Search customer message..."
+              class="product-search"
+            >
+
+
+
+
+
+            <select class="product-filter-select">
+
+              <option>
+
+                All Message Types
+
+              </option>
+
+
+
+              <option>
+
+                Product Enquiry
+
+              </option>
+
+
+
+              <option>
+
+                Stitching Request
+
+              </option>
+
+
+
+              <option>
+
+                Course Enquiry
+
+              </option>
+
+
+
+              <option>
+
+                Support Message
+
+              </option>
+
+            </select>
+
+
+
+
+
+            <select class="product-filter-select">
+
+              <option>
+
+                Message Status
+
+              </option>
+
+
+
+              <option>
+
+                New
+
+              </option>
+
+
+
+              <option>
+
+                Replied
+
+              </option>
+
+
+
+              <option>
+
+                Pending
+
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- CONTACT MESSAGES TABLE -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Customer Messages
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="products-table-wrapper">
+
+            <table class="products-table">
+
+
+
+
+
+              <thead>
+
+                <tr>
+
+                  <th>
+
+                    Message ID
+
+                  </th>
+
+
+
+                  <th>
+
+                    Customer Name
+
+                  </th>
+
+
+
+                  <th>
+
+                    Contact
+
+                  </th>
+
+
+
+                  <th>
+
+                    Subject
+
+                  </th>
+
+
+
+                  <th>
+
+                    Message Type
+
+                  </th>
+
+
+
+                  <th>
+
+                    Status
+
+                  </th>
+
+
+
+                  <th>
+
+                    Actions
+
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+
+
+
+              <tbody>
+
+
+
+
+
+                <!-- MESSAGE 1 -->
+
+                <tr>
+
+                  <td>
+
+                    #MSG101
+
+                  </td>
+
+
+
+                  <td>
+
+                    Priya Sharma
+
+                  </td>
+
+
+
+                  <td>
+
+                    +91 9876543210
+
+                  </td>
+
+
+
+                  <td>
+
+                    Designer Kurti Enquiry
+
+                  </td>
+
+
+
+                  <td>
+
+                    Product Enquiry
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      New
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Reply
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- MESSAGE 2 -->
+
+                <tr>
+
+                  <td>
+
+                    #MSG102
+
+                  </td>
+
+
+
+                  <td>
+
+                    Neha Jain
+
+                  </td>
+
+
+
+                  <td>
+
+                    +91 9988776655
+
+                  </td>
+
+
+
+                  <td>
+
+                    Bridal Stitching Request
+
+                  </td>
+
+
+
+                  <td>
+
+                    Stitching Request
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      Pending
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Reply
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- MESSAGE 3 -->
+
+                <tr>
+
+                  <td>
+
+                    #MSG103
+
+                  </td>
+
+
+
+                  <td>
+
+                    Riya Verma
+
+                  </td>
+
+
+
+                  <td>
+
+                    +91 9123456789
+
+                  </td>
+
+
+
+                  <td>
+
+                    Tailoring Course Details
+
+                  </td>
+
+
+
+                  <td>
+
+                    Course Enquiry
+
+                  </td>
+
+
+
+                  <td>
+
+                    <span class="status-active">
+
+                      Replied
+
+                    </span>
+
+                  </td>
+
+
+
+                  <td>
+
+                    <div class="table-action-buttons">
+
+                      <button class="edit-btn">
+
+                        View
+
+                      </button>
+
+
+
+                      <button class="primary-btn">
+
+                        Reply
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+
+
+
+
+                <!-- FUTURE DATABASE MESSAGES -->
+
+
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- MESSAGE ANALYTICS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Message Analytics
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="analytics-grid">
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Total Messages
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Customer Enquiries
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                New Messages
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Awaiting Response
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Replied Messages
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Completed Conversations
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="analytics-card">
+
+              <h3>
+
+                Support Requests
+
+              </h3>
+
+
+
+              <h2>
+
+                0
+
+              </h2>
+
+
+
+              <p>
+
+                Customer Support Cases
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- SUPPORT NOTES -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Communication Notes
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💬 Fast Replies
+
+              </h3>
+
+
+
+              <p>
+
+                Quick customer responses
+                increase trust & engagement.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Professional Tone
+
+              </h3>
+
+
+
+              <p>
+
+                Friendly communication improves
+                boutique reputation.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💖 Better Support
+
+              </h3>
+
+
+
+              <p>
+
+                Positive support experience
+                creates repeat customers.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    // REPLY BUTTON
+
+    const replyButtons = document.querySelectorAll(
+
+      ".primary-btn"
+
+    );
+
+
+
+
+
+    replyButtons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        if(button.innerText === "Reply"){
+
+          alert(
+
+            "Reply Window Opening ✨"
+
+          );
+
+
+
+
+
+          // FUTURE:
+          // Open customer reply modal
+
+        }
+
+      });
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Contact Messages Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
