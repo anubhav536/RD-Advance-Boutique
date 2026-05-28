@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Login | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- LOGIN SECTION -->
+  <!-- ========================= -->
+
+  <section class="admin-login-section">
+
+    <div class="admin-login-container">
+
+
+
+      <!-- LEFT SIDE -->
+
+      <div class="admin-left">
+
+
+
+        <img src="assets/logo.png" alt="RD Logo" class="admin-logo">
+        
+        
+
+
+
+        <h1>
+
+          RD Advance Boutique
+
+        </h1>
+
+
+
+        <p>
+
+          Admin Dashboard Access
+
+        </p>
+
+
+
+        
+
+      </div>
+
+
+
+
+
+      <!-- RIGHT SIDE -->
+
+      <div class="admin-right">
+
+
+
+        <div class="admin-form-box">
+
+          <span class="admin-tag">
+
+            Secure Login
+
+          </span>
+
+
+
+          <h2>
+
+            Welcome Back 👋
+
+          </h2>
+
+
+
+          <p>
+
+            Login to manage boutique products,
+            orders, gallery and course details.
+
+          </p>
+
+
+
+
+
+          <!-- LOGIN FORM -->
+
+          <form id="adminLoginForm">
+
+
+
+            <!-- EMAIL -->
+
+            <div class="input-group">
+
+              <label>
+
+                Email Address
+
+              </label>
+
+
+
+              <input
+                type="email"
+                placeholder="Enter admin email"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- PASSWORD -->
+
+            <div class="input-group">
+
+              <label>
+
+                Password
+
+              </label>
+
+
+
+              <input
+                type="password"
+                placeholder="Enter password"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- REMEMBER -->
+
+            <div class="remember-box">
+
+              <label>
+
+                <input type="checkbox">
+
+                Remember Me
+
+              </label>
+
+
+
+              <a href="#">
+
+                Forgot Password?
+
+              </a>
+
+            </div>
+
+
+
+
+
+            <!-- BUTTON -->
+
+            <button type="submit" class="primary-btn admin-btn">
+
+              Login To Dashboard
+
+            </button>
+
+          </form>
+
+
+
+
+
+          <!-- DASHBOARD INFO -->
+
+          <div class="admin-info">
+
+
+
+            <div class="admin-info-card">
+
+              <h3>
+
+                Manage Products
+
+              </h3>
+
+            </div>
+
+
+
+
+
+            <div class="admin-info-card">
+
+              <h3>
+
+                Update Gallery
+
+              </h3>
+
+            </div>
+
+
+
+
+
+            <div class="admin-info-card">
+
+              <h3>
+
+                Manage Courses
+
+              </h3>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- LOGIN SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    const loginForm = document.getElementById("adminLoginForm");
+
+
+
+
+
+    loginForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Admin Login Successful ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Redirect to dashboard
+
+      // window.location.href = "admin-dashboard.html";
+
+    });
+
+  </script>
+
+</body>
+</html>
