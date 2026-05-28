@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Edit Category | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="all-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-categories.html" class="menu-item active">
+
+            📂 Categories
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Edit Category
+
+            </h1>
+
+
+
+            <p>
+
+              Update boutique category details ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-categories.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- SEARCH CATEGORY -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Find Category
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="search-product-box">
+
+            <input
+              type="text"
+              placeholder="Search category by name..."
+              id="searchCategory"
+            >
+
+
+
+            <button class="primary-btn">
+
+              Search
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- CATEGORY LIST -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Available Categories
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+
+
+            <!-- CATEGORY CARD -->
+
+            <div class="overview-card">
+
+              <h3>
+
+                👗 Designer Blouse
+
+              </h3>
+
+
+
+              <p>
+
+                Premium blouse fashion category.
+
+              </p>
+
+
+
+
+
+              <div class="table-action-buttons">
+
+                <button class="edit-btn">
+
+                  Edit
+
+                </button>
+
+
+
+                <button class="delete-btn">
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY CARD -->
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Bridal Collection
+
+              </h3>
+
+
+
+              <p>
+
+                Elegant bridal wear category.
+
+              </p>
+
+
+
+
+
+              <div class="table-action-buttons">
+
+                <button class="edit-btn">
+
+                  Edit
+
+                </button>
+
+
+
+                <button class="delete-btn">
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY CARD -->
+
+            <div class="overview-card">
+
+              <h3>
+
+                🧵 Custom Stitching
+
+              </h3>
+
+
+
+              <p>
+
+                Tailoring & stitching category.
+
+              </p>
+
+
+
+
+
+              <div class="table-action-buttons">
+
+                <button class="edit-btn">
+
+                  Edit
+
+                </button>
+
+
+
+                <button class="delete-btn">
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- EDIT CATEGORY FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Update Category Details
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form
+            class="admin-product-form"
+            id="editCategoryForm"
+          >
+
+
+
+
+
+            <!-- CATEGORY NAME -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Name
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Update category name"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY SLUG -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Slug
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="update-category-slug"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Description
+
+              </label>
+
+
+
+              <textarea
+                rows="5"
+                placeholder="Update category description"
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY IMAGE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Update Category Image
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="editCategoryImage"
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Upload new category image.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div
+              class="image-preview-container"
+              id="editPreviewContainer"
+            >
+
+
+
+              <!-- IMAGE PREVIEW -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- FEATURED -->
+
+            <div class="input-group">
+
+              <label>
+
+                Featured Category
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  No
+
+                </option>
+
+
+
+                <option>
+
+                  Yes
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- STATUS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Status
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Active
+
+                </option>
+
+
+
+                <option>
+
+                  Hidden
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button
+                type="reset"
+                class="secondary-btn"
+              >
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+
+                Save Changes
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- MANAGEMENT NOTES -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Editing Tips
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                📂 Maintain Structure
+
+              </h3>
+
+
+
+              <p>
+
+                Keep category names
+                clean and organized.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Use Attractive Covers
+
+              </h3>
+
+
+
+              <p>
+
+                Premium category images
+                improve user engagement.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💖 Better Navigation
+
+              </h3>
+
+
+
+              <p>
+
+                Proper categories help
+                customers shop faster.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    // IMAGE PREVIEW
+
+    const imageInput = document.getElementById(
+
+      "editCategoryImage"
+
+    );
+
+
+
+
+
+    const previewContainer = document.getElementById(
+
+      "editPreviewContainer"
+
+    );
+
+
+
+
+
+    imageInput.addEventListener("change", function(){
+
+      previewContainer.innerHTML = "";
+
+
+
+
+
+      const file = this.files[0];
+
+
+
+
+
+      if(file){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement(
+
+            "div"
+
+          );
+
+
+
+
+
+          imageBox.classList.add(
+
+            "preview-image-box"
+
+          );
+
+
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Preview">
+
+          `;
+
+
+
+
+
+          previewContainer.appendChild(
+
+            imageBox
+
+          );
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(file);
+
+      }
+
+    });
+
+
+
+
+
+    // DELETE BUTTON
+
+    const deleteButtons = document.querySelectorAll(
+
+      ".delete-btn"
+
+    );
+
+
+
+
+
+    deleteButtons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const confirmDelete = confirm(
+
+          "Are you sure you want to delete this category?"
+
+        );
+
+
+
+
+
+        if(confirmDelete){
+
+          alert(
+
+            "Category Deleted Successfully ✨"
+
+          );
+
+        }
+
+      });
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const editCategoryForm = document.getElementById(
+
+      "editCategoryForm"
+
+    );
+
+
+
+
+
+    editCategoryForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Category Updated Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Update category in database
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Edit Category Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
