@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Add Category | RD Advance Boutique</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- DASHBOARD -->
+  <!-- ========================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================= -->
+
+      <div class="dashboard-sidebar">
+
+
+
+        <div class="dashboard-logo">
+
+          <img src="assets/logo.png" alt="Logo">
+
+
+
+          <h2>
+
+            RD Advance
+
+          </h2>
+
+
+
+          <p>
+
+            Admin Panel
+
+          </p>
+
+        </div>
+
+
+
+
+
+        <div class="dashboard-menu">
+
+
+
+          <a href="admin-dashboard.html" class="menu-item">
+
+            📊 Dashboard
+
+          </a>
+
+
+
+
+
+          <a href="admin-products.html" class="menu-item">
+
+            🛍 Products
+
+          </a>
+
+
+
+
+
+          <a href="admin-gallery.html" class="menu-item">
+
+            🖼 Gallery
+
+          </a>
+
+
+
+
+
+          <a href="all-orders.html" class="menu-item">
+
+            📦 Orders
+
+          </a>
+
+
+
+
+
+          <a href="admin-course.html" class="menu-item">
+
+            ✂️ Course
+
+          </a>
+
+
+
+
+
+          <a href="admin-categories.html" class="menu-item active">
+
+            📂 Categories
+
+          </a>
+
+
+
+
+
+          <a href="admin-settings.html" class="menu-item">
+
+            ⚙ Settings
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ========================= -->
+
+      <div class="dashboard-main">
+
+
+
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+          <div>
+
+            <h1>
+
+              Add Category
+
+            </h1>
+
+
+
+            <p>
+
+              Create boutique product categories ✨
+
+            </p>
+
+          </div>
+
+
+
+
+
+          <a href="admin-categories.html" class="primary-btn">
+
+            Back
+
+          </a>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- CATEGORY FORM -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Category Information
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <form
+            class="admin-product-form"
+            id="categoryForm"
+          >
+
+
+
+
+
+            <!-- CATEGORY NAME -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Name
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="Enter category name"
+                required
+              >
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY SLUG -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Slug
+
+              </label>
+
+
+
+              <input
+                type="text"
+                placeholder="designer-blouse"
+              >
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY DESCRIPTION -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Description
+
+              </label>
+
+
+
+              <textarea
+                rows="5"
+                placeholder="Write category description"
+              ></textarea>
+
+            </div>
+
+
+
+
+
+            <!-- CATEGORY IMAGE -->
+
+            <div class="input-group">
+
+              <label>
+
+                Upload Category Image
+
+              </label>
+
+
+
+              <input
+                type="file"
+                id="categoryImage"
+                accept="image/*"
+              >
+
+
+
+              <small>
+
+                Upload category cover image.
+
+              </small>
+
+            </div>
+
+
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div
+              class="image-preview-container"
+              id="imagePreviewContainer"
+            >
+
+
+
+              <!-- IMAGE PREVIEW -->
+
+
+
+            </div>
+
+
+
+
+
+            <!-- FEATURED CATEGORY -->
+
+            <div class="input-group">
+
+              <label>
+
+                Featured Category
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  No
+
+                </option>
+
+
+
+                <option>
+
+                  Yes
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- DISPLAY STATUS -->
+
+            <div class="input-group">
+
+              <label>
+
+                Category Status
+
+              </label>
+
+
+
+              <select>
+
+                <option>
+
+                  Active
+
+                </option>
+
+
+
+                <option>
+
+                  Hidden
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="admin-form-buttons">
+
+
+
+              <button
+                type="reset"
+                class="secondary-btn"
+              >
+
+                Reset
+
+              </button>
+
+
+
+
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+
+                Create Category
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+
+        <!-- ========================= -->
+        <!-- CATEGORY TIPS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <h2>
+
+              Category Tips
+
+            </h2>
+
+          </div>
+
+
+
+
+
+          <div class="overview-content">
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                📂 Clear Naming
+
+              </h3>
+
+
+
+              <p>
+
+                Use simple and attractive
+                category names.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                ✨ Premium Images
+
+              </h3>
+
+
+
+              <p>
+
+                High quality category covers
+                improve presentation.
+
+              </p>
+
+            </div>
+
+
+
+
+
+            <div class="overview-card">
+
+              <h3>
+
+                💖 Better Shopping
+
+              </h3>
+
+
+
+              <p>
+
+                Organized categories create
+                smooth shopping experience.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- SCRIPT -->
+  <!-- ========================= -->
+
+  <script>
+
+    // IMAGE PREVIEW
+
+    const imageInput = document.getElementById(
+
+      "categoryImage"
+
+    );
+
+
+
+
+
+    const previewContainer = document.getElementById(
+
+      "imagePreviewContainer"
+
+    );
+
+
+
+
+
+    imageInput.addEventListener("change", function(){
+
+      previewContainer.innerHTML = "";
+
+
+
+
+
+      const file = this.files[0];
+
+
+
+
+
+      if(file){
+
+        const reader = new FileReader();
+
+
+
+
+
+        reader.onload = function(e){
+
+          const imageBox = document.createElement(
+
+            "div"
+
+          );
+
+
+
+
+
+          imageBox.classList.add(
+
+            "preview-image-box"
+
+          );
+
+
+
+
+
+          imageBox.innerHTML = `
+
+            <img src="${e.target.result}" alt="Preview">
+
+          `;
+
+
+
+
+
+          previewContainer.appendChild(
+
+            imageBox
+
+          );
+
+        };
+
+
+
+
+
+        reader.readAsDataURL(file);
+
+      }
+
+    });
+
+
+
+
+
+    // FORM SUBMIT
+
+    const categoryForm = document.getElementById(
+
+      "categoryForm"
+
+    );
+
+
+
+
+
+    categoryForm.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+
+
+
+
+      alert(
+
+        "Category Created Successfully ✨"
+
+      );
+
+
+
+
+
+      // FUTURE:
+      // Save category in database
+
+    });
+
+
+
+
+
+    console.log(
+
+      "Add Category Panel Loaded ✨"
+
+    );
+
+  </script>
+
+</body>
+</html>
