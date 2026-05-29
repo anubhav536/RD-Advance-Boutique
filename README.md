@@ -51,6 +51,20 @@ Products are stored in `data/products.json` and exposed through dedicated backen
 
 Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product statuses are `active`, `draft`, `inactive`, and `out-of-stock`.
 
+### Gallery management endpoints
+
+Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes:
+
+- `GET /api/v1/gallery` lists gallery images with optional `search`, `category`, `layout`, and `featured` filters.
+- `POST /api/v1/gallery` adds a gallery image with title, category, image URL/path, alt text, layout, featured status, tags, description, and sort order.
+- `GET /api/v1/gallery/:id` returns one gallery image.
+- `PUT|PATCH /api/v1/gallery/:id` edits gallery image information.
+- `DELETE /api/v1/gallery/:id` deletes a gallery image.
+- `GET /api/v1/gallery/categories` returns gallery categories with image and featured counts.
+- `GET /api/v1/gallery/featured` returns featured gallery images.
+
+Valid gallery layouts are `default`, `wide`, and `tall`. Gallery categories are derived from `data/gallery.json`, so no separate gallery category file is required.
+
 ### Available endpoints
 
 - `GET /api/v1/health` returns the current API health status.
