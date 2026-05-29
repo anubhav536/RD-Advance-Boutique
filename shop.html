@@ -36,40 +36,79 @@
   <main>
     <section class="shop-hero" aria-labelledby="shop-title">
       <div class="shop-hero__content">
-        <p class="eyebrow">Curated luxury boutique</p>
-        <h1 id="shop-title">Shop refined fashion made for memorable moments.</h1>
-        <p>Browse boutique-ready silhouettes, premium custom stitching inspiration, and upcoming collections designed with graceful detail.</p>
+        <p class="eyebrow">Luxury fashion ecommerce</p>
+        <h1 id="shop-title">Shop premium ready-made fashion and custom boutique couture.</h1>
+        <p>Explore a fashion-store experience built for future product launches: ready-made outfits, accessories, bridal edits, and made-to-measure boutique services in a black, pink, and gold luxury aesthetic.</p>
         <div class="shop-hero__actions">
-          <a href="#shop-products" class="btn btn--primary">Explore Shop</a>
-          <a href="custom.html" class="btn btn--ghost">Custom Order</a>
+          <a href="#shop-products" class="btn btn--primary">Explore Products</a>
+          <a href="#boutique-collection" class="btn btn--ghost">Custom Collection</a>
         </div>
       </div>
 
       <aside class="shop-hero__panel" aria-label="Shop highlights">
-        <span>New season preview</span>
-        <strong>Blouses, kurtis, bridal edits & occasion wear.</strong>
-        <p>Products will connect dynamically from the admin panel soon.</p>
+        <span>Admin-ready storefront</span>
+        <strong>Ready-made collections, bridal couture & premium tailoring.</strong>
+        <p>Empty product cards are prepared for future JSON, database, or admin-panel products.</p>
       </aside>
+    </section>
+
+    <section class="collection-sections" aria-label="Main shopping sections">
+      <article class="collection-panel collection-panel--ready" id="ready-made-collection">
+        <div class="collection-panel__header">
+          <p class="eyebrow">Ready-Made Collection</p>
+          <h2>Luxury fashion ready to wear.</h2>
+          <p>Structured for everyday edits, occasionwear, family shopping, and premium accessories.</p>
+        </div>
+        <ul class="collection-chip-list" aria-label="Ready-Made Collection categories">
+          <li>Men</li>
+          <li>Women</li>
+          <li>Kids</li>
+          <li>Ethnic Wear</li>
+          <li>Casual Wear</li>
+          <li>Party Wear</li>
+          <li>Winter Wear</li>
+          <li>Accessories</li>
+        </ul>
+      </article>
+
+      <article class="collection-panel collection-panel--boutique" id="boutique-collection">
+        <div class="collection-panel__header">
+          <p class="eyebrow">Boutique Custom Collection</p>
+          <h2>Designed, stitched, and finished for you.</h2>
+          <p>Built for future custom orders, consultation-led products, and premium tailoring services.</p>
+        </div>
+        <ul class="collection-chip-list" aria-label="Boutique Custom Collection categories">
+          <li>Custom Blouse Designs</li>
+          <li>Designer Suits</li>
+          <li>Bridal Wear</li>
+          <li>Boutique Dresses</li>
+          <li>Custom Stitching</li>
+          <li>Premium Tailoring</li>
+        </ul>
+      </article>
     </section>
 
     <section class="shop-toolbar" aria-label="Shop search and filters">
       <div class="shop-toolbar__intro">
         <p class="eyebrow">Collection room</p>
-        <h2>Find your signature piece.</h2>
+        <h2>Filter the complete fashion store.</h2>
+        <p>Products are intentionally empty today and will be populated dynamically later.</p>
       </div>
 
       <div class="shop-search" role="search">
         <label class="sr-only" for="productSearch">Search products</label>
         <span aria-hidden="true">⌕</span>
-        <input id="productSearch" type="search" placeholder="Search blouses, bridal, kurtis..." autocomplete="off">
+        <input id="productSearch" type="search" placeholder="Search men, bridal, accessories, tailoring..." autocomplete="off">
       </div>
 
       <div class="category-filter" role="list" aria-label="Product categories">
-        <button class="filter-btn active" type="button" data-category="all" role="listitem">All</button>
-        <button class="filter-btn" type="button" data-category="blouses" role="listitem">Blouses</button>
-        <button class="filter-btn" type="button" data-category="kurtis" role="listitem">Kurtis</button>
+        <button class="filter-btn active" type="button" data-category="all" role="listitem">All Products</button>
+        <button class="filter-btn" type="button" data-category="ready-made" role="listitem">Ready-Made</button>
+        <button class="filter-btn" type="button" data-category="boutique" role="listitem">Boutique</button>
+        <button class="filter-btn" type="button" data-category="men" role="listitem">Men</button>
+        <button class="filter-btn" type="button" data-category="women" role="listitem">Women</button>
+        <button class="filter-btn" type="button" data-category="kids" role="listitem">Kids</button>
         <button class="filter-btn" type="button" data-category="bridal" role="listitem">Bridal</button>
-        <button class="filter-btn" type="button" data-category="kids-wear" role="listitem">Kids Wear</button>
         <button class="filter-btn" type="button" data-category="accessories" role="listitem">Accessories</button>
       </div>
     </section>
@@ -77,21 +116,21 @@
     <section class="products-section" id="shop-products" aria-labelledby="products-title">
       <div class="products-section__header">
         <div>
-          <p class="eyebrow">Boutique selection</p>
-          <h2 id="products-title">Luxury product gallery</h2>
+          <p class="eyebrow">Dynamic storefront</p>
+          <h2 id="products-title">Empty product cards ready for launch</h2>
         </div>
         <p id="productCount" aria-live="polite">Preparing collection</p>
       </div>
 
-      <div class="product-grid" id="productGrid">
-        <!-- Dynamic product cards render here. -->
+      <div class="product-grid" id="productGrid" aria-live="polite">
+        <!-- Empty dynamic product cards render here from js/script.js. -->
       </div>
 
       <div class="empty-products" id="emptyProducts" aria-live="polite">
         <div class="empty-box">
           <img src="assets/logo.png" alt="RD Advance Boutique emblem">
-          <h2>New fashion collection coming soon.</h2>
-          <p>Empty product cards are ready now; live products will appear here automatically once connected.</p>
+          <h2>Products are empty for now.</h2>
+          <p>The storefront is ready for future admin-added products with image, name, category, price, discount price, stock status, and view details support.</p>
           <a href="https://wa.me/917693849472" class="btn btn--primary">Ask on WhatsApp</a>
         </div>
       </div>
@@ -100,26 +139,26 @@
     <section class="shop-info" aria-label="Boutique promises">
       <article class="info-card">
         <span>01</span>
-        <h3>Premium Quality</h3>
-        <p>Elegant stitching, neat finishing, and carefully selected boutique detailing.</p>
+        <h3>Premium Ecommerce Feel</h3>
+        <p>Luxury storefront layouts, category browsing, product status details, and polished shopping actions.</p>
       </article>
       <article class="info-card">
         <span>02</span>
-        <h3>Custom Fashion</h3>
-        <p>Personalized outfits shaped around your occasion, measurements, and style.</p>
+        <h3>Ready for Admin Products</h3>
+        <p>Card slots are prepared to receive future JSON/database products without changing the visual system.</p>
       </article>
       <article class="info-card">
         <span>03</span>
-        <h3>Modern Boutique</h3>
-        <p>Traditional craft blended with modern silhouettes and luxury presentation.</p>
+        <h3>Custom Boutique Fashion</h3>
+        <p>Ready-made collections sit beside bespoke bridal, blouse, tailoring, and stitching categories.</p>
       </article>
     </section>
 
     <section class="custom-stitching-banner">
       <div class="custom-banner-content">
         <p class="eyebrow">Bespoke appointment</p>
-        <h2>Want custom stitching?</h2>
-        <p>Share your favorite design and get premium boutique stitching for your next celebration.</p>
+        <h2>Need a custom fashion consultation?</h2>
+        <p>Share your design inspiration and prepare for premium boutique stitching, bridal finishing, suits, dresses, or tailoring.</p>
         <a href="custom.html" class="btn btn--primary">Start Custom Order</a>
       </div>
     </section>
@@ -153,7 +192,6 @@
     <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
   </footer>
 
-  <script src="products.js" defer></script>
   <script src="js/script.js" defer></script>
 </body>
 </html>
