@@ -1,0 +1,56 @@
+[
+  {
+    "id": "designer-blouse",
+    "title": "Designer Blouse",
+    "category": "Blouses",
+    "price": 1499,
+    "image": "assets/design1.jpg",
+    "description": "Premium boutique blouse inspiration with refined detailing for festive styling.",
+    "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Designer%20Blouse"
+  },
+  {
+    "id": "boutique-kurti",
+    "title": "Boutique Kurti",
+    "category": "Kurtis",
+    "price": 1899,
+    "image": "assets/design2.jpg",
+    "description": "Graceful custom-stitched kurti silhouette designed for everyday elegance.",
+    "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Boutique%20Kurti"
+  },
+  {
+    "id": "bridal-collection",
+    "title": "Bridal Collection Edit",
+    "category": "Bridal",
+    "price": "On request",
+    "image": "assets/design3.jpg",
+    "description": "Occasion-ready bridal inspiration with luxury finishing and custom-fit support.",
+    "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Bridal%20Collection%20Edit"
+  },
+  {
+    "id": "little-occasion-wear",
+    "title": "Little Occasion Wear",
+    "category": "Kids Wear",
+    "price": 999,
+    "image": "assets/design4.jpg",
+    "description": "Soft, polished kids wear design for celebrations, birthdays, and family events.",
+    "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Little%20Occasion%20Wear"
+  },
+  {
+    "id": "custom-stitching",
+    "title": "Custom Stitching Package",
+    "category": "Blouses",
+    "price": "On request",
+    "image": "assets/design5.jpg",
+    "description": "Personalized stitching package shaped around your preferred fabric, fit, and finish.",
+    "link": "custom.html"
+  },
+  {
+    "id": "boutique-accessory-set",
+    "title": "Boutique Accessory Set",
+    "category": "Accessories",
+    "price": 699,
+    "image": "assets/design6.png",
+    "description": "A curated accessory-style inspiration set to complete your boutique look.",
+    "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Boutique%20Accessory%20Set"
+  }
+]

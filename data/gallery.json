@@ -1,0 +1,66 @@
+[
+  {
+    "id": "design1",
+    "title": "Designer Blouse",
+    "category": "Blouse",
+    "image": "assets/design1.jpg",
+    "alt": "Designer blouse with premium boutique detailing",
+    "layout": "tall"
+  },
+  {
+    "id": "design2",
+    "title": "Boutique Kurti",
+    "category": "Kurti",
+    "image": "assets/design2.jpg",
+    "alt": "Boutique kurti with graceful custom stitching",
+    "layout": "default"
+  },
+  {
+    "id": "design3",
+    "title": "Bridal Collection",
+    "category": "Bridal",
+    "image": "assets/design3.jpg",
+    "alt": "Bridal boutique collection with ornate festive styling",
+    "layout": "wide"
+  },
+  {
+    "id": "design4",
+    "title": "Little Occasion Wear",
+    "category": "Kids Wear",
+    "image": "assets/design4.jpg",
+    "alt": "Kids wear boutique design with soft premium finishing",
+    "layout": "default"
+  },
+  {
+    "id": "design5",
+    "title": "Custom Stitching",
+    "category": "Blouse",
+    "image": "assets/design5.jpg",
+    "alt": "Custom stitched blouse with luxury boutique finish",
+    "layout": "wide"
+  },
+  {
+    "id": "design6",
+    "title": "Modern Patterns",
+    "category": "Kurti",
+    "image": "assets/design6.png",
+    "alt": "Modern kurti pattern from RD Advance Boutique",
+    "layout": "tall"
+  },
+  {
+    "id": "course1",
+    "title": "Celebration Detail",
+    "category": "Bridal",
+    "image": "assets/coursedesign1.jpg",
+    "alt": "Bridal-inspired course design with refined tailoring",
+    "layout": "default"
+  },
+  {
+    "id": "course2",
+    "title": "Playful Couture",
+    "category": "Kids Wear",
+    "image": "assets/coursedesign2.jpg",
+    "alt": "Kids boutique sample with polished sewing detail",
+    "layout": "default"
+  }
+]

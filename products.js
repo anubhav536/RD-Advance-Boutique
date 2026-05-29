@@ -1,0 +1,296 @@
+(function () {
+  "use strict";
+
+  const DATA_SOURCES = {
+    products: "data/products.json",
+    gallery: "data/gallery.json"
+  };
+
+  const WHATSAPP_LINK = "https://wa.me/917693849472";
+  const PLACEHOLDER_CATEGORIES = ["Blouses", "Kurtis", "Bridal", "Kids Wear", "Accessories", "Custom Edit"];
+
+  const state = {
+    products: [],
+    activeCategory: "all"
+  };
+
+  function normalize(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function createElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+
+    if (className) {
+      element.className = className;
+    }
+
+    if (text !== undefined && text !== null) {
+      element.textContent = text;
+    }
+
+    return element;
+  }
+
+  async function loadJson(source) {
+    const response = await fetch(source, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Unable to load ${source}: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  function formatPrice(price) {
+    if (price === undefined || price === null || price === "") {
+      return "Price on request";
+    }
+
+    if (typeof price === "number") {
+      return `₹${price.toLocaleString("en-IN")}`;
+    }
+
+    const value = String(price).trim();
+    return value.toLowerCase().includes("request") ? value : value;
+  }
+
+  function renderProductCard(product) {
+    const title = product.title || "Boutique Product";
+    const category = product.category || "Boutique";
+    const image = product.image || "assets/logo.png";
+    const description = product.description || "Premium boutique fashion piece.";
+    const link = product.link || WHATSAPP_LINK;
+
+    const article = createElement("article", "product-card");
+    article.dataset.category = normalize(category);
+    article.dataset.productId = product.id || normalize(title);
+
+    const media = createElement("div", "product-card__media");
+    const imageElement = document.createElement("img");
+    imageElement.src = image;
+    imageElement.alt = product.alt || title;
+    imageElement.loading = "lazy";
+
+    const wishlistButton = createElement("button", "wishlist-btn", "♡");
+    wishlistButton.type = "button";
+    wishlistButton.setAttribute("aria-label", `Add ${title} to wishlist`);
+
+    const quickView = createElement("a", "quick-view-btn", "Quick View");
+    quickView.href = link;
+
+    const content = createElement("div", "product-content");
+    content.append(
+      createElement("span", "product-category", category),
+      createElement("h3", "", title),
+      createElement("p", "product-price", formatPrice(product.price)),
+      createElement("p", "product-description", description)
+    );
+
+    media.append(imageElement, wishlistButton, quickView);
+    article.append(media, content);
+
+    return article;
+  }
+
+  function renderPlaceholderCard(category, index) {
+    const article = createElement("article", "product-card product-card--empty");
+    article.setAttribute("aria-label", `Empty ${category} product card`);
+
+    const media = createElement("div", "product-card__media");
+    const placeholder = createElement("div", "product-card__placeholder");
+    placeholder.setAttribute("aria-hidden", "true");
+
+    const wishlistButton = createElement("button", "wishlist-btn", "♡");
+    wishlistButton.type = "button";
+    wishlistButton.setAttribute("aria-label", `Add future ${category} product to wishlist`);
+
+    const quickView = createElement("button", "quick-view-btn", "Quick View");
+    quickView.type = "button";
+    quickView.disabled = true;
+
+    const content = createElement("div", "product-content");
+    content.append(
+      createElement("span", "product-category", category),
+      createElement("h3", "", `Product slot ${index + 1}`),
+      createElement("p", "product-price", "Coming soon"),
+      createElement("p", "product-description", "This dynamic card is ready for product image, price, category, and purchase link.")
+    );
+
+    media.append(placeholder, wishlistButton, quickView);
+    article.append(media, content);
+
+    return article;
+  }
+
+  function productMatches(product, searchTerm) {
+    const matchesCategory = state.activeCategory === "all" || normalize(product.category) === state.activeCategory;
+    const productText = normalize(`${product.title} ${product.category} ${product.description}`);
+    const matchesSearch = !searchTerm || productText.includes(searchTerm);
+
+    return matchesCategory && matchesSearch;
+  }
+
+  function renderProducts() {
+    const productGrid = document.getElementById("productGrid");
+    const productSearch = document.getElementById("productSearch");
+    const productCount = document.getElementById("productCount");
+    const emptyProducts = document.getElementById("emptyProducts");
+
+    if (!productGrid) {
+      return;
+    }
+
+    const searchTerm = normalize(productSearch ? productSearch.value : "");
+    const filteredProducts = state.products.filter((product) => productMatches(product, searchTerm));
+    productGrid.replaceChildren();
+
+    if (state.products.length === 0) {
+      productGrid.append(...PLACEHOLDER_CATEGORIES.map(renderPlaceholderCard));
+
+      if (emptyProducts) {
+        emptyProducts.hidden = false;
+      }
+
+      if (productCount) {
+        productCount.textContent = "6 empty dynamic cards ready";
+      }
+
+      return;
+    }
+
+    productGrid.append(...filteredProducts.map(renderProductCard));
+
+    if (emptyProducts) {
+      emptyProducts.hidden = filteredProducts.length > 0;
+    }
+
+    if (productCount) {
+      productCount.textContent = `${filteredProducts.length} product${filteredProducts.length === 1 ? "" : "s"} found`;
+    }
+  }
+
+  function bindProductControls() {
+    const productSearch = document.getElementById("productSearch");
+    const filterButtons = document.querySelectorAll(".category-filter .filter-btn");
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        state.activeCategory = button.dataset.category || "all";
+        renderProducts();
+      });
+    });
+
+    if (productSearch) {
+      productSearch.addEventListener("input", renderProducts);
+    }
+  }
+
+  async function initShop() {
+    const productGrid = document.getElementById("productGrid");
+
+    if (!productGrid) {
+      return;
+    }
+
+    bindProductControls();
+    renderProducts();
+
+    try {
+      const products = await loadJson(DATA_SOURCES.products);
+      state.products = Array.isArray(products) ? products : [];
+    } catch (error) {
+      console.error(error);
+      state.products = [];
+    }
+
+    renderProducts();
+  }
+
+  function renderGalleryCard(item) {
+    const title = item.title || "Boutique Design";
+    const category = item.category || "Boutique";
+    const previewId = `preview-${item.id || normalize(title)}`;
+    const layoutClass = item.layout && item.layout !== "default" ? ` gallery-card--${normalize(item.layout)}` : "";
+
+    const card = createElement("a", `gallery-card${layoutClass}`);
+    card.dataset.category = normalize(category).replace("kids-wear", "kids");
+    card.href = `#${previewId}`;
+
+    const image = document.createElement("img");
+    image.src = item.image || "assets/logo.png";
+    image.alt = item.alt || title;
+    image.loading = "lazy";
+
+    const shade = createElement("span", "gallery-card__shade");
+    const content = createElement("span", "gallery-card__content");
+    content.append(createElement("small", "", category), createElement("strong", "", title));
+
+    card.append(image, shade, content);
+
+    return card;
+  }
+
+  function renderLightbox(item) {
+    const title = item.title || "Boutique Design";
+    const previewId = `preview-${item.id || normalize(title)}`;
+    const lightbox = createElement("div", "lightbox");
+    lightbox.id = previewId;
+    lightbox.setAttribute("aria-label", `Fullscreen preview of ${title}`);
+
+    const closeLink = createElement("a", "lightbox__close", "×");
+    closeLink.href = "#gallery-title";
+    closeLink.setAttribute("aria-label", "Close image preview");
+
+    const image = document.createElement("img");
+    image.src = item.image || "assets/logo.png";
+    image.alt = item.previewAlt || `${title} fullscreen preview`;
+
+    lightbox.append(closeLink, image);
+
+    return lightbox;
+  }
+
+  async function initGallery() {
+    const galleryGrid = document.getElementById("galleryGrid");
+    const galleryLightboxes = document.getElementById("galleryLightboxes");
+
+    if (!galleryGrid) {
+      return;
+    }
+
+    try {
+      const galleryItems = await loadJson(DATA_SOURCES.gallery);
+      const items = Array.isArray(galleryItems) ? galleryItems : [];
+
+      galleryGrid.replaceChildren(...items.map(renderGalleryCard));
+
+      if (galleryLightboxes) {
+        galleryLightboxes.replaceChildren(...items.map(renderLightbox));
+      }
+    } catch (error) {
+      console.error(error);
+      galleryGrid.textContent = "Gallery images could not be loaded right now.";
+    }
+  }
+
+  window.RDProductRenderer = {
+    normalize,
+    renderProductCard,
+    renderGalleryCard,
+    renderLightbox,
+    renderProducts
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initShop();
+    initGallery();
+  });
+})();
