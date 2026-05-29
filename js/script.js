@@ -161,46 +161,41 @@
   };
 
   const setupSecretAdminShortcut = () => {
-    const trigger = doc.querySelector(".site-header .brand");
+    const isIndexPage = ["/", "", "/index.html"].includes(window.location.pathname);
+    const trigger = isIndexPage ? doc.querySelector(".site-header .brand__logo") : null;
     if (!trigger) return;
 
-    const shortcutPath = "/admin-login.html?next=%2Fadmin-dashboard.html";
-    const holdDurationMs = 2200;
-    let holdTimer = 0;
-    let shortcutOpened = false;
+    const shortcutPath = "/admin-login.html";
+    const requiredTapCount = 10;
+    const tapResetDelayMs = 3000;
+    let tapCount = 0;
+    let resetTimer = 0;
 
-    const clearHoldTimer = () => {
-      if (!holdTimer) return;
-      window.clearTimeout(holdTimer);
-      holdTimer = 0;
+    const resetTapCount = () => {
+      tapCount = 0;
+      if (!resetTimer) return;
+      window.clearTimeout(resetTimer);
+      resetTimer = 0;
     };
 
-    const openShortcut = () => {
-      clearHoldTimer();
-      shortcutOpened = true;
-      window.location.assign(shortcutPath);
+    const scheduleReset = () => {
+      if (resetTimer) window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(resetTapCount, tapResetDelayMs);
     };
-
-    trigger.addEventListener("pointerdown", event => {
-      if (event.button && event.button !== 0) return;
-      clearHoldTimer();
-      shortcutOpened = false;
-      holdTimer = window.setTimeout(openShortcut, holdDurationMs);
-    });
-
-    ["pointerup", "pointercancel", "pointerleave"].forEach(eventName => {
-      trigger.addEventListener(eventName, clearHoldTimer);
-    });
-
-    trigger.addEventListener("contextmenu", event => {
-      if (!holdTimer && !shortcutOpened) return;
-      event.preventDefault();
-    });
 
     trigger.addEventListener("click", event => {
-      if (!shortcutOpened) return;
       event.preventDefault();
       event.stopPropagation();
+
+      tapCount += 1;
+
+      if (tapCount >= requiredTapCount) {
+        resetTapCount();
+        window.location.assign(shortcutPath);
+        return;
+      }
+
+      scheduleReset();
     }, true);
   };
 
