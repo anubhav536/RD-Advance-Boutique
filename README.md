@@ -51,6 +51,28 @@ Products are stored in `data/products.json` and exposed through dedicated backen
 
 Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product statuses are `active`, `draft`, `inactive`, and `out-of-stock`.
 
+
+### Order management endpoints
+
+Orders are stored in `data/orders.json` and exposed through dedicated backend routes with no payment integration yet:
+
+- `GET /api/v1/orders` lists orders with optional `search`, `status`, `type`/`orderType`, `customerPhone`, `customerEmail`, `productId`, `createdFrom`, and `createdTo` filters.
+- `POST /api/v1/orders` creates an order for either a ready-made product order or a custom stitching order. Customer name and phone are required.
+- `GET /api/v1/orders/:id` returns one order.
+- `PUT|PATCH /api/v1/orders/:id` edits order details, customer details, items, measurements, stitching details, due date, notes, and totals.
+- `PATCH /api/v1/orders/:id/status` updates an order status with `pending`, `completed`, or `cancelled`.
+- `PATCH /api/v1/orders/:id/complete` marks an order completed.
+- `PATCH /api/v1/orders/:id/cancel` marks an order cancelled.
+- `DELETE /api/v1/orders/:id` deletes an order.
+- `GET /api/v1/orders/summary` returns status and order-type counts.
+- `GET /api/v1/orders/pending` returns pending orders.
+- `GET /api/v1/orders/completed` returns completed orders.
+- `GET /api/v1/orders/cancelled` returns cancelled orders.
+- `GET /api/v1/orders/custom-stitching` returns custom stitching orders.
+- `GET /api/v1/orders/ready-made` returns ready-made product orders.
+
+Valid order statuses are `pending`, `completed`, and `cancelled`. Valid order types are `custom-stitching` and `ready-made`.
+
 ### Gallery management endpoints
 
 Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes:
