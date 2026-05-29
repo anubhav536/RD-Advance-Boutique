@@ -1,3 +1,4 @@
+const path = require('path');
 const compression = require('compression');
 const express = require('express');
 const morgan = require('morgan');
@@ -28,6 +29,8 @@ app.get('/', (req, res) => {
     docs: `${config.apiPrefix}/health`,
   });
 });
+
+app.use(express.static(path.resolve(__dirname, '..')));
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
