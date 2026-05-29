@@ -160,6 +160,50 @@
     });
   };
 
+  const setupSecretAdminShortcut = () => {
+    const trigger = doc.querySelector(".site-header .brand");
+    if (!trigger) return;
+
+    const shortcutPath = "/rd-secret-admin";
+    const holdDurationMs = 2200;
+    let holdTimer = 0;
+    let shortcutOpened = false;
+
+    const clearHoldTimer = () => {
+      if (!holdTimer) return;
+      window.clearTimeout(holdTimer);
+      holdTimer = 0;
+    };
+
+    const openShortcut = () => {
+      clearHoldTimer();
+      shortcutOpened = true;
+      window.location.assign(shortcutPath);
+    };
+
+    trigger.addEventListener("pointerdown", event => {
+      if (event.button && event.button !== 0) return;
+      clearHoldTimer();
+      shortcutOpened = false;
+      holdTimer = window.setTimeout(openShortcut, holdDurationMs);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave"].forEach(eventName => {
+      trigger.addEventListener(eventName, clearHoldTimer);
+    });
+
+    trigger.addEventListener("contextmenu", event => {
+      if (!holdTimer && !shortcutOpened) return;
+      event.preventDefault();
+    });
+
+    trigger.addEventListener("click", event => {
+      if (!shortcutOpened) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
+  };
+
   const setupLuxuryButtons = () => {
     doc.addEventListener("pointerdown", event => {
       const button = event.target.closest(buttonSelectors);
@@ -502,6 +546,7 @@
     markPageReady();
     setupPageTransitions();
     setupResponsiveNavigation();
+    setupSecretAdminShortcut();
     setupFashionShop();
     setupCustomStitchingRequests();
     setupScrollReveal();

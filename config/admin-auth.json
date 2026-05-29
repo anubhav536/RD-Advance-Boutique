@@ -1,6 +1,6 @@
 {
-  "username": "admin@example.com",
-  "passwordHash": "pbkdf2_sha256$310000$a38542b119b132b64c41a36f7722a8ad$f7b6e80c5a1012c4b0587dcc0df64b8466d4cbcc7b00a627e84c89618dde46e7",
-  "sessionSecret": "fb197afd38b9d8976527cee4c908246e9d752159c3e1618d87f49f2c4e3b8ca31a4ef7c316fc073df329709414b103de",
+  "username": "rdadvanceboutique@gmail.com",
+  "passwordHash": "pbkdf2_sha256$310000$43b2b7541c8b18b6a60aee04787c2efb$8dea760f4684c5c477359e946ba58b3a02a34897a703a04f7632abe464d961e3",
+  "sessionSecret": "4724236595eb7f3d56e91d2815fbe42de28674f7bff74ed9588048164170606e787f6fd3f4622c13653b33ab8c3776fc",
   "sessionDurationMinutes": 120
 }
