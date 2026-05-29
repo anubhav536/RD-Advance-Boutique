@@ -22,6 +22,15 @@ app.use(compression());
 app.use(express.json({ limit: '6mb' }));
 app.use(express.urlencoded({ extended: true, limit: '6mb' }));
 
+app.get(config.adminShortcutPath, (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+
+  if (req.adminSession) {
+    return res.redirect(302, '/admin-dashboard.html');
+  }
+
+  return res.redirect(302, `/admin-login.html?next=${encodeURIComponent('/admin-dashboard.html')}`);
+});
 
 const protectedAdminPages = new Set([
   '/add-category.html',

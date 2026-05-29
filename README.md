@@ -38,12 +38,11 @@ data/
 
 Admin authentication uses only local credentials from `config/admin-auth.json`; no external identity provider or third-party API is used. The password is stored as a PBKDF2 hash and successful logins receive an HTTP-only, signed same-site session cookie.
 
-Default local development credentials are:
+Default local development admin email is `rdadvanceboutique@gmail.com`. The admin password is stored only as a PBKDF2 hash in `config/admin-auth.json`; do not publish the plaintext password in documentation.
 
-- Email: `admin@example.com`
-- Password: `ChangeMeNow!2026`
+Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: `/rd-secret-admin`) to open the admin login flow without adding an admin link to the public site navigation. Admins can also press and hold the public site logo for about two seconds on mobile or desktop to open the same hidden shortcut. After successful login, the shortcut sends the admin to `admin-dashboard.html`.
 
-Change both the password hash and `sessionSecret` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
+Change both the password hash, `sessionSecret`, and `ADMIN_SHORTCUT_PATH` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
 
 Admin auth endpoints:
 

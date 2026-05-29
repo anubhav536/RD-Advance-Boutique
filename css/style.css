@@ -58,9 +58,11 @@ a {
 }
 
 .brand {
+  -webkit-touch-callout: none;
   align-items: center;
   display: flex;
   gap: 0.8rem;
+  user-select: none;
 }
 
 .brand__logo {
