@@ -44,9 +44,14 @@ Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: 
 
 Change both the password hash, `sessionSecret`, and `ADMIN_SHORTCUT_PATH` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
 
+Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Configure SMTP environment variables so the server can send reset links to the configured admin email: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, and `APP_BASE_URL` (or `SITE_URL`) for the public reset-link origin. If SMTP is not configured in development, the reset link is printed to the server console and returned as a development preview response.
+
 Admin auth endpoints:
 
 - `POST /api/v1/admin/auth/login` creates an admin session from the configured local credentials.
+- `POST /api/v1/admin/auth/password-reset/request` sends a one-hour password reset link to the configured admin email when the submitted email matches.
+- `GET /api/v1/admin/auth/password-reset/validate` validates a reset token before showing the reset form.
+- `POST /api/v1/admin/auth/password-reset/complete` changes the admin password with a valid reset token.
 - `GET /api/v1/admin/auth/session` verifies the current admin session.
 - `POST /api/v1/admin/auth/logout` destroys the current admin session.
 

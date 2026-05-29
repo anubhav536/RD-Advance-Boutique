@@ -4,6 +4,7 @@ const crypto = require('crypto');
 
 const CONFIG_PATH = path.resolve(__dirname, '../../config/admin-auth.json');
 const DEFAULT_SESSION_MINUTES = 120;
+const DEFAULT_RESET_MINUTES = 60;
 const PASSWORD_HASH_ALGORITHM = 'sha256';
 const PASSWORD_HASH_ITERATIONS = 310000;
 const PASSWORD_HASH_BYTES = 32;
@@ -40,6 +41,14 @@ const normalizeConfig = (parsedConfig) => {
     throw new Error('Admin authentication sessionSecret must be at least 32 characters long.');
   }
 
+  const resetExpiresAt = Number(parsedConfig.passwordReset?.expiresAt || 0);
+  const passwordReset = parsedConfig.passwordReset?.tokenHash && resetExpiresAt > Date.now()
+    ? {
+      tokenHash: String(parsedConfig.passwordReset.tokenHash),
+      expiresAt: resetExpiresAt,
+    }
+    : null;
+
   return {
     username,
     passwordHash,
@@ -50,6 +59,7 @@ const normalizeConfig = (parsedConfig) => {
     sessionDurationMs: Number.isFinite(sessionDurationMinutes)
       ? sessionDurationMinutes * 60 * 1000
       : DEFAULT_SESSION_MINUTES * 60 * 1000,
+    passwordReset,
   };
 };
 
@@ -79,6 +89,27 @@ const writeConfigFile = (config) => {
   cachedMtimeMs = stats.mtimeMs;
 };
 
+const createResetTokenHash = (token, sessionSecret = getAdminAuthConfig().sessionSecret) => crypto
+  .createHmac('sha256', sessionSecret)
+  .update(String(token || ''))
+  .digest('hex');
+
+const writeNormalizedConfig = (overrides = {}) => {
+  const currentConfig = getAdminAuthConfig();
+  const nextConfig = {
+    username: currentConfig.username,
+    passwordHash: currentConfig.passwordHash,
+    sessionSecret: currentConfig.sessionSecret,
+    sessionDurationMinutes: currentConfig.sessionDurationMinutes,
+    ...(currentConfig.passwordReset ? { passwordReset: currentConfig.passwordReset } : {}),
+    ...overrides,
+  };
+
+  if (!nextConfig.passwordReset) delete nextConfig.passwordReset;
+  writeConfigFile(nextConfig);
+  return getAdminAuthConfig();
+};
+
 const updateAdminCredentials = ({ username, password }) => {
   const currentConfig = getAdminAuthConfig();
   const nextConfig = {
@@ -96,8 +127,59 @@ const updateAdminCredentials = ({ username, password }) => {
   return getAdminAuthConfig();
 };
 
+const createAdminPasswordResetToken = (minutes = DEFAULT_RESET_MINUTES) => {
+  const currentConfig = getAdminAuthConfig();
+  const token = crypto.randomBytes(32).toString('base64url');
+  const expiresAt = Date.now() + minutes * 60 * 1000;
+
+  writeNormalizedConfig({
+    passwordReset: {
+      tokenHash: createResetTokenHash(token, currentConfig.sessionSecret),
+      expiresAt,
+    },
+  });
+
+  return {
+    token,
+    expiresAt,
+    expiresInMinutes: minutes,
+  };
+};
+
+const verifyAdminPasswordResetToken = (token) => {
+  const currentConfig = getAdminAuthConfig();
+  const reset = currentConfig.passwordReset;
+
+  if (!reset || reset.expiresAt <= Date.now()) return false;
+
+  const submittedHash = createResetTokenHash(token, currentConfig.sessionSecret);
+  const expectedBuffer = Buffer.from(reset.tokenHash, 'hex');
+  const submittedBuffer = Buffer.from(submittedHash, 'hex');
+
+  return expectedBuffer.length === submittedBuffer.length
+    && crypto.timingSafeEqual(expectedBuffer, submittedBuffer);
+};
+
+const resetAdminPasswordWithToken = ({ token, password }) => {
+  if (!verifyAdminPasswordResetToken(token)) {
+    return null;
+  }
+
+  const currentConfig = getAdminAuthConfig();
+  writeNormalizedConfig({
+    username: currentConfig.username,
+    passwordHash: hashPassword(password),
+    passwordReset: null,
+  });
+
+  return getAdminAuthConfig();
+};
+
 module.exports = {
+  createAdminPasswordResetToken,
   getAdminAuthConfig,
   hashPassword,
+  resetAdminPasswordWithToken,
   updateAdminCredentials,
+  verifyAdminPasswordResetToken,
 };
