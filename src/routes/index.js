@@ -8,6 +8,7 @@ const orderRoutes = require('./orderRoutes');
 const tailoringCourseRoutes = require('./tailoringCourseRoutes');
 const contactRoutes = require('./contactRoutes');
 const adminAuthRoutes = require('./adminAuthRoutes');
+const assetRoutes = require('./assetRoutes');
 const { requireAdminApi } = require('../middleware/adminAuthMiddleware');
 
 const router = express.Router();
@@ -19,6 +20,8 @@ router.use('/orders', orderRoutes);
 router.use('/tailoring-courses', tailoringCourseRoutes);
 router.use('/contact', contactRoutes);
 router.use('/data', publicJsonDatabaseRoutes);
+router.use('/assets', assetRoutes);
+router.use('/admin/assets', assetRoutes);
 router.use('/admin/auth', adminAuthRoutes);
 router.use('/admin/data', requireAdminApi, jsonDatabaseRoutes);
 

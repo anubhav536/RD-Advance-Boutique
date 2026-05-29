@@ -2,6 +2,7 @@
   "use strict";
 
   const API_BASE = "/api/v1/products";
+  const ASSET_API_BASE = "/api/v1/admin/assets/products";
   const DATA_SOURCE = "data/products.json";
   const PLACEHOLDER_IMAGE = "assets/logo.png";
 
@@ -80,11 +81,29 @@
     return products;
   };
 
+  const uploadProductImage = async (file) => {
+    const formData = new FormData();
+    formData.append("asset", file);
+    formData.append("title", file.name.replace(/\.[^.]+$/, ""));
+
+    const response = await fetch(ASSET_API_BASE, {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.message || "Unable to upload product image locally.");
+    }
+
+    return payload.data?.url || payload.data?.path || PLACEHOLDER_IMAGE;
+  };
+
   const readFilesAsImages = async (input, fallback = []) => {
     const files = Array.from(input?.files || []);
     if (files.length === 0) return fallback;
 
-    return files.map((file) => `assets/${file.name}`);
+    return Promise.all(files.map(uploadProductImage));
   };
 
   const readForm = async (form, current = {}) => {
