@@ -78,7 +78,16 @@ const sendCommand = async (socket, readResponse, command, acceptedCodes) => {
 
 const upgradeToTls = async (socket, host, readResponse) => {
   await sendCommand(socket, readResponse, 'STARTTLS', [220]);
-  return tls.connect({ socket, servername: host });
+
+  return new Promise((resolve, reject) => {
+    const secureSocket = tls.connect({ socket, servername: host }, () => resolve(secureSocket));
+    secureSocket.setTimeout(15000);
+    secureSocket.once('error', reject);
+    secureSocket.once('timeout', () => {
+      secureSocket.destroy();
+      reject(new Error('SMTP TLS upgrade timed out.'));
+    });
+  });
 };
 
 const buildMessage = ({ to, subject, text, html }) => {
