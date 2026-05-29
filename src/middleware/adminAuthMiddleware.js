@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const adminAuthConfig = require('../config/adminAuth');
+const { getAdminAuthConfig } = require('../config/adminAuth');
 
 const COOKIE_NAME = 'rd_admin_session';
 const sessions = new Map();
@@ -17,7 +17,7 @@ const parseCookies = (cookieHeader = '') => cookieHeader
   }, {});
 
 const signSessionId = (sessionId) => crypto
-  .createHmac('sha256', adminAuthConfig.sessionSecret)
+  .createHmac('sha256', getAdminAuthConfig().sessionSecret)
   .update(sessionId)
   .digest('base64url');
 
@@ -84,12 +84,12 @@ const createAdminSession = (req, res, username) => {
   const session = {
     username,
     createdAt: now,
-    expiresAt: now + adminAuthConfig.sessionDurationMs,
+    expiresAt: now + getAdminAuthConfig().sessionDurationMs,
   };
 
   sessions.set(sessionId, session);
   req.adminSessionId = sessionId;
-  res.setHeader('Set-Cookie', buildCookieOptions(req, sessionId, Math.floor(adminAuthConfig.sessionDurationMs / 1000)));
+  res.setHeader('Set-Cookie', buildCookieOptions(req, sessionId, Math.floor(getAdminAuthConfig().sessionDurationMs / 1000)));
 
   return { ...session, id: sessionId };
 };
@@ -134,6 +134,7 @@ const hashPassword = (password, encodedHash) => {
 const verifyAdminCredentials = (username, password) => {
   const submittedUsername = String(username || '').trim().toLowerCase();
   const submittedPassword = String(password || '');
+  const adminAuthConfig = getAdminAuthConfig();
   const expectedUsername = adminAuthConfig.username;
   const expectedHash = adminAuthConfig.passwordHash.split('$').at(-1);
   const submittedHash = hashPassword(submittedPassword, adminAuthConfig.passwordHash);

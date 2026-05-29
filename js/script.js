@@ -164,7 +164,7 @@
     const trigger = doc.querySelector(".site-header .brand");
     if (!trigger) return;
 
-    const shortcutPath = "/rd-secret-admin";
+    const shortcutPath = "/admin-login.html?next=%2Fadmin-dashboard.html";
     const holdDurationMs = 2200;
     let holdTimer = 0;
     let shortcutOpened = false;
