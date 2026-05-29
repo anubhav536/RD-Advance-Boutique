@@ -231,6 +231,124 @@
   };
 
 
+  const setupContactAppointmentForm = () => {
+    const form = doc.getElementById("appointmentForm");
+    if (!form) return;
+
+    const statusBox = doc.getElementById("appointmentFormStatus");
+    const submitButton = form.querySelector("button[type='submit']");
+    const fields = {
+      name: form.elements.name,
+      phone: form.elements.phone,
+      occasion: form.elements.occasion,
+      message: form.elements.message
+    };
+    const errorMessages = {
+      name: "Please enter your full name.",
+      phone: "Please enter your phone number.",
+      occasion: "Please select the service you need.",
+      message: "Please share your design notes."
+    };
+
+    const setStatus = (message, type = "success") => {
+      if (!statusBox) return;
+      statusBox.textContent = message;
+      statusBox.dataset.type = type;
+      statusBox.hidden = false;
+    };
+
+    const clearStatus = () => {
+      if (!statusBox) return;
+      statusBox.textContent = "";
+      statusBox.removeAttribute("data-type");
+      statusBox.hidden = true;
+    };
+
+    const getErrorElement = field => {
+      const errorId = field?.getAttribute("aria-describedby");
+      return errorId ? doc.getElementById(errorId) : null;
+    };
+
+    const setFieldError = (field, message = "") => {
+      if (!field) return;
+      const errorElement = getErrorElement(field);
+      field.setAttribute("aria-invalid", message ? "true" : "false");
+      if (errorElement) errorElement.textContent = message;
+    };
+
+    const validateForm = () => {
+      let firstInvalidField = null;
+
+      Object.entries(fields).forEach(([fieldName, field]) => {
+        const value = String(field?.value || "").trim();
+        const errorMessage = value ? "" : errorMessages[fieldName];
+        setFieldError(field, errorMessage);
+        if (errorMessage && !firstInvalidField) firstInvalidField = field;
+      });
+
+      if (firstInvalidField) {
+        setStatus("Please correct the highlighted fields before submitting.", "error");
+        firstInvalidField.focus();
+        return false;
+      }
+
+      clearStatus();
+      return true;
+    };
+
+    const clearFieldErrors = () => {
+      Object.values(fields).forEach(field => setFieldError(field));
+    };
+
+    Object.values(fields).forEach(field => {
+      if (!field) return;
+      field.addEventListener("input", () => {
+        if (String(field.value || "").trim()) setFieldError(field);
+      });
+      field.addEventListener("change", () => {
+        if (String(field.value || "").trim()) setFieldError(field);
+      });
+    });
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!validateForm()) return;
+
+      const formData = new FormData(form);
+      const payload = {
+        name: String(formData.get("name") || "").trim(),
+        phone: String(formData.get("phone") || "").trim(),
+        occasion: String(formData.get("occasion") || "").trim(),
+        message: String(formData.get("message") || "").trim(),
+        source: "contact.html appointment form"
+      };
+
+      try {
+        if (submitButton) submitButton.disabled = true;
+        setStatus("Sending your appointment request...", "success");
+
+        const response = await fetch("/api/v1/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Unable to submit your appointment request.");
+        }
+
+        form.reset();
+        clearFieldErrors();
+        setStatus("Thank you! Your appointment request has been submitted. Our boutique team will contact you shortly.", "success");
+      } catch (error) {
+        setStatus(error.message || "Unable to submit your appointment request right now.", "error");
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    });
+  };
+
   const setupFashionShop = () => {
     const productGrid = doc.getElementById("productGrid");
     const productSearch = doc.getElementById("productSearch");
@@ -538,6 +656,7 @@
     setupResponsiveNavigation();
     setupSecretAdminShortcut();
     setupFashionShop();
+    setupContactAppointmentForm();
     setupCustomStitchingRequests();
     setupScrollReveal();
     setupLuxuryButtons();

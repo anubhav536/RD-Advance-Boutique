@@ -56,30 +56,35 @@
       <div class="contact-form-card" id="contact-form">
         <p class="eyebrow">Start your consultation</p>
         <h2>Tell us about your dream outfit.</h2>
-        <form class="luxury-form" action="#" method="post">
+        <form class="luxury-form" id="appointmentForm" action="/api/v1/contact" method="post" novalidate>
+          <div class="form-status" id="appointmentFormStatus" role="status" aria-live="polite" hidden></div>
           <div class="form-row">
             <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="Your name" required>
+            <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" aria-describedby="nameError" required>
+            <span class="form-error" id="nameError" aria-live="polite"></span>
           </div>
           <div class="form-row form-row--split">
             <div>
               <label for="phone">Phone Number</label>
-              <input type="tel" id="phone" name="phone" placeholder="+91 00000 00000" required>
+              <input type="tel" id="phone" name="phone" placeholder="+91 00000 00000" autocomplete="tel" inputmode="tel" aria-describedby="phoneError" required>
+              <span class="form-error" id="phoneError" aria-live="polite"></span>
             </div>
             <div>
               <label for="occasion">Occasion</label>
-              <select id="occasion" name="occasion" required>
+              <select id="occasion" name="occasion" aria-describedby="occasionError" required>
                 <option value="">Select service</option>
                 <option>Custom boutique outfit</option>
                 <option>Designer blouse</option>
                 <option>Alteration or fitting</option>
                 <option>Tailoring course enquiry</option>
               </select>
+              <span class="form-error" id="occasionError" aria-live="polite"></span>
             </div>
           </div>
           <div class="form-row">
             <label for="message">Design Notes</label>
-            <textarea id="message" name="message" rows="6" placeholder="Tell us your preferred style, date, colors, fabric, and fitting needs."></textarea>
+            <textarea id="message" name="message" rows="6" placeholder="Tell us your preferred style, date, colors, fabric, and fitting needs." aria-describedby="messageError" required></textarea>
+            <span class="form-error" id="messageError" aria-live="polite"></span>
           </div>
           <button class="btn btn--primary" type="submit">Request Appointment</button>
         </form>

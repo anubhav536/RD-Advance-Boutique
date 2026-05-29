@@ -2795,6 +2795,12 @@ h3 {
   gap: 1rem;
 }
 
+.form-row--split > div {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
 .form-row label {
   color: var(--charcoal);
   font-size: 0.78rem;
@@ -2828,6 +2834,41 @@ h3 {
   border-color: var(--gold);
   box-shadow: 0 0 0 4px rgba(201, 164, 92, 0.14);
   transform: translateY(-1px);
+}
+
+.form-status {
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 0.9rem 1rem;
+}
+
+.form-status[data-type="success"] {
+  background: rgba(57, 132, 85, 0.12);
+  border: 1px solid rgba(57, 132, 85, 0.26);
+  color: #2f6f46;
+}
+
+.form-status[data-type="error"] {
+  background: rgba(153, 42, 42, 0.1);
+  border: 1px solid rgba(153, 42, 42, 0.24);
+  color: #8d3030;
+}
+
+.form-error {
+  color: #8d3030;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+  min-height: 1.1rem;
+}
+
+.form-row input[aria-invalid="true"],
+.form-row select[aria-invalid="true"],
+.form-row textarea[aria-invalid="true"] {
+  border-color: rgba(153, 42, 42, 0.68);
+  box-shadow: 0 0 0 4px rgba(153, 42, 42, 0.1);
 }
 
 .contact-detail-stack {
