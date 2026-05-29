@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getAdminAuthConfig } = require('../config/adminAuth');
+const { getAdminAuthConfig, getAdminUserByUsername } = require('../config/adminAuth');
 
 const COOKIE_NAME = 'rd_admin_session';
 const sessions = new Map();
@@ -142,17 +142,15 @@ const passwordMatchesHash = (submittedPassword, encodedHash) => {
 };
 
 const verifyAdminCredentials = (username, password) => {
-  const submittedUsername = String(username || '').trim().toLowerCase();
   const submittedPassword = String(password || '');
   const trimmedPassword = submittedPassword.trim();
-  const adminAuthConfig = getAdminAuthConfig();
-  const usernameMatches = submittedUsername === adminAuthConfig.username;
+  const adminUser = getAdminUserByUsername(username);
 
-  if (!usernameMatches) return false;
+  if (!adminUser) return false;
 
-  return passwordMatchesHash(submittedPassword, adminAuthConfig.passwordHash)
+  return passwordMatchesHash(submittedPassword, adminUser.passwordHash)
     || (trimmedPassword !== submittedPassword
-      && passwordMatchesHash(trimmedPassword, adminAuthConfig.passwordHash));
+      && passwordMatchesHash(trimmedPassword, adminUser.passwordHash));
 };
 
 module.exports = {

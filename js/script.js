@@ -163,9 +163,20 @@
     const trigger = doc.querySelector(".site-header .brand__logo");
     if (!trigger) return;
 
-    const shortcutPath = "admin-login.html";
-    const requiredHoldDurationMs = 11000;
+    const shortcutPath = "/rd-secret-admin";
+    const requiredTapCount = 5;
+    const tapWindowMs = 2800;
+    const requiredHoldDurationMs = 2500;
     let holdTimer = 0;
+    let tapCount = 0;
+    let tapResetTimer = 0;
+
+    const resetTaps = () => {
+      tapCount = 0;
+      if (!tapResetTimer) return;
+      window.clearTimeout(tapResetTimer);
+      tapResetTimer = 0;
+    };
 
     const cancelHold = () => {
       if (!holdTimer) return;
@@ -174,8 +185,20 @@
     };
 
     const openAdminLogin = () => {
-      holdTimer = 0;
+      cancelHold();
+      resetTaps();
       window.location.assign(shortcutPath);
+    };
+
+    const registerTap = () => {
+      tapCount += 1;
+      if (tapCount >= requiredTapCount) {
+        openAdminLogin();
+        return;
+      }
+
+      if (tapResetTimer) window.clearTimeout(tapResetTimer);
+      tapResetTimer = window.setTimeout(resetTaps, tapWindowMs);
     };
 
     trigger.addEventListener("pointerdown", () => {
@@ -183,7 +206,12 @@
       holdTimer = window.setTimeout(openAdminLogin, requiredHoldDurationMs);
     });
 
-    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(eventName => {
+    trigger.addEventListener("pointerup", () => {
+      cancelHold();
+      registerTap();
+    });
+
+    ["pointercancel", "pointerleave", "blur"].forEach(eventName => {
       trigger.addEventListener(eventName, cancelHold);
     });
 

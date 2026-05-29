@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Signup | RD Advance Boutique</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+  <section class="admin-login-section">
+
+    <div class="admin-login-container">
+
+      <div class="admin-left">
+
+        <img src="assets/logo.png" alt="RD Logo" class="admin-logo">
+
+        <h1>RD Advance Boutique</h1>
+
+        <p>Request admin dashboard access</p>
+
+      </div>
+
+      <div class="admin-right">
+
+        <div class="admin-form-box">
+
+          <span class="admin-tag">Admin Signup</span>
+
+          <h2>Request Access</h2>
+
+          <p>
+            Create an admin request. Access starts only after
+            rdadvanceboutique@gmail.com approves your request.
+          </p>
+
+          <form id="adminSignupForm">
+
+            <div class="input-group">
+
+              <label>Full Name</label>
+
+              <input
+                id="adminSignupName"
+                name="name"
+                type="text"
+                autocomplete="name"
+                placeholder="Enter your full name"
+              >
+
+            </div>
+
+            <div class="input-group">
+
+              <label>Email Address</label>
+
+              <input
+                id="adminSignupEmail"
+                name="email"
+                type="email"
+                autocomplete="username"
+                placeholder="Enter admin email"
+                required
+              >
+
+            </div>
+
+            <div class="input-group">
+
+              <label>Password</label>
+
+              <input
+                id="adminSignupPassword"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Create password"
+                minlength="8"
+                required
+              >
+
+            </div>
+
+            <div class="input-group">
+
+              <label>Confirm Password</label>
+
+              <input
+                id="adminSignupConfirmPassword"
+                name="confirmPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Confirm password"
+                minlength="8"
+                required
+              >
+
+            </div>
+
+            <p id="adminSignupMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
+
+            <button type="submit" class="primary-btn admin-btn">Send Approval Request</button>
+
+            <a class="secondary-btn admin-secondary-link" href="admin-login.html">Back To Login</a>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <script>
+    const signupForm = document.getElementById("adminSignupForm");
+    const signupMessage = document.getElementById("adminSignupMessage");
+    const signupButton = signupForm.querySelector("button[type='submit']");
+
+    const setMessage = (message, isError = false) => {
+      signupMessage.textContent = message;
+      signupMessage.classList.toggle("error", isError);
+    };
+
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      signupButton.disabled = true;
+      setMessage("Sending approval request...");
+
+      try {
+        const response = await fetch("/api/v1/admin/auth/signup", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("adminSignupName").value,
+            email: document.getElementById("adminSignupEmail").value,
+            password: document.getElementById("adminSignupPassword").value,
+            confirmPassword: document.getElementById("adminSignupConfirmPassword").value,
+          }),
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(payload.message || "Unable to send approval request.");
+        }
+
+        const preview = payload.data?.previewLink ? ` Development approval link: ${payload.data.previewLink}` : "";
+        setMessage(`${payload.message}${preview}`);
+        signupForm.reset();
+      } catch (error) {
+        setMessage(error.message, true);
+      } finally {
+        signupButton.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

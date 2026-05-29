@@ -1,13 +1,18 @@
 const asyncHandler = require('../utils/asyncHandler');
 const config = require('../config/env');
 const {
+  ADMIN_APPROVAL_EMAIL,
+  approveAdminSignupWithToken,
   createAdminPasswordResetToken,
+  createAdminSignupApprovalToken,
   getAdminAuthConfig,
+  getAdminUserByUsername,
+  isValidEmail,
   resetAdminPasswordWithToken,
   updateAdminCredentials,
   verifyAdminPasswordResetToken,
 } = require('../config/adminAuth');
-const { sendPasswordResetEmail } = require('../services/emailService');
+const { sendAdminSignupApprovalEmail, sendPasswordResetEmail } = require('../services/emailService');
 const {
   createAdminSession,
   destroyAdminSession,
@@ -44,17 +49,90 @@ const login = asyncHandler(async (req, res) => {
 });
 
 
+const requestSignup = asyncHandler(async (req, res) => {
+  const { name, email, password, confirmPassword } = req.body || {};
+  const submittedEmail = String(email || '').trim().toLowerCase();
+  const submittedPassword = String(password || '');
+
+  if (!isValidEmail(submittedEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid admin email address.',
+    });
+  }
+
+  if (submittedPassword.length < 8) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 8 characters long.',
+    });
+  }
+
+  if (submittedPassword !== String(confirmPassword || '')) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password and confirm password must match.',
+    });
+  }
+
+  let approval;
+  try {
+    approval = createAdminSignupApprovalToken({
+      email: submittedEmail,
+      password: submittedPassword,
+      name,
+    });
+  } catch (error) {
+    return res.status(409).json({
+      success: false,
+      message: error.message || 'Unable to create admin signup request.',
+    });
+  }
+
+  const approvalLink = `${getRequestBaseUrl(req)}/api/v1/admin/auth/signup/approve?token=${encodeURIComponent(approval.token)}`;
+  const delivery = await sendAdminSignupApprovalEmail({
+    to: ADMIN_APPROVAL_EMAIL,
+    signupEmail: approval.username,
+    approvalLink,
+    expiresInMinutes: approval.expiresInMinutes,
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: `Signup request sent for approval. ${ADMIN_APPROVAL_EMAIL} must approve it before you can login.`,
+    ...(delivery?.previewLink && config.env !== 'production'
+      ? { data: { previewLink: delivery.previewLink } }
+      : {}),
+  });
+});
+
+const approveSignup = asyncHandler(async (req, res) => {
+  const token = String(req.query?.token || '').trim();
+
+  if (!token) {
+    return res.redirect(302, '/admin-login.html?approved=missing');
+  }
+
+  const approved = approveAdminSignupWithToken(token);
+  if (!approved) {
+    return res.redirect(302, '/admin-login.html?approved=invalid');
+  }
+
+  return res.redirect(302, `/admin-login.html?approved=success&email=${encodeURIComponent(approved.username)}`);
+});
+
 const requestPasswordReset = asyncHandler(async (req, res) => {
   const submittedEmail = String(req.body?.email || '').trim().toLowerCase();
-  const adminConfig = getAdminAuthConfig();
   let delivery = null;
 
-  if (submittedEmail && submittedEmail === adminConfig.username) {
-    const reset = createAdminPasswordResetToken();
+  const adminUser = submittedEmail ? getAdminUserByUsername(submittedEmail) : null;
+
+  if (adminUser) {
+    const reset = createAdminPasswordResetToken(adminUser.username);
     const resetLink = `${getRequestBaseUrl(req)}/admin-reset-password.html?token=${encodeURIComponent(reset.token)}`;
 
     delivery = await sendPasswordResetEmail({
-      to: adminConfig.username,
+      to: adminUser.username,
       resetLink,
       expiresInMinutes: reset.expiresInMinutes,
     });
@@ -210,12 +288,14 @@ const updateCredentials = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  approveSignup,
   completePasswordReset,
   getProfile,
   getSession,
   login,
   logout,
   requestPasswordReset,
+  requestSignup,
   updateCredentials,
   validatePasswordResetToken,
 };
