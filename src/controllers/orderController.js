@@ -36,6 +36,7 @@ const getOrder = asyncHandler(async (req, res) => {
 const trackOrder = asyncHandler(async (req, res) => {
   const order = await OrderModel.findByTrackingId(req.params.id);
 
+  res.setHeader('Cache-Control', 'no-store');
   res.status(200).json({
     success: true,
     data: order,
