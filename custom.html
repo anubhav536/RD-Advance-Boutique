@@ -64,7 +64,7 @@
       </div>
 
       <div class="booking-layout">
-        <form class="booking-form" action="#" method="post" enctype="multipart/form-data">
+        <form class="booking-form" id="custom-stitching-request-form" action="#" method="post" enctype="multipart/form-data">
           <fieldset class="form-card">
             <legend><span>01</span> Client Details</legend>
             <div class="form-grid form-grid--two">
@@ -75,6 +75,10 @@
               <label class="field">
                 <span>Phone Number</span>
                 <input type="tel" name="phone" placeholder="Enter mobile number" required>
+              </label>
+              <label class="field">
+                <span>Email Address</span>
+                <input type="email" name="email" placeholder="Enter email address">
               </label>
               <label class="field">
                 <span>Outfit Type</span>
@@ -208,7 +212,24 @@
           </fieldset>
 
           <button type="submit" class="btn btn--primary booking-submit">Submit Premium Booking Request</button>
+          <p class="booking-message" id="custom-booking-message" role="status" aria-live="polite"></p>
         </form>
+
+        <section class="order-tracker" aria-labelledby="order-tracker-title">
+          <div>
+            <p class="eyebrow">Track your request</p>
+            <h3 id="order-tracker-title">Check custom stitching status</h3>
+            <p>Use your order number or phone number to see the latest tailoring status saved in orders.json.</p>
+          </div>
+          <form class="tracking-form" id="custom-order-tracking-form">
+            <label class="field">
+              <span>Order Number or Phone</span>
+              <input type="text" name="tracking_query" placeholder="RD-20260529-0001 or mobile number" required>
+            </label>
+            <button type="submit" class="btn btn--ghost">Track Status</button>
+          </form>
+          <div class="tracking-result" id="custom-tracking-result" role="status" aria-live="polite"></div>
+        </section>
 
         <aside class="booking-sidebar" aria-label="Booking support details">
           <div class="sidebar-card sidebar-card--dark">

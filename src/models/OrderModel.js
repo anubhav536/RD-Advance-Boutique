@@ -4,7 +4,7 @@ const jsonDatabase = require('../utils/jsonDatabase');
 
 const ORDER_COLLECTION = 'orders';
 
-const ORDER_STATUSES = Object.freeze(['pending', 'completed', 'cancelled']);
+const ORDER_STATUSES = Object.freeze(['pending', 'in-progress', 'completed', 'cancelled']);
 const ORDER_TYPES = Object.freeze(['custom-stitching', 'ready-made']);
 
 const DEFAULT_STATUS = 'pending';
@@ -21,7 +21,7 @@ const normalizeStatus = (status = DEFAULT_STATUS) => {
   const normalizedStatus = normalizeSlug(status || DEFAULT_STATUS);
 
   if (!ORDER_STATUSES.includes(normalizedStatus)) {
-    throw new AppError('Order status must be pending, completed, or cancelled.', 400, {
+    throw new AppError('Order status must be pending, in-progress, completed, or cancelled.', 400, {
       allowedStatuses: ORDER_STATUSES,
     });
   }
@@ -130,6 +130,109 @@ const normalizeCustomer = (payload = {}, currentCustomer = {}) => {
   }, {});
 };
 
+
+const normalizeMeasurementValue = (value, fieldName) => {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const stringValue = String(value).trim();
+
+  if (!stringValue) {
+    return undefined;
+  }
+
+  const numericValue = Number(stringValue);
+  if (Number.isFinite(numericValue) && numericValue < 0) {
+    throw new AppError(`${fieldName} must be greater than or equal to 0.`, 400);
+  }
+
+  return stringValue;
+};
+
+const normalizeMeasurements = (payloadMeasurements = {}, currentMeasurements = {}) => {
+  const directMeasurementFields = [
+    'bust',
+    'waist',
+    'hip',
+    'shoulder',
+    'sleeve',
+    'length',
+    'neck',
+    'armhole',
+  ];
+  const measurements = {
+    ...currentMeasurements,
+    ...cleanObject(payloadMeasurements),
+  };
+
+  directMeasurementFields.forEach((field) => {
+    const measurementValue = normalizeMeasurementValue(payloadMeasurements[field] ?? measurements[field], `measurements.${field}`);
+    if (measurementValue !== undefined) {
+      measurements[field] = measurementValue;
+    }
+  });
+
+  const notes = payloadMeasurements.notes ?? payloadMeasurements.measurementNotes ?? measurements.notes;
+  if (notes !== undefined && notes !== null && notes !== '') {
+    measurements.notes = String(notes).trim();
+  }
+
+  return cleanObject(measurements);
+};
+
+const normalizeFabricSelection = (payload = {}, currentFabricSelection = {}) => {
+  const incomingFabric = payload.fabricSelection || {};
+  const fabricSelection = {
+    ...currentFabricSelection,
+    ...cleanObject(incomingFabric),
+  };
+
+  if (payload.fabric !== undefined) {
+    fabricSelection.type = String(payload.fabric).trim();
+  }
+
+  if (payload.fabricType !== undefined) {
+    fabricSelection.type = String(payload.fabricType).trim();
+  }
+
+  if (payload.fabricDetails !== undefined) {
+    fabricSelection.details = String(payload.fabricDetails).trim();
+  }
+
+  return cleanObject(fabricSelection);
+};
+
+const normalizeDesignReference = (payload = {}, currentDesignReference = {}) => {
+  const incomingReference = payload.designReference || payload.referenceDesign || {};
+  const designReference = {
+    ...currentDesignReference,
+    ...cleanObject(incomingReference),
+  };
+
+  ['fileName', 'fileType', 'dataUrl', 'url'].forEach((field) => {
+    const payloadValue = payload[`reference${field.charAt(0).toUpperCase()}${field.slice(1)}`];
+    if (payloadValue !== undefined && payloadValue !== null && payloadValue !== '') {
+      designReference[field] = String(payloadValue).trim();
+    }
+  });
+
+  return cleanObject(designReference);
+};
+
+const normalizeAppointmentDate = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new AppError('appointmentDate must be a valid date.', 400);
+  }
+
+  return String(value).trim();
+};
+
 const normalizeItems = (items) => {
   if (items === undefined || items === null || items === '') {
     return [];
@@ -183,6 +286,12 @@ const matchesText = (order, search) => {
     order.productId,
     order.productName,
     order.notes,
+    order.appointmentDate,
+    order.fabricSelection?.type,
+    order.fabricSelection?.details,
+    order.stitchingDetails?.outfit,
+    order.stitchingDetails?.occasion,
+    order.stitchingDetails?.designInstructions,
     ...(order.items || []).flatMap((item) => [item.productId, item.name, item.title, item.sku]),
   ]
     .filter(Boolean)
@@ -306,12 +415,19 @@ class OrderModel extends BaseModel {
       statusUpdates.cancelledAt = null;
     }
 
+    if (normalizedStatus === 'in-progress') {
+      statusUpdates.startedAt = new Date().toISOString();
+      statusUpdates.completedAt = null;
+      statusUpdates.cancelledAt = null;
+    }
+
     if (normalizedStatus === 'cancelled') {
       statusUpdates.cancelledAt = new Date().toISOString();
       statusUpdates.completedAt = null;
     }
 
     if (normalizedStatus === 'pending') {
+      statusUpdates.startedAt = null;
       statusUpdates.completedAt = null;
       statusUpdates.cancelledAt = null;
     }
@@ -370,12 +486,56 @@ class OrderModel extends BaseModel {
       order.productName = String(payload.productName).trim();
     }
 
-    if (payload.measurements !== undefined) {
-      order.measurements = cleanObject(payload.measurements);
+    const incomingMeasurements = payload.measurements || {};
+    ['bust', 'waist', 'hip', 'shoulder', 'sleeve', 'length', 'neck', 'armhole'].forEach((field) => {
+      if (payload[field] !== undefined) {
+        incomingMeasurements[field] = payload[field];
+      }
+    });
+    if (payload.measurementNotes !== undefined || payload.measurement_notes !== undefined) {
+      incomingMeasurements.notes = payload.measurementNotes ?? payload.measurement_notes;
+    }
+    if (payload.measurements !== undefined || Object.keys(incomingMeasurements).length > 0) {
+      order.measurements = normalizeMeasurements(incomingMeasurements, currentOrder.measurements || {});
     }
 
-    if (payload.stitchingDetails !== undefined) {
-      order.stitchingDetails = cleanObject(payload.stitchingDetails);
+    const stitchingDetails = {
+      ...(currentOrder.stitchingDetails || {}),
+      ...cleanObject(payload.stitchingDetails),
+    };
+    const stitchingFieldMap = {
+      outfit: payload.outfit,
+      occasion: payload.occasion,
+      designInstructions: payload.designInstructions ?? payload.design_instructions,
+      consultationType: payload.consultationType ?? payload.consultation_type,
+      timeline: payload.timeline,
+    };
+    Object.entries(stitchingFieldMap).forEach(([field, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        stitchingDetails[field] = String(value).trim();
+      }
+    });
+    if (payload.stitchingDetails !== undefined || Object.values(stitchingFieldMap).some((value) => value !== undefined)) {
+      order.stitchingDetails = cleanObject(stitchingDetails);
+    }
+
+    const fabricSelection = normalizeFabricSelection(payload, currentOrder.fabricSelection || {});
+    if (!partial || payload.fabricSelection !== undefined || payload.fabric !== undefined || payload.fabricType !== undefined || payload.fabricDetails !== undefined) {
+      order.fabricSelection = fabricSelection;
+    }
+
+    const designReference = normalizeDesignReference(payload, currentOrder.designReference || {});
+    if (payload.designReference !== undefined || payload.referenceDesign !== undefined || Object.keys(designReference).length > 0) {
+      order.designReference = designReference;
+    }
+
+    const appointmentDate = normalizeAppointmentDate(payload.appointmentDate ?? payload.appointment_date);
+    if (appointmentDate !== undefined) {
+      order.appointmentDate = appointmentDate;
+    }
+
+    if (payload.appointmentTime !== undefined || payload.appointment_time !== undefined) {
+      order.appointmentTime = String(payload.appointmentTime ?? payload.appointment_time).trim();
     }
 
     if (payload.size !== undefined) {
@@ -475,6 +635,11 @@ class OrderModel extends BaseModel {
 
     const createdTo = parseDateFilter(filters.createdTo, 'createdTo');
     if (createdTo && new Date(order.createdAt) > createdTo) {
+      return false;
+    }
+
+    const appointmentDate = parseDateFilter(filters.appointmentDate, 'appointmentDate');
+    if (appointmentDate && order.appointmentDate !== filters.appointmentDate) {
       return false;
     }
 
