@@ -320,11 +320,173 @@
     renderShopSlots();
   };
 
+
+  const readReferenceFile = (file) => new Promise((resolve, reject) => {
+    if (!file) {
+      resolve({});
+      return;
+    }
+
+    const maxFileSize = 4 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      reject(new Error("Reference design must be smaller than 4 MB."));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      resolve({
+        fileName: file.name,
+        fileType: file.type || "application/octet-stream",
+        fileSize: file.size,
+        dataUrl: reader.result
+      });
+    });
+    reader.addEventListener("error", () => reject(new Error("Unable to read the reference design file.")));
+    reader.readAsDataURL(file);
+  });
+
+  const formatStatus = status => String(status || "pending")
+    .split("-")
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+
+  const setupCustomStitchingRequests = () => {
+    const form = doc.querySelector("#custom-stitching-request-form");
+    const message = doc.querySelector("#custom-booking-message");
+    const trackingForm = doc.querySelector("#custom-order-tracking-form");
+    const trackingResult = doc.querySelector("#custom-tracking-result");
+
+    const setMessage = (text, type = "") => {
+      if (!message) return;
+      message.textContent = text;
+      message.dataset.type = type;
+    };
+
+    const renderTrackingResult = (order) => {
+      if (!trackingResult) return;
+
+      if (!order) {
+        trackingResult.innerHTML = "<strong>No request found.</strong><span>Please check the order number or phone number and try again.</span>";
+        trackingResult.dataset.type = "error";
+        return;
+      }
+
+      const appointment = [order.appointmentDate, order.appointmentTime].filter(Boolean).join(" at ") || "Appointment not set";
+      trackingResult.dataset.type = "success";
+      trackingResult.innerHTML = `
+        <strong>${order.orderNumber || order.id} · ${formatStatus(order.status)}</strong>
+        <span>${order.customer?.name || "Customer"} · ${order.stitchingDetails?.outfit || "Custom Stitching"}</span>
+        <span>Fabric: ${order.fabricSelection?.type || "To be confirmed"}</span>
+        <span>Appointment: ${appointment}</span>
+      `;
+    };
+
+    if (form) {
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const submitButton = form.querySelector("button[type='submit']");
+        const formData = new FormData(form);
+
+        try {
+          if (submitButton) submitButton.disabled = true;
+          setMessage("Saving your custom stitching request...", "info");
+
+          const designReference = await readReferenceFile(formData.get("reference_design"));
+          const payload = {
+            orderType: "custom-stitching",
+            status: "pending",
+            customer: {
+              name: formData.get("name"),
+              phone: formData.get("phone"),
+              email: formData.get("email")
+            },
+            productName: formData.get("outfit"),
+            stitchingDetails: {
+              outfit: formData.get("outfit"),
+              occasion: formData.get("occasion"),
+              designInstructions: formData.get("design_instructions"),
+              consultationType: formData.get("consultation_type"),
+              timeline: formData.get("timeline")
+            },
+            measurements: {
+              bust: formData.get("bust"),
+              waist: formData.get("waist"),
+              hip: formData.get("hip"),
+              shoulder: formData.get("shoulder"),
+              sleeve: formData.get("sleeve"),
+              length: formData.get("length"),
+              notes: formData.get("measurement_notes")
+            },
+            fabricSelection: {
+              type: formData.get("fabric"),
+              details: formData.get("fabric_details")
+            },
+            designReference,
+            appointmentDate: formData.get("appointment_date"),
+            appointmentTime: formData.get("appointment_time"),
+            notes: formData.get("design_instructions")
+          };
+
+          const response = await fetch("/api/v1/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to save the request.");
+          }
+
+          form.reset();
+          setMessage(`Request saved! Your order number is ${result.data.orderNumber}. Current status: ${formatStatus(result.data.status)}.`, "success");
+          renderTrackingResult(result.data);
+        } catch (error) {
+          setMessage(error.message || "Unable to save the request right now.", "error");
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
+      });
+    }
+
+    if (trackingForm) {
+      trackingForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const formData = new FormData(trackingForm);
+        const query = String(formData.get("tracking_query") || "").trim();
+        if (!query) return;
+
+        try {
+          if (trackingResult) {
+            trackingResult.dataset.type = "info";
+            trackingResult.textContent = "Checking request status...";
+          }
+
+          const response = await fetch(`/api/v1/orders/custom-stitching?search=${encodeURIComponent(query)}`);
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to track the request.");
+          }
+
+          renderTrackingResult(result.data[0]);
+        } catch (error) {
+          if (trackingResult) {
+            trackingResult.dataset.type = "error";
+            trackingResult.textContent = error.message || "Unable to track the request right now.";
+          }
+        }
+      });
+    }
+  };
+
   const init = () => {
     markPageReady();
     setupPageTransitions();
     setupResponsiveNavigation();
     setupFashionShop();
+    setupCustomStitchingRequests();
     setupScrollReveal();
     setupLuxuryButtons();
     setupFloatingHero();

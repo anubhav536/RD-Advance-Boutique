@@ -2548,3 +2548,39 @@ iframe{
     padding:16px;
   }
 }
+
+.status-cancelled{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.4px;
+  text-transform:uppercase;
+  color:#ffd7dd;
+  background:rgba(255,107,129,0.14);
+  border:1px solid rgba(255,107,129,0.28);
+}
+
+.stitching-table small{
+  color:rgba(255,255,255,0.68);
+  display:inline-block;
+  line-height:1.6;
+  margin-top:4px;
+}
+
+.stitching-actions{
+  align-items:center;
+}
+
+.stitching-actions .status-update{
+  min-width:142px;
+}
+
+.disabled-link{
+  cursor:not-allowed;
+  filter:grayscale(1);
+  opacity:0.6;
+}

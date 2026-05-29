@@ -1,988 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Custom Stitching | RD Advance Boutique</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- GOOGLE FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 </head>
-
 <body>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- DASHBOARD SECTION -->
-  <!-- ========================= -->
-
   <section class="dashboard-section">
-
     <div class="dashboard-container">
-
-
-
-
-
-      <!-- ========================= -->
-      <!-- SIDEBAR -->
-      <!-- ========================= -->
-
       <div class="dashboard-sidebar">
-
-
-
         <div class="dashboard-logo">
-
           <img src="assets/logo.png" alt="Logo">
-
-
-
-          <h2>
-
-            RD Advance
-
-          </h2>
-
-
-
-          <p>
-
-            Admin Panel
-
-          </p>
-
+          <h2>RD Advance</h2>
+          <p>Admin Panel</p>
         </div>
-
-
-
-
-
         <div class="dashboard-menu">
-
-
-
-          <a href="admin-dashboard.html" class="menu-item">
-
-            📊 Dashboard
-
-          </a>
-
-
-
-
-
-          <a href="admin-products.html" class="menu-item">
-
-            🛍 Products
-
-          </a>
-
-
-
-
-
-          <a href="admin-gallery.html" class="menu-item">
-
-            🖼 Gallery
-
-          </a>
-
-
-
-
-
-          <a href="admin.orders.html" class="menu-item active">
-
-            📦 Orders
-
-          </a>
-
-
-
-
-
-          <a href="admin-course.html" class="menu-item">
-
-            ✂️ Course
-
-          </a>
-
-
-
-
-
-          <a href="admin-settings.html" class="menu-item">
-
-            ⚙ Settings
-
-          </a>
-
+          <a href="admin-dashboard.html" class="menu-item">📊 Dashboard</a>
+          <a href="admin-products.html" class="menu-item">🛍 Products</a>
+          <a href="admin-gallery.html" class="menu-item">🖼 Gallery</a>
+          <a href="admin.orders.html" class="menu-item active">📦 Orders</a>
+          <a href="admin-course.html" class="menu-item">✂️ Course</a>
+          <a href="admin-settings.html" class="menu-item">⚙ Settings</a>
         </div>
-
       </div>
-
-
-
-
-
-      <!-- ========================= -->
-      <!-- MAIN CONTENT -->
-      <!-- ========================= -->
 
       <div class="dashboard-main">
-
-
-
-
-
-        <!-- TOPBAR -->
-
         <div class="dashboard-topbar">
-
           <div>
-
-            <h1>
-
-              Custom Stitching
-
-            </h1>
-
-
-
-            <p>
-
-              Manage tailoring & custom stitching requests ✨
-
-            </p>
-
+            <h1>Custom Stitching</h1>
+            <p>Manage tailoring requests with measurements, reference uploads, fabrics, appointments, and status tracking ✨</p>
           </div>
-
-
-
-
-
-          <a href="admin.orders.html" class="primary-btn">
-
-            Back
-
-          </a>
-
+          <a href="admin.orders.html" class="primary-btn">Back</a>
         </div>
 
-
-
-
-
-        <!-- ========================= -->
-        <!-- FILTERS -->
-        <!-- ========================= -->
-
-        <div class="dashboard-box">
-
+        <div class="dashboard-box stitching-request-panel">
           <div class="box-header">
-
-            <h2>
-
-              Stitching Filters
-
-            </h2>
-
+            <h2>Stitching Filters</h2>
           </div>
-
-
-
-
-
           <div class="all-products-filters">
-
-
-
-            <input
-              type="text"
-              placeholder="Search stitching request..."
-              class="product-search"
-            >
-
-
-
-
-
-            <select class="product-filter-select">
-
-              <option>
-
-                All Categories
-
-              </option>
-
-
-
-              <option>
-
-                Bridal Wear
-
-              </option>
-
-
-
-              <option>
-
-                Blouse Stitching
-
-              </option>
-
-
-
-              <option>
-
-                Lehenga
-
-              </option>
-
-
-
-              <option>
-
-                Kurti
-
-              </option>
-
+            <input type="text" id="stitching-search" placeholder="Search name, phone, order number, fabric..." class="product-search">
+            <select id="stitching-outfit-filter" class="product-filter-select">
+              <option value="">All Outfit Types</option>
+              <option value="Designer Blouse">Designer Blouse</option>
+              <option value="Lehenga">Lehenga</option>
+              <option value="Kurti">Kurti</option>
+              <option value="Salwar Suit">Salwar Suit</option>
+              <option value="Kids Wear">Kids Wear</option>
+              <option value="Custom Design">Custom Design</option>
             </select>
-
-
-
-
-
-            <select class="product-filter-select">
-
-              <option>
-
-                Request Status
-
-              </option>
-
-
-
-              <option>
-
-                Pending
-
-              </option>
-
-
-
-              <option>
-
-                In Progress
-
-              </option>
-
-
-
-              <option>
-
-                Completed
-
-              </option>
-
+            <select id="stitching-status-filter" class="product-filter-select">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
-
           </div>
-
         </div>
 
-
-
-
-
-        <!-- ========================= -->
-        <!-- STITCHING REQUEST TABLE -->
-        <!-- ========================= -->
-
         <div class="dashboard-box">
-
           <div class="box-header">
-
-            <h2>
-
-              Custom Stitching Requests
-
-            </h2>
-
+            <h2>Custom Stitching Requests</h2>
           </div>
-
-
-
-
-
           <div class="products-table-wrapper">
-
-            <table class="products-table">
-
-
-
-
-
+            <table class="products-table stitching-table">
               <thead>
-
                 <tr>
-
-                  <th>
-
-                    Request ID
-
-                  </th>
-
-
-
-                  <th>
-
-                    Customer
-
-                  </th>
-
-
-
-                  <th>
-
-                    Design Type
-
-                  </th>
-
-
-
-                  <th>
-
-                    Measurements
-
-                  </th>
-
-
-
-                  <th>
-
-                    Amount
-
-                  </th>
-
-
-
-                  <th>
-
-                    Status
-
-                  </th>
-
-
-
-                  <th>
-
-                    Actions
-
-                  </th>
-
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Design & Fabric</th>
+                  <th>Measurements</th>
+                  <th>Appointment</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-
               </thead>
-
-
-
-
-
-              <tbody>
-
-
-
-
-
-                <!-- REQUEST 1 -->
-
+              <tbody id="stitching-requests-body">
                 <tr>
-
-                  <td>
-
-                    #CS101
-
-                  </td>
-
-
-
-                  <td>
-
-                    Priya Sharma
-
-                  </td>
-
-
-
-                  <td>
-
-                    Bridal Lehenga
-
-                  </td>
-
-
-
-                  <td>
-
-                    Submitted
-
-                  </td>
-
-
-
-                  <td>
-
-                    ₹15000
-
-                  </td>
-
-
-
-                  <td>
-
-                    <span class="status-active">
-
-                      In Progress
-
-                    </span>
-
-                  </td>
-
-
-
-                  <td>
-
-                    <div class="table-action-buttons">
-
-                      <button class="edit-btn">
-
-                        View
-
-                      </button>
-
-
-
-                      <button class="primary-btn">
-
-                        Update
-
-                      </button>
-
-                    </div>
-
-                  </td>
-
+                  <td colspan="7">Loading custom stitching requests...</td>
                 </tr>
-
-
-
-
-
-                <!-- REQUEST 2 -->
-
-                <tr>
-
-                  <td>
-
-                    #CS102
-
-                  </td>
-
-
-
-                  <td>
-
-                    Neha Jain
-
-                  </td>
-
-
-
-                  <td>
-
-                    Designer Blouse
-
-                  </td>
-
-
-
-                  <td>
-
-                    Submitted
-
-                  </td>
-
-
-
-                  <td>
-
-                    ₹3500
-
-                  </td>
-
-
-
-                  <td>
-
-                    <span class="status-active">
-
-                      Pending
-
-                    </span>
-
-                  </td>
-
-
-
-                  <td>
-
-                    <div class="table-action-buttons">
-
-                      <button class="edit-btn">
-
-                        View
-
-                      </button>
-
-
-
-                      <button class="primary-btn">
-
-                        Update
-
-                      </button>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-
-
-
-
-                <!-- REQUEST 3 -->
-
-                <tr>
-
-                  <td>
-
-                    #CS103
-
-                  </td>
-
-
-
-                  <td>
-
-                    Riya Verma
-
-                  </td>
-
-
-
-                  <td>
-
-                    Kurti Stitching
-
-                  </td>
-
-
-
-                  <td>
-
-                    Submitted
-
-                  </td>
-
-
-
-                  <td>
-
-                    ₹2200
-
-                  </td>
-
-
-
-                  <td>
-
-                    <span class="status-active">
-
-                      Completed
-
-                    </span>
-
-                  </td>
-
-
-
-                  <td>
-
-                    <div class="table-action-buttons">
-
-                      <button class="edit-btn">
-
-                        View
-
-                      </button>
-
-
-
-                      <button class="primary-btn">
-
-                        Update
-
-                      </button>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-
-
-
-
-                <!-- FUTURE DATABASE REQUESTS -->
-
-
-
               </tbody>
-
             </table>
-
           </div>
-
         </div>
 
-
-
-
-
-        <!-- ========================= -->
-        <!-- ANALYTICS -->
-        <!-- ========================= -->
-
         <div class="dashboard-box">
-
           <div class="box-header">
-
-            <h2>
-
-              Stitching Analytics
-
-            </h2>
-
+            <h2>Stitching Analytics</h2>
           </div>
-
-
-
-
-
           <div class="analytics-grid">
-
-
-
             <div class="analytics-card">
-
-              <h3>
-
-                Total Requests
-
-              </h3>
-
-
-
-              <h2>
-
-                0
-
-              </h2>
-
-
-
-              <p>
-
-                Custom Orders
-
-              </p>
-
+              <h3>Total Requests</h3>
+              <h2 id="total-requests-count">0</h2>
+              <p>Custom Orders</p>
             </div>
-
-
-
-
-
             <div class="analytics-card">
-
-              <h3>
-
-                In Progress
-
-              </h3>
-
-
-
-              <h2>
-
-                0
-
-              </h2>
-
-
-
-              <p>
-
-                Tailoring Work
-
-              </p>
-
+              <h3>In Progress</h3>
+              <h2 id="in-progress-count">0</h2>
+              <p>Tailoring Work</p>
             </div>
-
-
-
-
-
             <div class="analytics-card">
-
-              <h3>
-
-                Completed
-
-              </h3>
-
-
-
-              <h2>
-
-                0
-
-              </h2>
-
-
-
-              <p>
-
-                Finished Stitching
-
-              </p>
-
+              <h3>Completed</h3>
+              <h2 id="completed-count">0</h2>
+              <p>Finished Stitching</p>
             </div>
-
-
-
-
-
             <div class="analytics-card">
-
-              <h3>
-
-                Bridal Orders
-
-              </h3>
-
-
-
-              <h2>
-
-                0
-
-              </h2>
-
-
-
-              <p>
-
-                Premium Stitching
-
-              </p>
-
+              <h3>Appointments</h3>
+              <h2 id="appointment-count">0</h2>
+              <p>Scheduled Fittings</p>
             </div>
-
           </div>
-
         </div>
-
-
-
-
-
-        <!-- ========================= -->
-        <!-- CUSTOMER NOTES -->
-        <!-- ========================= -->
 
         <div class="dashboard-box">
-
           <div class="box-header">
-
-            <h2>
-
-              Tailoring Notes
-
-            </h2>
-
+            <h2>Tailoring Notes</h2>
           </div>
-
-
-
-
-
           <div class="overview-content">
-
-
-
             <div class="overview-card">
-
-              <h3>
-
-                📏 Accurate Measurements
-
-              </h3>
-
-
-
-              <p>
-
-                Double check customer measurements
-                before stitching.
-
-              </p>
-
+              <h3>📏 Accurate Measurements</h3>
+              <p>Review measurement values and notes before stitching begins.</p>
             </div>
-
-
-
-
-
             <div class="overview-card">
-
-              <h3>
-
-                ✨ Premium Finishing
-
-              </h3>
-
-
-
-              <p>
-
-                Elegant finishing improves
-                boutique reputation.
-
-              </p>
-
+              <h3>🧵 Reference & Fabric</h3>
+              <p>Open design references and confirm fabric selection before cutting.</p>
             </div>
-
-
-
-
-
             <div class="overview-card">
-
-              <h3>
-
-                💖 Customer Satisfaction
-
-              </h3>
-
-
-
-              <p>
-
-                Maintain proper communication
-                during stitching process.
-
-              </p>
-
+              <h3>💖 Customer Updates</h3>
+              <p>Use the status dropdown so customers can track request progress.</p>
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </section>
 
-
-
-
-
-  <!-- ========================= -->
-  <!-- SCRIPT -->
-  <!-- ========================= -->
-
   <script>
+    const statusLabels = {
+      pending: "Pending",
+      "in-progress": "In Progress",
+      completed: "Completed",
+      cancelled: "Cancelled"
+    };
+    const statusClasses = {
+      pending: "status-pending",
+      "in-progress": "status-active",
+      completed: "status-completed",
+      cancelled: "status-cancelled"
+    };
+    let stitchingOrders = [];
 
-    // UPDATE BUTTON
+    const formatCurrency = amount => `₹${Number(amount || 0).toLocaleString("en-IN")}`;
+    const formatAppointment = order => [order.appointmentDate, order.appointmentTime].filter(Boolean).join(" at ") || "Not scheduled";
+    const formatMeasurements = measurements => {
+      if (!measurements || !Object.keys(measurements).length) return "Not submitted";
+      const values = ["bust", "waist", "hip", "shoulder", "sleeve", "length"]
+        .filter(key => measurements[key])
+        .map(key => `${key}: ${measurements[key]}`);
+      return values.length ? values.join(", ") : (measurements.notes || "Submitted");
+    };
 
-    const updateButtons = document.querySelectorAll(
-
-      ".primary-btn"
-
-    );
-
-
-
-
-
-    updateButtons.forEach(button => {
-
-      button.addEventListener("click", () => {
-
-        if(button.innerText === "Update"){
-
-          alert(
-
-            "Stitching Status Updated ✨"
-
-          );
-
-
-
-
-
-          // FUTURE:
-          // Update stitching request in database
-
-        }
-
+    const getFilteredOrders = () => {
+      const search = document.querySelector("#stitching-search").value.trim().toLowerCase();
+      const outfit = document.querySelector("#stitching-outfit-filter").value;
+      const status = document.querySelector("#stitching-status-filter").value;
+      return stitchingOrders.filter(order => {
+        const searchable = [
+          order.orderNumber,
+          order.customer?.name,
+          order.customer?.phone,
+          order.customer?.email,
+          order.stitchingDetails?.outfit,
+          order.fabricSelection?.type,
+          order.fabricSelection?.details,
+          order.appointmentDate,
+          order.status
+        ].filter(Boolean).join(" ").toLowerCase();
+        return (!search || searchable.includes(search))
+          && (!outfit || order.stitchingDetails?.outfit === outfit || order.productName === outfit)
+          && (!status || order.status === status);
       });
+    };
 
+    const updateAnalytics = () => {
+      document.querySelector("#total-requests-count").textContent = stitchingOrders.length;
+      document.querySelector("#in-progress-count").textContent = stitchingOrders.filter(order => order.status === "in-progress").length;
+      document.querySelector("#completed-count").textContent = stitchingOrders.filter(order => order.status === "completed").length;
+      document.querySelector("#appointment-count").textContent = stitchingOrders.filter(order => order.appointmentDate).length;
+    };
+
+    const renderOrders = () => {
+      const tbody = document.querySelector("#stitching-requests-body");
+      const orders = getFilteredOrders();
+      updateAnalytics();
+
+      if (!orders.length) {
+        tbody.innerHTML = '<tr><td colspan="7">No custom stitching requests found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = orders.map(order => {
+        const referenceLink = order.designReference?.dataUrl || order.designReference?.url;
+        return `
+          <tr>
+            <td><strong>${order.orderNumber || order.id}</strong><br><small>${formatCurrency(order.totalAmount)}</small></td>
+            <td>${order.customer?.name || "-"}<br><small>${order.customer?.phone || ""} ${order.customer?.email || ""}</small></td>
+            <td><strong>${order.stitchingDetails?.outfit || order.productName || "Custom Design"}</strong><br><small>${order.fabricSelection?.type || "Fabric pending"} ${order.fabricSelection?.details || ""}</small></td>
+            <td><small>${formatMeasurements(order.measurements)}</small></td>
+            <td>${formatAppointment(order)}</td>
+            <td><span class="${statusClasses[order.status] || "status-active"}">${statusLabels[order.status] || order.status}</span></td>
+            <td>
+              <div class="table-action-buttons stitching-actions">
+                ${referenceLink ? `<a class="edit-btn" href="${referenceLink}" target="_blank" rel="noopener">View Reference</a>` : '<span class="edit-btn disabled-link">No Reference</span>'}
+                <select class="product-filter-select status-update" data-order-id="${order.id}" aria-label="Update status for ${order.orderNumber || order.id}">
+                  ${Object.entries(statusLabels).map(([value, label]) => `<option value="${value}" ${order.status === value ? "selected" : ""}>${label}</option>`).join("")}
+                </select>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    };
+
+    const loadOrders = async () => {
+      try {
+        const response = await fetch("/api/v1/orders/custom-stitching");
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Unable to load requests.");
+        stitchingOrders = result.data;
+        renderOrders();
+      } catch (error) {
+        document.querySelector("#stitching-requests-body").innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
+      }
+    };
+
+    document.querySelector("#stitching-search").addEventListener("input", renderOrders);
+    document.querySelector("#stitching-outfit-filter").addEventListener("change", renderOrders);
+    document.querySelector("#stitching-status-filter").addEventListener("change", renderOrders);
+    document.querySelector("#stitching-requests-body").addEventListener("change", async event => {
+      const select = event.target.closest(".status-update");
+      if (!select) return;
+      const orderId = select.dataset.orderId;
+      const nextStatus = select.value;
+      select.disabled = true;
+      try {
+        const response = await fetch(`/api/v1/orders/${encodeURIComponent(orderId)}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: nextStatus })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Unable to update status.");
+        stitchingOrders = stitchingOrders.map(order => order.id === orderId ? result.data : order);
+        renderOrders();
+      } catch (error) {
+        alert(error.message);
+        loadOrders();
+      } finally {
+        select.disabled = false;
+      }
     });
 
-
-
-
-
-    console.log(
-
-      "Custom Stitching Panel Loaded ✨"
-
-    );
-
+    loadOrders();
   </script>
-
 </body>
 </html>
