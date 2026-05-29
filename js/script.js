@@ -103,7 +103,6 @@
     revealItems.forEach(item => observer.observe(item));
   };
 
-
   const setupResponsiveNavigation = () => {
     const headers = Array.from(doc.querySelectorAll(".site-header, .navbar"));
 
@@ -229,7 +228,6 @@
       body.style.setProperty("--cursor-y", `${event.clientY}px`);
     }, { passive: true });
   };
-
 
   const setupContactAppointmentForm = () => {
     const form = doc.getElementById("appointmentForm");
@@ -472,7 +470,6 @@
     renderShopSlots();
   };
 
-
   const readUploadFile = (file, { label = "Upload", maxFileSize = 4 * 1024 * 1024, required = false } = {}) => new Promise((resolve, reject) => {
     if (!file || !file.name) {
       if (required) {
@@ -507,6 +504,20 @@
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
+  const escapeHtml = value => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+  const formatTimelineDate = value => {
+    if (!value) return "";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return "";
+    return parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
   const setupCustomStitchingRequests = () => {
     const form = doc.querySelector("#custom-stitching-request-form");
     const message = doc.querySelector("#custom-booking-message");
@@ -523,19 +534,37 @@
       if (!trackingResult) return;
 
       if (!order) {
-        trackingResult.innerHTML = "<strong>No request found.</strong><span>Please check the order number or phone number and try again.</span>";
+        trackingResult.innerHTML = "<strong>No request found.</strong><span>Please check the order ID and try again.</span>";
         trackingResult.dataset.type = "error";
         return;
       }
 
       const appointment = [order.appointmentDate, order.appointmentTime].filter(Boolean).join(" at ") || "Appointment not set";
+      const timeline = Array.isArray(order.timeline) ? order.timeline : [];
+      const timelineHtml = timeline.map(step => {
+        const state = step.state || "upcoming";
+        const date = formatTimelineDate(step.date);
+        return `
+          <li class="tracking-timeline__step tracking-timeline__step--${escapeHtml(state)}">
+            <span class="tracking-timeline__marker" aria-hidden="true"></span>
+            <span class="tracking-timeline__content">
+              <strong>${escapeHtml(step.label)}</strong>
+              <small>${escapeHtml(state === "current" ? "Current step" : formatStatus(state))}${date ? ` · ${escapeHtml(date)}` : ""}</small>
+            </span>
+          </li>
+        `;
+      }).join("");
+
       trackingResult.dataset.type = "success";
       trackingResult.innerHTML = `
-        <strong>${order.orderNumber || order.id} · ${formatStatus(order.status)}</strong>
-        <span>${order.customer?.name || "Customer"} · ${order.stitchingDetails?.outfit || "Custom Stitching"}</span>
-        <span>Fabric: ${order.fabricSelection?.type || "To be confirmed"}</span>
-        <span>Appointment: ${appointment}</span>
-        <span>Payment: ${formatStatus(order.payment?.status || "not-submitted")} · UPI ID: ${order.payment?.upiTransactionId || "Not submitted"}</span>
+        <strong>${escapeHtml(order.orderNumber || order.id)} · ${escapeHtml(formatStatus(order.status))}</strong>
+        <span>${escapeHtml(order.item || "Boutique order")}</span>
+        <span>Fabric: ${escapeHtml(order.fabric || "To be confirmed")}</span>
+        <span>Appointment: ${escapeHtml(appointment)}</span>
+        <span>Payment: ${escapeHtml(formatStatus(order.payment?.status || "not-submitted"))}</span>
+        <ol class="tracking-timeline" aria-label="Order status timeline">
+          ${timelineHtml}
+        </ol>
       `;
     };
 
@@ -609,8 +638,10 @@
           }
 
           form.reset();
-          setMessage(`Request saved! Your order number is ${result.data.orderNumber}. Payment is pending admin verification. Current order status: ${formatStatus(result.data.status)}.`, "success");
-          renderTrackingResult(result.data);
+          setMessage(`Request saved! Your order ID is ${result.data.orderNumber || result.data.id}. Payment is pending admin verification. Current order status: ${formatStatus(result.data.status)}.`, "success");
+          const trackingResponse = await fetch(`/api/v1/orders/track/${encodeURIComponent(result.data.orderNumber || result.data.id)}`);
+          const trackingPayload = await trackingResponse.json();
+          renderTrackingResult(trackingPayload.success ? trackingPayload.data : null);
         } catch (error) {
           setMessage(error.message || "Unable to save the request right now.", "error");
         } finally {
@@ -632,14 +663,14 @@
             trackingResult.textContent = "Checking request status...";
           }
 
-          const response = await fetch(`/api/v1/orders/custom-stitching?search=${encodeURIComponent(query)}`);
+          const response = await fetch(`/api/v1/orders/track/${encodeURIComponent(query)}`);
           const result = await response.json();
 
           if (!response.ok || !result.success) {
             throw new Error(result.message || "Unable to track the request.");
           }
 
-          renderTrackingResult(result.data[0]);
+          renderTrackingResult(result.data);
         } catch (error) {
           if (trackingResult) {
             trackingResult.dataset.type = "error";
