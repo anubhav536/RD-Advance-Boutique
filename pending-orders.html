@@ -404,7 +404,7 @@
 
 
 
-              <tbody>
+              <tbody id="pending-orders-body">
 
 
 
@@ -953,59 +953,249 @@
 
 
 
+
+
+  <div class="admin-modal" id="payment-verification-modal" aria-hidden="true">
+    <div class="admin-modal-content payment-modal-content">
+      <button type="button" class="close-modal" data-close-payment-modal aria-label="Close payment details">×</button>
+      <p class="eyebrow">Manual verification</p>
+      <h2>Payment Proof Review</h2>
+      <div class="payment-detail-grid" id="payment-detail-grid"></div>
+      <img id="payment-screenshot-preview" class="payment-screenshot-preview" alt="Uploaded payment screenshot" hidden>
+      <label class="field full-field">
+        <span>Reject Reason</span>
+        <textarea id="payment-reject-reason" rows="3" placeholder="Example: Transaction ID does not match bank statement."></textarea>
+      </label>
+      <div class="table-action-buttons">
+        <button type="button" class="primary-btn" id="approve-payment-btn">Approve Payment</button>
+        <button type="button" class="delete-btn" id="reject-payment-btn">Reject Payment</button>
+      </div>
+      <p class="admin-payment-message" id="payment-modal-message" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+
   <!-- ========================= -->
   <!-- SCRIPT -->
   <!-- ========================= -->
 
   <script>
+    (() => {
+      "use strict";
 
-    // COMPLETE ORDER BUTTON
+      const tableBody = document.querySelector("#pending-orders-body");
+      const searchInput = document.querySelector(".product-search");
+      const filterSelects = document.querySelectorAll(".product-filter-select");
+      const analyticsNumbers = document.querySelectorAll(".analytics-card h2");
+      const modal = document.querySelector("#payment-verification-modal");
+      const detailGrid = document.querySelector("#payment-detail-grid");
+      const screenshotPreview = document.querySelector("#payment-screenshot-preview");
+      const rejectReason = document.querySelector("#payment-reject-reason");
+      const modalMessage = document.querySelector("#payment-modal-message");
+      const approveButton = document.querySelector("#approve-payment-btn");
+      const rejectButton = document.querySelector("#reject-payment-btn");
+      let orders = [];
+      let activeOrderId = "";
 
-    const completeButtons = document.querySelectorAll(
+      const formatStatus = value => String(value || "not-submitted")
+        .split("-")
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
 
-      ".primary-btn"
+      const formatCurrency = (amount, currency = "INR") => new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 0
+      }).format(Number(amount || 0));
 
-    );
+      const statusClass = status => {
+        if (status === "approved") return "status-active";
+        if (status === "pending-verification") return "status-pending";
+        return "status-inactive";
+      };
 
+      const request = async (url, options = {}) => {
+        const response = await fetch(url, {
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          },
+          ...options
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success) throw new Error(result.message || "Request failed.");
+        return result.data;
+      };
 
+      const setModalMessage = (text, type = "") => {
+        if (!modalMessage) return;
+        modalMessage.textContent = text;
+        modalMessage.dataset.type = type;
+      };
 
+      const renderAnalytics = (visibleOrders) => {
+        if (analyticsNumbers.length < 4) return;
+        analyticsNumbers[0].textContent = visibleOrders.length;
+        analyticsNumbers[1].textContent = visibleOrders.filter(order => order.orderType === "ready-made").length;
+        analyticsNumbers[2].textContent = visibleOrders.filter(order => order.orderType !== "custom-stitching" && order.orderType !== "ready-made").length;
+        analyticsNumbers[3].textContent = visibleOrders.filter(order => order.orderType === "custom-stitching").length;
+      };
 
+      const getFilteredOrders = () => {
+        const search = String(searchInput?.value || "").trim().toLowerCase();
+        const orderTypeFilter = String(filterSelects[0]?.value || "").toLowerCase();
+        const paymentFilter = String(filterSelects[1]?.value || "").toLowerCase();
 
-    completeButtons.forEach(button => {
+        return orders.filter(order => {
+          const paymentStatus = order.payment?.status || "not-submitted";
+          const searchText = [
+            order.orderNumber,
+            order.customer?.name,
+            order.customer?.phone,
+            order.productName,
+            order.orderType,
+            paymentStatus,
+            order.payment?.upiTransactionId
+          ].filter(Boolean).join(" ").toLowerCase();
 
-      button.addEventListener("click", () => {
+          if (search && !searchText.includes(search)) return false;
+          if (orderTypeFilter.includes("custom") && order.orderType !== "custom-stitching") return false;
+          if (orderTypeFilter.includes("readymade") && order.orderType !== "ready-made") return false;
+          if (paymentFilter === "paid" && paymentStatus !== "approved") return false;
+          if (paymentFilter === "pending" && paymentStatus !== "pending-verification") return false;
+          return true;
+        });
+      };
 
-        if(button.innerText === "Complete"){
+      const renderOrders = () => {
+        if (!tableBody) return;
+        const visibleOrders = getFilteredOrders();
+        tableBody.innerHTML = "";
 
-          alert(
-
-            "Order Marked As Completed ✨"
-
-          );
-
-
-
-
-
-          // FUTURE:
-          // Update order status in database
-
+        if (!visibleOrders.length) {
+          tableBody.innerHTML = '<tr><td colspan="8"><strong>No pending orders found.</strong><small>Customer orders with uploaded payment proof will appear here for admin verification.</small></td></tr>';
+          renderAnalytics(visibleOrders);
+          return;
         }
 
+        visibleOrders.forEach(order => {
+          const payment = order.payment || {};
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td><strong>${order.orderNumber || order.id}</strong><small>${new Date(order.createdAt || Date.now()).toLocaleDateString("en-IN")}</small></td>
+            <td><strong>${order.customer?.name || "Customer"}</strong><small>${order.customer?.phone || "Phone not saved"}</small></td>
+            <td>${order.productName || order.stitchingDetails?.outfit || "Custom Order"}</td>
+            <td>${formatStatus(order.orderType)}</td>
+            <td>${formatCurrency(order.totalAmount || payment.amount, order.currency || "INR")}</td>
+            <td><span class="${statusClass(payment.status)}">${formatStatus(payment.status)}</span><small>UPI: ${payment.upiTransactionId || "Not submitted"}</small></td>
+            <td><span class="status-pending">${formatStatus(order.status)}</span></td>
+            <td>
+              <div class="table-action-buttons">
+                <button type="button" class="edit-btn" data-view-payment="${order.id}">View</button>
+                <button type="button" class="primary-btn" data-approve-payment="${order.id}" ${payment.status === "approved" ? "disabled" : ""}>Approve</button>
+                <button type="button" class="delete-btn" data-reject-payment="${order.id}">Reject</button>
+              </div>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+        renderAnalytics(visibleOrders);
+      };
+
+      const loadOrders = async () => {
+        if (!tableBody) return;
+        tableBody.innerHTML = '<tr><td colspan="8">Loading pending orders...</td></tr>';
+        try {
+          orders = await request("/api/v1/orders/pending");
+          renderOrders();
+        } catch (error) {
+          tableBody.innerHTML = `<tr><td colspan="8"><strong>Unable to load orders.</strong><small>${error.message}</small></td></tr>`;
+        }
+      };
+
+      const openPaymentModal = (orderId) => {
+        const order = orders.find(entry => String(entry.id) === String(orderId));
+        if (!order || !modal) return;
+        activeOrderId = order.id;
+        const payment = order.payment || {};
+        detailGrid.innerHTML = `
+          <div><strong>Order</strong><span>${order.orderNumber || order.id}</span></div>
+          <div><strong>Customer</strong><span>${order.customer?.name || "Customer"}</span></div>
+          <div><strong>UPI Transaction ID</strong><span>${payment.upiTransactionId || "Not submitted"}</span></div>
+          <div><strong>Payment Status</strong><span>${formatStatus(payment.status)}</span></div>
+          <div><strong>Amount</strong><span>${formatCurrency(payment.amount || order.totalAmount, order.currency || "INR")}</span></div>
+          <div><strong>Submitted</strong><span>${payment.submittedAt ? new Date(payment.submittedAt).toLocaleString("en-IN") : "Not submitted"}</span></div>
+        `;
+        if (payment.screenshot?.dataUrl || payment.screenshot?.url) {
+          screenshotPreview.src = payment.screenshot.dataUrl || payment.screenshot.url;
+          screenshotPreview.hidden = false;
+        } else {
+          screenshotPreview.removeAttribute("src");
+          screenshotPreview.hidden = true;
+        }
+        if (rejectReason) rejectReason.value = "";
+        setModalMessage("");
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false");
+      };
+
+      const closePaymentModal = () => {
+        if (!modal) return;
+        modal.classList.remove("active");
+        modal.setAttribute("aria-hidden", "true");
+        activeOrderId = "";
+      };
+
+      const verifyPayment = async (orderId, action) => {
+        const url = `/api/v1/orders/${encodeURIComponent(orderId)}/payment/${action}`;
+        const body = action === "reject" ? { reason: rejectReason?.value || "Payment proof rejected by admin." } : { verifiedBy: "admin" };
+        setModalMessage(`${action === "approve" ? "Approving" : "Rejecting"} payment...`, "info");
+        const updatedOrder = await request(url, {
+          method: "PATCH",
+          body: JSON.stringify(body)
+        });
+        orders = orders.map(order => String(order.id) === String(updatedOrder.id) ? updatedOrder : order)
+          .filter(order => order.status === "pending");
+        renderOrders();
+        setModalMessage(`Payment ${action === "approve" ? "approved" : "rejected"}. Order status updated to ${formatStatus(updatedOrder.status)}.`, "success");
+        window.setTimeout(closePaymentModal, 900);
+      };
+
+      tableBody?.addEventListener("click", event => {
+        const viewButton = event.target.closest("[data-view-payment]");
+        const approveRowButton = event.target.closest("[data-approve-payment]");
+        const rejectRowButton = event.target.closest("[data-reject-payment]");
+
+        if (viewButton) openPaymentModal(viewButton.dataset.viewPayment);
+        if (approveRowButton) verifyPayment(approveRowButton.dataset.approvePayment, "approve").catch(error => alert(error.message));
+        if (rejectRowButton) {
+          openPaymentModal(rejectRowButton.dataset.rejectPayment);
+          rejectReason?.focus();
+        }
       });
 
-    });
+      approveButton?.addEventListener("click", () => {
+        if (!activeOrderId) return;
+        verifyPayment(activeOrderId, "approve").catch(error => setModalMessage(error.message, "error"));
+      });
 
+      rejectButton?.addEventListener("click", () => {
+        if (!activeOrderId) return;
+        verifyPayment(activeOrderId, "reject").catch(error => setModalMessage(error.message, "error"));
+      });
 
+      document.querySelector("[data-close-payment-modal]")?.addEventListener("click", closePaymentModal);
+      modal?.addEventListener("click", event => {
+        if (event.target === modal) closePaymentModal();
+      });
+      searchInput?.addEventListener("input", renderOrders);
+      filterSelects.forEach(select => select.addEventListener("change", renderOrders));
+      document.addEventListener("DOMContentLoaded", loadOrders);
 
-
-
-    console.log(
-
-      "Pending Orders Panel Loaded ✨"
-
-    );
-
+      console.log("Pending Orders Panel Loaded ✨");
+    })();
   </script>
 
   <script src="js/admin-auth.js"></script>

@@ -50,6 +50,34 @@ const deleteOrder = asyncHandler(async (req, res) => {
   });
 });
 
+
+const updatePayment = asyncHandler(async (req, res) => {
+  const order = await OrderModel.updatePayment(req.params.id, req.body);
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
+const approvePayment = asyncHandler(async (req, res) => {
+  const order = await OrderModel.approvePayment(req.params.id, req.body.verifiedBy || 'admin');
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
+const rejectPayment = asyncHandler(async (req, res) => {
+  const order = await OrderModel.rejectPayment(req.params.id, req.body.reason || req.body.rejectionReason || '');
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const order = await OrderModel.updateStatus(req.params.id, req.body.status);
 
@@ -124,6 +152,9 @@ module.exports = {
   getOrders,
   getPendingOrders,
   getReadyMadeOrders,
+  approvePayment,
+  rejectPayment,
   updateOrder,
   updateOrderStatus,
+  updatePayment,
 };
