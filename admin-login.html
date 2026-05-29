@@ -179,6 +179,8 @@
 
               </label>
 
+              <a href="#forgot-password" id="forgotPasswordLink">Forgot password?</a>
+
             </div>
 
             <p id="adminLoginMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
@@ -192,6 +194,45 @@
             <button type="submit" class="primary-btn admin-btn">
 
               Login To Dashboard
+
+            </button>
+
+          </form>
+
+          <!-- FORGOT PASSWORD FORM -->
+
+          <form id="adminForgotPasswordForm" class="admin-forgot-password-form" hidden>
+
+            <div class="input-group">
+
+              <label>
+
+                Admin Email Address
+
+              </label>
+
+              <input
+                id="forgotAdminEmail"
+                name="email"
+                type="email"
+                autocomplete="username"
+                placeholder="Enter admin email"
+                required
+              >
+
+            </div>
+
+            <p id="forgotPasswordMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
+
+            <button type="submit" class="primary-btn admin-btn">
+
+              Send Reset Link
+
+            </button>
+
+            <button type="button" id="backToLoginButton" class="secondary-btn admin-secondary-btn">
+
+              Back To Login
 
             </button>
 
@@ -268,16 +309,70 @@
     const loginForm = document.getElementById("adminLoginForm");
     const loginMessage = document.getElementById("adminLoginMessage");
     const loginButton = loginForm.querySelector("button[type='submit']");
+    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    const forgotPasswordForm = document.getElementById("adminForgotPasswordForm");
+    const forgotPasswordMessage = document.getElementById("forgotPasswordMessage");
+    const forgotPasswordButton = forgotPasswordForm.querySelector("button[type='submit']");
+    const backToLoginButton = document.getElementById("backToLoginButton");
     const params = new URLSearchParams(window.location.search);
     const requestedNextPage = params.get("next") || "admin-dashboard.html";
     const nextPage = requestedNextPage.startsWith("/") && !requestedNextPage.startsWith("//")
       ? requestedNextPage
       : "admin-dashboard.html";
 
-    const setMessage = (message, isError = false) => {
-      loginMessage.textContent = message;
-      loginMessage.classList.toggle("error", isError);
+    const setMessage = (message, isError = false, target = loginMessage) => {
+      target.textContent = message;
+      target.classList.toggle("error", isError);
     };
+
+    const showForgotPassword = () => {
+      forgotPasswordForm.hidden = false;
+      loginForm.hidden = true;
+      document.getElementById("forgotAdminEmail").value = document.getElementById("adminEmail").value;
+      setMessage("Enter your admin email to receive a reset link.", false, forgotPasswordMessage);
+    };
+
+    const showLogin = () => {
+      forgotPasswordForm.hidden = true;
+      loginForm.hidden = false;
+      setMessage("", false, forgotPasswordMessage);
+    };
+
+    forgotPasswordLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      showForgotPassword();
+    });
+
+    backToLoginButton.addEventListener("click", showLogin);
+
+    forgotPasswordForm.addEventListener("submit", async function(e){
+      e.preventDefault();
+      forgotPasswordButton.disabled = true;
+      setMessage("Sending reset link...", false, forgotPasswordMessage);
+
+      try {
+        const response = await fetch("/api/v1/admin/auth/password-reset/request", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("forgotAdminEmail").value,
+          }),
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(payload.message || "Unable to send reset link.");
+        }
+
+        const preview = payload.data?.previewLink ? ` Development preview: ${payload.data.previewLink}` : "";
+        setMessage(`${payload.message}${preview}`, false, forgotPasswordMessage);
+      } catch (error) {
+        setMessage(error.message, true, forgotPasswordMessage);
+      } finally {
+        forgotPasswordButton.disabled = false;
+      }
+    });
 
     loginForm.addEventListener("submit", async function(e){
       e.preventDefault();

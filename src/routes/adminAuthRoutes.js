@@ -5,6 +5,9 @@ const { requireAdminApi } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
 
 router.post('/login', adminAuthController.login);
+router.post('/password-reset/request', adminAuthController.requestPasswordReset);
+router.get('/password-reset/validate', adminAuthController.validatePasswordResetToken);
+router.post('/password-reset/complete', adminAuthController.completePasswordReset);
 router.post('/logout', requireAdminApi, adminAuthController.logout);
 router.get('/session', requireAdminApi, adminAuthController.getSession);
 router.get('/profile', requireAdminApi, adminAuthController.getProfile);
