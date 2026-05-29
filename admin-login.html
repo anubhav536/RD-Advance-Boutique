@@ -199,6 +199,10 @@
 
           </form>
 
+          <p class="admin-login-message">
+            Need admin access? <a href="admin-signup.html">Request admin signup</a>
+          </p>
+
           <!-- FORGOT PASSWORD FORM -->
 
           <form id="adminForgotPasswordForm" class="admin-forgot-password-form" hidden>
@@ -319,6 +323,8 @@
     const nextPage = requestedNextPage.startsWith("/") && !requestedNextPage.startsWith("//")
       ? requestedNextPage
       : "admin-dashboard.html";
+    const approvalStatus = params.get("approved");
+    const approvedEmail = params.get("email") || "";
 
     const setMessage = (message, isError = false, target = loginMessage) => {
       target.textContent = message;
@@ -337,6 +343,15 @@
       loginForm.hidden = false;
       setMessage("", false, forgotPasswordMessage);
     };
+
+    if (approvalStatus === "success") {
+      document.getElementById("adminEmail").value = approvedEmail;
+      setMessage("Admin signup approved. You can login now.");
+    } else if (approvalStatus === "invalid") {
+      setMessage("Approval link is invalid or expired.", true);
+    } else if (approvalStatus === "missing") {
+      setMessage("Approval token is missing.", true);
+    }
 
     forgotPasswordLink.addEventListener("click", (event) => {
       event.preventDefault();

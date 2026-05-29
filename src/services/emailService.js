@@ -192,6 +192,41 @@ const sendPasswordResetEmail = async ({ to, resetLink, expiresInMinutes }) => {
   return { sent: true };
 };
 
+const escapeHtml = (value) => String(value || '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
+const sendAdminSignupApprovalEmail = async ({ to, signupEmail, approvalLink, expiresInMinutes }) => {
+  if (!config.email.smtpHost) {
+    console.info(`Admin signup approval request for ${signupEmail}: ${approvalLink}`);
+    return { sent: false, previewLink: approvalLink };
+  }
+
+  const subject = 'RD Advance Boutique admin signup approval';
+  const text = [
+    'A new admin signup request is waiting for approval.',
+    '',
+    `Requested admin email: ${signupEmail}`,
+    `Approve this admin here: ${approvalLink}`,
+    '',
+    `This approval link will expire in ${expiresInMinutes} minutes. Approve only if you trust this admin.`,
+  ].join('\n');
+  const safeLink = escapeHtml(approvalLink);
+  const safeSignupEmail = escapeHtml(signupEmail);
+  const html = `
+    <p>A new admin signup request is waiting for approval.</p>
+    <p><strong>Requested admin email:</strong> ${safeSignupEmail}</p>
+    <p><a href="${safeLink}">Approve this admin</a></p>
+    <p>This approval link will expire in ${expiresInMinutes} minutes. Approve only if you trust this admin.</p>
+  `;
+
+  await sendSmtpEmail({ to, subject, text, html });
+  return { sent: true };
+};
+
 module.exports = {
+  sendAdminSignupApprovalEmail,
   sendPasswordResetEmail,
 };
