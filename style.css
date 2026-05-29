@@ -2737,3 +2737,32 @@ iframe{
     height:150px;
   }
 }
+
+.admin-logout-btn {
+  margin-left: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #b91c1c;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(185, 28, 28, 0.18);
+}
+
+.admin-logout-btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.admin-login-message {
+  min-height: 22px;
+  margin: 10px 0 0;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.admin-login-message.error {
+  color: #b91c1c;
+}

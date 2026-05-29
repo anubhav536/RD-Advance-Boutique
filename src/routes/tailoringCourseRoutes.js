@@ -1,5 +1,6 @@
 const express = require('express');
 const tailoringCourseController = require('../controllers/tailoringCourseController');
+const { requireAdminApi } = require('../middleware/adminAuthMiddleware');
 
 const router = express.Router();
 
@@ -7,16 +8,16 @@ const crudRoute = (path, listHandler, createHandler, updateHandler, deleteHandle
   router
     .route(path)
     .get(listHandler)
-    .post(createHandler);
+    .post(requireAdminApi, createHandler);
 
   router
     .route(`${path}/:id`)
-    .put(updateHandler)
-    .patch(updateHandler)
-    .delete(deleteHandler);
+    .put(requireAdminApi, updateHandler)
+    .patch(requireAdminApi, updateHandler)
+    .delete(requireAdminApi, deleteHandler);
 };
 
-router.get('/dashboard', tailoringCourseController.getDashboard);
+router.get('/dashboard', requireAdminApi, tailoringCourseController.getDashboard);
 router.get('/constants', tailoringCourseController.getConstants);
 
 crudRoute(

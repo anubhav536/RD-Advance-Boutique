@@ -34,9 +34,28 @@ data/
 3. Start development mode with `npm run dev` or production mode with `npm start`.
 
 
+### Admin authentication
+
+Admin authentication uses only local credentials from `config/admin-auth.json`; no external identity provider or third-party API is used. The password is stored as a PBKDF2 hash and successful logins receive an HTTP-only, signed same-site session cookie.
+
+Default local development credentials are:
+
+- Email: `admin@example.com`
+- Password: `ChangeMeNow!2026`
+
+Change both the password hash and `sessionSecret` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
+
+Admin auth endpoints:
+
+- `POST /api/v1/admin/auth/login` creates an admin session from the configured local credentials.
+- `GET /api/v1/admin/auth/session` verifies the current admin session.
+- `POST /api/v1/admin/auth/logout` destroys the current admin session.
+
+Protected admin HTML pages redirect unauthenticated users to `admin-login.html`. Admin-only JSON database writes are available under `/api/v1/admin/data...`; public `/api/v1/data...` is read-only.
+
 ### Product management endpoints
 
-Products are stored in `data/products.json` and exposed through dedicated backend routes:
+Products are stored in `data/products.json` and exposed through dedicated backend routes. Product reads are public; create, update, stock update, and delete operations require an admin session:
 
 - `GET /api/v1/products` lists products with optional `search`, `category`, `type`, `status`, `featured`, and `inStock` filters.
 - `POST /api/v1/products` adds a product with title, category, price, type, stock quantity, images, details, features, tags, featured status, and affiliate/product links.
@@ -55,7 +74,7 @@ Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product
 
 ### Order management endpoints
 
-Orders are stored in `data/orders.json` and exposed through dedicated backend routes with no payment integration yet:
+Orders are stored in `data/orders.json` and exposed through dedicated backend routes with no payment integration yet. Public customers can create orders; admin order lists, detail reads, status changes, edits, and deletes require an admin session:
 
 - `GET /api/v1/orders` lists orders with optional `search`, `status`, `type`/`orderType`, `customerPhone`, `customerEmail`, `productId`, `createdFrom`, and `createdTo` filters.
 - `POST /api/v1/orders` creates an order for either a ready-made product order or a custom stitching order. Customer name and phone are required.
@@ -101,7 +120,7 @@ Valid contact submission statuses are `new`, `read`, `replied`, and `closed`. Va
 
 ### Gallery management endpoints
 
-Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes:
+Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes. Gallery reads are public; create, update, and delete operations require an admin session:
 
 - `GET /api/v1/gallery` lists gallery images with optional `search`, `category`, `layout`, and `featured` filters.
 - `POST /api/v1/gallery` adds a gallery image with title, category, image URL/path, alt text, layout, featured status, tags, description, and sort order.
@@ -118,11 +137,7 @@ Valid gallery layouts are `default`, `wide`, and `tall`. Gallery categories are 
 - `GET /api/v1/health` returns the current API health status.
 - `GET /api/v1/data` lists every supported local JSON collection.
 - `GET /api/v1/data/:collection` reads a JSON collection.
-- `PUT /api/v1/data/:collection` replaces an entire JSON collection.
-- `POST /api/v1/data/:collection` creates an item in an array collection or merges settings into `settings.json`.
-- `PATCH /api/v1/data/:collection/:id` updates an array item by `id` or merges updates into `settings.json`.
-- `DELETE /api/v1/data/:collection/:id` deletes an array item by `id` or a key from `settings.json`.
-- `GET|PUT|POST|PATCH|DELETE /api/v1/admin/data...` mirrors the same JSON database endpoints for admin panel usage.
+- `GET|PUT|POST|PATCH|DELETE /api/v1/admin/data...` provides authenticated JSON database management for the admin panel.
 
 Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, `contact`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
 
