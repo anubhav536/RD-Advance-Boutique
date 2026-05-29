@@ -1,4 +1,5 @@
 const asyncHandler = require('../utils/asyncHandler');
+const { getAdminAuthConfig, updateAdminCredentials } = require('../config/adminAuth');
 const {
   createAdminSession,
   destroyAdminSession,
@@ -46,8 +47,73 @@ const getSession = asyncHandler(async (req, res) => {
   });
 });
 
+const getProfile = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      email: getAdminAuthConfig().username,
+    },
+  });
+});
+
+const updateCredentials = asyncHandler(async (req, res) => {
+  const {
+    currentPassword,
+    email,
+    newPassword,
+    confirmPassword,
+  } = req.body || {};
+  const nextEmail = String(email || '').trim().toLowerCase();
+  const nextPassword = String(newPassword || '');
+
+  if (!verifyAdminCredentials(getAdminAuthConfig().username, currentPassword)) {
+    return res.status(401).json({
+      success: false,
+      message: 'Current admin password is incorrect.',
+    });
+  }
+
+  if (!nextEmail || !nextPassword) {
+    return res.status(400).json({
+      success: false,
+      message: 'New admin email and password are required.',
+    });
+  }
+
+  if (nextPassword.length < 8) {
+    return res.status(400).json({
+      success: false,
+      message: 'New password must be at least 8 characters long.',
+    });
+  }
+
+  if (nextPassword !== String(confirmPassword || '')) {
+    return res.status(400).json({
+      success: false,
+      message: 'New password and confirm password must match.',
+    });
+  }
+
+  const updatedConfig = updateAdminCredentials({
+    username: nextEmail,
+    password: nextPassword,
+  });
+  const session = createAdminSession(req, res, updatedConfig.username);
+
+  return res.status(200).json({
+    success: true,
+    message: 'Admin login credentials updated successfully.',
+    data: {
+      email: updatedConfig.username,
+      expiresAt: new Date(session.expiresAt).toISOString(),
+    },
+  });
+});
+
 module.exports = {
+  getProfile,
   getSession,
   login,
   logout,
+  updateCredentials,
 };

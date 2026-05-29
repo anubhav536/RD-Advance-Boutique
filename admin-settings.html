@@ -562,6 +562,143 @@
 
 
         <!-- ========================= -->
+        <!-- ADMIN LOGIN CREDENTIALS -->
+        <!-- ========================= -->
+
+        <div class="dashboard-box">
+
+          <div class="box-header">
+
+            <div>
+
+              <h2>
+
+                Admin Login Credentials
+
+              </h2>
+
+              <p>
+
+                Change the protected admin email and password after signing in.
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+
+          <form id="adminCredentialsForm" class="admin-product-form admin-credentials-form">
+
+            <div class="input-group">
+
+              <label for="adminCredentialEmail">
+
+                Admin Email
+
+              </label>
+
+              <input
+                id="adminCredentialEmail"
+                name="email"
+                type="email"
+                autocomplete="username"
+                placeholder="rdadvanceboutique@gmail.com"
+                required
+              >
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label for="adminCurrentPassword">
+
+                Current Password
+
+              </label>
+
+              <input
+                id="adminCurrentPassword"
+                name="currentPassword"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter current password"
+                required
+              >
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label for="adminNewPassword">
+
+                New Password
+
+              </label>
+
+              <input
+                id="adminNewPassword"
+                name="newPassword"
+                type="password"
+                autocomplete="new-password"
+                minlength="8"
+                placeholder="Enter new password"
+                required
+              >
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label for="adminConfirmPassword">
+
+                Confirm New Password
+
+              </label>
+
+              <input
+                id="adminConfirmPassword"
+                name="confirmPassword"
+                type="password"
+                autocomplete="new-password"
+                minlength="8"
+                placeholder="Confirm new password"
+                required
+              >
+
+            </div>
+
+
+
+            <p id="adminCredentialsMessage" class="admin-login-message admin-credentials-message" role="alert" aria-live="polite"></p>
+
+
+
+            <div class="admin-form-buttons">
+
+              <button type="submit" class="primary-btn">
+
+                Save Admin Login
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+
+
+
+        <!-- ========================= -->
         <!-- RECENT UPDATES -->
         <!-- ========================= -->
 
@@ -705,11 +842,64 @@
 
   <script>
 
-    console.log(
+    const credentialsForm = document.getElementById("adminCredentialsForm");
+    const credentialsMessage = document.getElementById("adminCredentialsMessage");
+    const credentialEmail = document.getElementById("adminCredentialEmail");
+    const credentialButton = credentialsForm.querySelector("button[type='submit']");
 
-      "Admin Settings Panel Loaded ✨"
+    const setCredentialsMessage = (message, isError = false) => {
+      credentialsMessage.textContent = message;
+      credentialsMessage.classList.toggle("error", isError);
+    };
 
-    );
+    const requestAdminAuth = async (path, options = {}) => {
+      const response = await fetch(`/api/v1/admin/auth${path}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        },
+        ...options,
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.message || "Admin credential update failed.");
+      return payload;
+    };
+
+    const loadAdminCredentialsProfile = async () => {
+      try {
+        const payload = await requestAdminAuth("/profile");
+        credentialEmail.value = payload.data?.email || "rdadvanceboutique@gmail.com";
+      } catch (error) {
+        setCredentialsMessage(error.message, true);
+      }
+    };
+
+    credentialsForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      credentialButton.disabled = true;
+      setCredentialsMessage("Saving admin login credentials...");
+
+      try {
+        const formData = new FormData(credentialsForm);
+        const payload = await requestAdminAuth("/credentials", {
+          method: "PUT",
+          body: JSON.stringify(Object.fromEntries(formData.entries())),
+        });
+
+        setCredentialsMessage(payload.message || "Admin login credentials updated successfully.");
+        credentialEmail.value = payload.data?.email || credentialEmail.value;
+        credentialsForm.reset();
+        credentialEmail.value = payload.data?.email || credentialEmail.value;
+      } catch (error) {
+        setCredentialsMessage(error.message, true);
+      } finally {
+        credentialButton.disabled = false;
+      }
+    });
+
+    loadAdminCredentialsProfile();
 
   </script>
 
