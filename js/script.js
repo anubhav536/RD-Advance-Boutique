@@ -164,7 +164,7 @@
     const trigger = doc.querySelector(".site-header .brand__logo");
     if (!trigger) return;
 
-    const shortcutPath = "/admin-login.html";
+    const shortcutPath = "admin-login.html";
     const requiredHoldDurationMs = 11000;
     let holdTimer = 0;
 
