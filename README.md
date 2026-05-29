@@ -74,13 +74,17 @@ Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product
 
 ### Order management endpoints
 
-Orders are stored in `data/orders.json` and exposed through dedicated backend routes with no payment integration yet. Public customers can create orders; admin order lists, detail reads, status changes, edits, and deletes require an admin session:
+Orders are stored in `data/orders.json` and exposed through dedicated backend routes. Public customers can create orders and submit manual payment details; admin order lists, detail reads, status changes, payment approvals/rejections, edits, and deletes require an admin session:
 
 - `GET /api/v1/orders` lists orders with optional `search`, `status`, `type`/`orderType`, `customerPhone`, `customerEmail`, `productId`, `createdFrom`, and `createdTo` filters.
 - `POST /api/v1/orders` creates an order for either a ready-made product order or a custom stitching order. Customer name and phone are required.
 - `GET /api/v1/orders/:id` returns one order.
+- `GET /api/v1/orders/payment-methods` returns the currently enabled payment methods and required submission fields.
+- `PATCH /api/v1/orders/:id/payment` submits manual UPI payment details for admin verification.
+- `PATCH /api/v1/orders/:id/payment/approve` approves a submitted manual payment and moves the order to `in-progress`.
+- `PATCH /api/v1/orders/:id/payment/reject` rejects submitted manual payment details with an optional reason.
 - `PUT|PATCH /api/v1/orders/:id` edits order details, customer details, items, measurements, stitching details, due date, notes, and totals.
-- `PATCH /api/v1/orders/:id/status` updates an order status with `pending`, `completed`, or `cancelled`.
+- `PATCH /api/v1/orders/:id/status` updates an order status with `pending`, `in-progress`, `completed`, or `cancelled`.
 - `PATCH /api/v1/orders/:id/complete` marks an order completed.
 - `PATCH /api/v1/orders/:id/cancel` marks an order cancelled.
 - `DELETE /api/v1/orders/:id` deletes an order.
@@ -91,7 +95,13 @@ Orders are stored in `data/orders.json` and exposed through dedicated backend ro
 - `GET /api/v1/orders/custom-stitching` returns custom stitching orders.
 - `GET /api/v1/orders/ready-made` returns ready-made product orders.
 
-Valid order statuses are `pending`, `completed`, and `cancelled`. Valid order types are `custom-stitching` and `ready-made`.
+Valid order statuses are `pending`, `in-progress`, `completed`, and `cancelled`. Valid order types are `custom-stitching` and `ready-made`. Valid payment statuses are `not-submitted`, `pending-verification`, `approved`, and `rejected`.
+
+### Payment architecture
+
+Payment handling is intentionally modular but does not integrate any external gateway yet. `src/services/payment/PaymentService.js` resolves the payment method for an order, delegates method-specific behavior to a gateway adapter, and persists the resulting payment state through `OrderModel`. The only registered adapter is `manual-upi`, which captures a customer-provided UPI transaction ID and screenshot for admin verification.
+
+Future payment gateways can be added by creating a gateway adapter with `getMetadata`, `submit`, `approve`, and `reject` behaviors under `src/services/payment/gateways/`, then registering the adapter in `src/services/payment/gateways/index.js`. No Razorpay SDK, credentials, checkout flow, or webhook handling is included at this stage.
 
 ### Contact management endpoints
 
@@ -141,4 +151,4 @@ Valid gallery layouts are `default`, `wide`, and `tall`. Gallery categories are 
 
 Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, `contact`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
 
-Payment gateway integrations and external API calls are intentionally not included in this foundation.
+External payment gateway SDKs, credentials, webhooks, and checkout API calls are intentionally not included in this foundation.
