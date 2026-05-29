@@ -161,42 +161,37 @@
   };
 
   const setupSecretAdminShortcut = () => {
-    const isIndexPage = ["/", "", "/index.html"].includes(window.location.pathname);
-    const trigger = isIndexPage ? doc.querySelector(".site-header .brand__logo") : null;
+    const trigger = doc.querySelector(".site-header .brand__logo");
     if (!trigger) return;
 
     const shortcutPath = "/admin-login.html";
-    const requiredTapCount = 10;
-    const tapResetDelayMs = 3000;
-    let tapCount = 0;
-    let resetTimer = 0;
+    const requiredHoldDurationMs = 11000;
+    let holdTimer = 0;
 
-    const resetTapCount = () => {
-      tapCount = 0;
-      if (!resetTimer) return;
-      window.clearTimeout(resetTimer);
-      resetTimer = 0;
+    const cancelHold = () => {
+      if (!holdTimer) return;
+      window.clearTimeout(holdTimer);
+      holdTimer = 0;
     };
 
-    const scheduleReset = () => {
-      if (resetTimer) window.clearTimeout(resetTimer);
-      resetTimer = window.setTimeout(resetTapCount, tapResetDelayMs);
+    const openAdminLogin = () => {
+      holdTimer = 0;
+      window.location.assign(shortcutPath);
     };
 
-    trigger.addEventListener("click", event => {
+    trigger.addEventListener("pointerdown", () => {
+      cancelHold();
+      holdTimer = window.setTimeout(openAdminLogin, requiredHoldDurationMs);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(eventName => {
+      trigger.addEventListener(eventName, cancelHold);
+    });
+
+    trigger.addEventListener("contextmenu", event => {
+      if (!holdTimer) return;
       event.preventDefault();
-      event.stopPropagation();
-
-      tapCount += 1;
-
-      if (tapCount >= requiredTapCount) {
-        resetTapCount();
-        window.location.assign(shortcutPath);
-        return;
-      }
-
-      scheduleReset();
-    }, true);
+    });
   };
 
   const setupLuxuryButtons = () => {
