@@ -1579,3 +1579,505 @@ h3 {
     padding: 4.5rem 1rem 1rem;
   }
 }
+
+/* =========================
+   Premium Custom Stitching Booking page
+   ========================= */
+.custom-page {
+  background:
+    radial-gradient(circle at 8% 5%, rgba(201, 164, 92, 0.2), transparent 24rem),
+    radial-gradient(circle at 92% 16%, rgba(190, 107, 114, 0.18), transparent 24rem),
+    linear-gradient(180deg, var(--cream), #f9efe2 46%, var(--ivory));
+}
+
+.custom-header {
+  box-shadow: 0 14px 40px rgba(45, 28, 18, 0.06);
+}
+
+.custom-hero {
+  align-items: end;
+  background:
+    linear-gradient(112deg, rgba(16, 13, 11, 0.92), rgba(32, 25, 23, 0.74) 50%, rgba(190, 107, 114, 0.24)),
+    url("../assets/design5.jpg") center/cover no-repeat;
+  color: var(--ivory);
+  display: grid;
+  gap: 2rem;
+  min-height: 720px;
+  overflow: hidden;
+  padding: 8rem 5% 4rem;
+  position: relative;
+}
+
+.custom-hero::before {
+  background: linear-gradient(90deg, rgba(255, 253, 248, 0.12) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 253, 248, 0.1) 1px, transparent 1px);
+  background-size: 88px 88px;
+  content: "";
+  inset: 0;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent 78%);
+  opacity: 0.55;
+  pointer-events: none;
+  position: absolute;
+}
+
+.custom-hero::after {
+  background: linear-gradient(0deg, var(--cream), transparent);
+  bottom: 0;
+  content: "";
+  height: 24%;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+.custom-hero__content,
+.custom-hero__card {
+  position: relative;
+  z-index: 1;
+}
+
+.custom-hero__content h1 {
+  font-size: clamp(3rem, 10vw, 6.6rem);
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  max-width: 960px;
+}
+
+.custom-hero__content p:not(.eyebrow) {
+  color: rgba(255, 253, 248, 0.8);
+  font-size: 1.02rem;
+  margin-top: 1.25rem;
+  max-width: 650px;
+}
+
+.custom-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+}
+
+.custom-hero__card {
+  backdrop-filter: blur(22px);
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(201, 164, 92, 0.42);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--black);
+  max-width: 405px;
+  padding: 1.5rem;
+}
+
+.custom-hero__card span,
+.tailor-card span,
+.process-card span {
+  color: var(--rose);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.custom-hero__card strong {
+  display: block;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  line-height: 1.02;
+  margin: 0.55rem 0 0.85rem;
+}
+
+.custom-hero__card ul,
+.sidebar-card ol {
+  color: var(--muted);
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.15rem;
+}
+
+.booking-section,
+.tailor-process {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.booking-section {
+  padding-bottom: 5rem;
+  padding-top: 5rem;
+}
+
+.booking-intro {
+  margin: 0 auto 2.5rem;
+  max-width: 780px;
+  text-align: center;
+}
+
+.booking-intro h2 {
+  font-size: clamp(2.35rem, 8vw, 4.7rem);
+  letter-spacing: -0.05em;
+  line-height: 0.94;
+}
+
+.booking-intro p:not(.eyebrow) {
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+.booking-layout {
+  align-items: start;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.booking-form,
+.booking-sidebar {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-card,
+.sidebar-card,
+.process-card {
+  background: rgba(255, 253, 248, 0.82);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 55px rgba(45, 28, 18, 0.08);
+}
+
+.form-card {
+  display: grid;
+  gap: 1.1rem;
+  padding: clamp(1.2rem, 3vw, 1.75rem);
+}
+
+.form-card legend {
+  color: var(--black);
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.65rem, 4vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 1rem;
+  padding-right: 1rem;
+}
+
+.form-card legend span {
+  color: var(--gold);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-right: 0.45rem;
+}
+
+.form-grid,
+.measurement-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field span {
+  color: var(--charcoal);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: rgba(255, 248, 238, 0.72);
+  border: 1px solid rgba(201, 164, 92, 0.32);
+  border-radius: 18px;
+  color: var(--black);
+  font: inherit;
+  min-height: 54px;
+  outline: 0;
+  padding: 0.9rem 1rem;
+  transition: 0.25s ease;
+  width: 100%;
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  background: var(--ivory);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 164, 92, 0.14);
+}
+
+.measurement-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compact-field input {
+  text-align: center;
+}
+
+.fabric-options {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.fabric-card {
+  background: rgba(255, 248, 238, 0.62);
+  border: 1px solid rgba(201, 164, 92, 0.32);
+  border-radius: 22px;
+  cursor: pointer;
+  display: grid;
+  gap: 0.35rem;
+  min-height: 160px;
+  padding: 1rem;
+  position: relative;
+  transition: 0.25s ease;
+}
+
+.fabric-card input {
+  accent-color: var(--gold);
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.fabric-card:hover,
+.fabric-card:has(input:checked) {
+  background: var(--ivory);
+  border-color: var(--gold);
+  box-shadow: 0 18px 45px rgba(45, 28, 18, 0.1);
+  transform: translateY(-3px);
+}
+
+.fabric-swatch {
+  border: 1px solid rgba(16, 13, 11, 0.08);
+  border-radius: 18px;
+  display: block;
+  height: 66px;
+  width: 88px;
+}
+
+.fabric-swatch--silk {
+  background: linear-gradient(135deg, #8f2638, #df9f89 52%, #f6d58b);
+}
+
+.fabric-swatch--cotton {
+  background: linear-gradient(135deg, #fff9ef, #dfc7a8);
+}
+
+.fabric-swatch--georgette {
+  background: linear-gradient(135deg, #6d749c, #d9c1d8 58%, #fff5f0);
+}
+
+.fabric-swatch--velvet {
+  background: linear-gradient(135deg, #1d1630, #62406b 55%, #bd8f69);
+}
+
+.fabric-card strong {
+  font-size: 1rem;
+}
+
+.fabric-card small,
+.upload-box small {
+  color: var(--muted);
+}
+
+.upload-box {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, 0.9), rgba(248, 225, 220, 0.58));
+  border: 1px dashed rgba(201, 164, 92, 0.7);
+  border-radius: 24px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  min-height: 190px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: 0.25s ease;
+}
+
+.upload-box:hover {
+  border-color: var(--rose);
+  box-shadow: 0 18px 45px rgba(45, 28, 18, 0.1);
+  transform: translateY(-3px);
+}
+
+.upload-box input {
+  max-width: 260px;
+}
+
+.upload-icon {
+  align-items: center;
+  background: var(--black);
+  border-radius: 50%;
+  color: var(--gold);
+  display: inline-flex;
+  font-size: 1.7rem;
+  height: 62px;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+  width: 62px;
+}
+
+.appointment-card {
+  background:
+    radial-gradient(circle at top right, rgba(201, 164, 92, 0.18), transparent 16rem),
+    rgba(255, 253, 248, 0.9);
+}
+
+.booking-submit {
+  border: 0;
+  cursor: pointer;
+  min-height: 58px;
+  width: 100%;
+}
+
+.booking-sidebar {
+  position: sticky;
+  top: 112px;
+}
+
+.sidebar-card,
+.process-card {
+  padding: 1.4rem;
+}
+
+.sidebar-card--dark {
+  background:
+    radial-gradient(circle at top right, rgba(201, 164, 92, 0.22), transparent 15rem),
+    var(--charcoal);
+  border-color: rgba(201, 164, 92, 0.26);
+  color: var(--ivory);
+}
+
+.sidebar-card--dark h3,
+.tailor-card h3,
+.contact-mini-card h3,
+.process-card h3 {
+  font-size: clamp(1.8rem, 4vw, 2.35rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0.55rem 0 0.9rem;
+}
+
+.sidebar-card--dark ol {
+  color: rgba(255, 253, 248, 0.72);
+}
+
+.tailor-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.tailor-card img {
+  aspect-ratio: 4 / 3;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.tailor-card div {
+  padding: 1.25rem;
+}
+
+.contact-mini-card p,
+.process-card p {
+  color: var(--muted);
+}
+
+.contact-mini-card .btn {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.contact-line {
+  font-size: 0.9rem;
+}
+
+.tailor-process {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 5rem;
+}
+
+.process-card {
+  min-height: 240px;
+}
+
+.custom-footer {
+  text-align: left;
+}
+
+@media (min-width: 700px) {
+  .custom-hero {
+    grid-template-columns: minmax(0, 1fr) 390px;
+  }
+
+  .custom-hero__card {
+    justify-self: end;
+  }
+
+  .form-grid--two,
+  .measurement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tailor-process {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .custom-hero,
+  .booking-section,
+  .tailor-process {
+    padding-left: 7%;
+    padding-right: 7%;
+  }
+
+  .booking-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 410px);
+  }
+
+  .form-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .measurement-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .booking-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 520px) {
+  .custom-hero {
+    min-height: 700px;
+    padding-top: 5rem;
+  }
+
+  .custom-hero__actions .btn,
+  .fabric-card {
+    width: 100%;
+  }
+
+  .measurement-grid,
+  .fabric-options {
+    grid-template-columns: 1fr;
+  }
+}

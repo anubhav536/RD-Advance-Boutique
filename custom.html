@@ -1,572 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book premium custom stitching at RD Advance Boutique with measurements, fabric selection, reference design upload, and appointment scheduling.">
+  <title>Premium Custom Stitching | RD Advance Boutique</title>
 
-  <title>Custom Stitching | RD Advance Boutique</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- GOOGLE FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-<body>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- NAVBAR -->
-  <!-- ========================= -->
-
-  <header class="navbar">
-
-    <div class="logo-section">
-
-      <img src="assets/logo.png" alt="RD Logo" class="logo">
-
-      <div class="logo-text">
-
-        <h2>RD Advance</h2>
-
-        <p>Boutique</p>
-
-      </div>
-
-    </div>
-
-
-
-    <nav>
-
-      <ul class="nav-links">
-
-        <li><a href="index.html">Home</a></li>
-
-        <li><a href="shop.html">Shop</a></li>
-
-        <li><a href="gallery.html">Gallery</a></li>
-
-        <li><a href="learn.html">Course</a></li>
-
-        <li><a href="custom.html" class="active">Custom Stitching</a></li>
-
-      </ul>
-
-    </nav>
-
-
-
-    <a href="https://wa.me/917693849472" class="whatsapp-btn">
-
-      WhatsApp
-
+<body class="custom-page">
+  <header class="site-header custom-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text">
+        <strong>RD Advance</strong>
+        <span>Boutique</span>
+      </span>
     </a>
 
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="shop.html" class="nav__link">Shop</a>
+      <a href="gallery.html" class="nav__link">Gallery</a>
+      <a href="learn.html" class="nav__link">Course</a>
+      <a href="custom.html" class="nav__link nav__link--active">Custom Stitching</a>
+    </nav>
+
+    <a href="https://wa.me/917693849472" class="header-cta">WhatsApp Fitting</a>
   </header>
 
+  <main>
+    <section class="custom-hero">
+      <div class="custom-hero__content">
+        <p class="eyebrow">Premium tailor booking</p>
+        <h1>Custom stitched outfits with couture-level care.</h1>
+        <p>Share your measurements, choose your fabric direction, upload a reference design, and reserve a personal fitting appointment with RD Advance Boutique.</p>
+        <div class="custom-hero__actions">
+          <a href="#booking-form" class="btn btn--primary">Start Booking</a>
+          <a href="https://wa.me/917693849472" class="btn btn--ghost">Ask on WhatsApp</a>
+        </div>
+      </div>
 
+      <aside class="custom-hero__card" aria-label="Premium tailoring highlights">
+        <span>Signature Service</span>
+        <strong>Blouses, suits, lehengas & special occasion silhouettes</strong>
+        <ul>
+          <li>Designer consultation</li>
+          <li>Measurement review</li>
+          <li>Fabric & finish guidance</li>
+        </ul>
+      </aside>
+    </section>
 
+    <section class="booking-section" id="booking-form">
+      <div class="booking-intro">
+        <p class="eyebrow">Tailor your request</p>
+        <h2>Complete your premium stitching brief.</h2>
+        <p>Every detail helps our boutique team understand your fit, finish, and styling expectations before your appointment.</p>
+      </div>
 
+      <div class="booking-layout">
+        <form class="booking-form" action="#" method="post" enctype="multipart/form-data">
+          <fieldset class="form-card">
+            <legend><span>01</span> Client Details</legend>
+            <div class="form-grid form-grid--two">
+              <label class="field">
+                <span>Full Name</span>
+                <input type="text" name="name" placeholder="Enter your name" required>
+              </label>
+              <label class="field">
+                <span>Phone Number</span>
+                <input type="tel" name="phone" placeholder="Enter mobile number" required>
+              </label>
+              <label class="field">
+                <span>Outfit Type</span>
+                <select name="outfit" required>
+                  <option value="">Select outfit</option>
+                  <option>Designer Blouse</option>
+                  <option>Kurti</option>
+                  <option>Salwar Suit</option>
+                  <option>Lehenga</option>
+                  <option>Kids Wear</option>
+                  <option>Custom Design</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Occasion</span>
+                <input type="text" name="occasion" placeholder="Wedding, festival, party...">
+              </label>
+            </div>
+          </fieldset>
 
-  <!-- ========================= -->
-  <!-- HERO SECTION -->
-  <!-- ========================= -->
-
-  <section class="custom-hero">
-
-    <div class="custom-hero-content">
-
-      <span class="custom-tag">
-
-        Premium Boutique Stitching ✂️
-
-      </span>
-
-
-
-      <h1>
-
-        Get Your Dress <br>
-        Custom Stitched
-
-      </h1>
-
-
-
-      <p>
-
-        Share your favorite design,
-        measurements and style preferences
-        for premium boutique stitching.
-
-      </p>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CUSTOM FORM -->
-  <!-- ========================= -->
-
-  <section class="custom-form-section">
-
-    <div class="custom-form-container">
-
-
-
-      <div class="form-left">
-
-        <h2>
-
-          Custom Stitching Form
-
-        </h2>
-
-
-
-        <p>
-
-          Fill your details below and
-          we will contact you shortly.
-
-        </p>
-
-
-
-        <form class="custom-form" id="customForm">
-
-
-
-          <!-- NAME -->
-
-          <div class="input-group">
-
-            <label>
-
-              Full Name
-
+          <fieldset class="form-card">
+            <legend><span>02</span> Measurements</legend>
+            <div class="measurement-grid">
+              <label class="field compact-field">
+                <span>Bust</span>
+                <input type="text" name="bust" placeholder="inches">
+              </label>
+              <label class="field compact-field">
+                <span>Waist</span>
+                <input type="text" name="waist" placeholder="inches">
+              </label>
+              <label class="field compact-field">
+                <span>Hip</span>
+                <input type="text" name="hip" placeholder="inches">
+              </label>
+              <label class="field compact-field">
+                <span>Shoulder</span>
+                <input type="text" name="shoulder" placeholder="inches">
+              </label>
+              <label class="field compact-field">
+                <span>Sleeve</span>
+                <input type="text" name="sleeve" placeholder="length">
+              </label>
+              <label class="field compact-field">
+                <span>Garment Length</span>
+                <input type="text" name="length" placeholder="length">
+              </label>
+            </div>
+            <label class="field full-field">
+              <span>Additional Measurement Notes</span>
+              <textarea name="measurement_notes" rows="4" placeholder="Neck depth, armhole, blouse length, preferred fit, lining notes..."></textarea>
             </label>
+          </fieldset>
 
-            <input type="text" placeholder="Enter your name">
-
-          </div>
-
-
-
-
-
-          <!-- PHONE -->
-
-          <div class="input-group">
-
-            <label>
-
-              Phone Number
-
+          <fieldset class="form-card">
+            <legend><span>03</span> Fabric Selection</legend>
+            <div class="fabric-options" role="group" aria-label="Choose fabric preference">
+              <label class="fabric-card">
+                <input type="radio" name="fabric" value="silk">
+                <span class="fabric-swatch fabric-swatch--silk"></span>
+                <strong>Silk Finish</strong>
+                <small>Rich festive sheen</small>
+              </label>
+              <label class="fabric-card">
+                <input type="radio" name="fabric" value="cotton">
+                <span class="fabric-swatch fabric-swatch--cotton"></span>
+                <strong>Cotton Blend</strong>
+                <small>Comfort daily wear</small>
+              </label>
+              <label class="fabric-card">
+                <input type="radio" name="fabric" value="georgette">
+                <span class="fabric-swatch fabric-swatch--georgette"></span>
+                <strong>Georgette</strong>
+                <small>Soft flowing drape</small>
+              </label>
+              <label class="fabric-card">
+                <input type="radio" name="fabric" value="velvet">
+                <span class="fabric-swatch fabric-swatch--velvet"></span>
+                <strong>Velvet</strong>
+                <small>Premium occasion look</small>
+              </label>
+            </div>
+            <label class="field full-field">
+              <span>Fabric Color / Material Details</span>
+              <input type="text" name="fabric_details" placeholder="Example: wine silk, gold border, customer fabric available...">
             </label>
+          </fieldset>
 
-            <input type="tel" placeholder="Enter your mobile number">
-
-          </div>
-
-
-
-
-
-          <!-- DRESS TYPE -->
-
-          <div class="input-group">
-
-            <label>
-
-              Dress Type
-
+          <fieldset class="form-card">
+            <legend><span>04</span> Reference Design Upload</legend>
+            <label class="upload-box">
+              <input type="file" name="reference_design" accept="image/*,.pdf">
+              <span class="upload-icon">✦</span>
+              <strong>Upload inspiration photo or PDF</strong>
+              <small>Share neckline, sleeve, embroidery, or full outfit references.</small>
             </label>
-
-            <select>
-
-              <option>Select Dress Type</option>
-
-              <option>Blouse</option>
-
-              <option>Kurti</option>
-
-              <option>Salwar Suit</option>
-
-              <option>Lehenga</option>
-
-              <option>Kids Wear</option>
-
-              <option>Custom Design</option>
-
-            </select>
-
-          </div>
-
-
-
-
-
-          <!-- MEASUREMENTS -->
-
-          <div class="input-group">
-
-            <label>
-
-              Measurements
-
+            <label class="field full-field">
+              <span>Design Instructions</span>
+              <textarea name="design_instructions" rows="4" placeholder="Mention changes from the reference, embroidery style, neckline, back design, tassels, padding, lining..."></textarea>
             </label>
+          </fieldset>
 
-            <textarea rows="4" placeholder="Write your measurements here"></textarea>
+          <fieldset class="form-card appointment-card">
+            <legend><span>05</span> Appointment</legend>
+            <div class="form-grid form-grid--two">
+              <label class="field">
+                <span>Preferred Date</span>
+                <input type="date" name="appointment_date" required>
+              </label>
+              <label class="field">
+                <span>Preferred Time</span>
+                <input type="time" name="appointment_time" required>
+              </label>
+              <label class="field">
+                <span>Consultation Type</span>
+                <select name="consultation_type">
+                  <option>Boutique Visit</option>
+                  <option>WhatsApp Consultation</option>
+                  <option>Pickup & Measurement Discussion</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Delivery Timeline</span>
+                <select name="timeline">
+                  <option>Standard</option>
+                  <option>Urgent</option>
+                  <option>Event date confirmed</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
 
-          </div>
-
-
-
-
-
-          <!-- DESIGN IMAGE -->
-
-          <div class="input-group">
-
-            <label>
-
-              Upload Design Image
-
-            </label>
-
-            <input type="file">
-
-          </div>
-
-
-
-
-
-          <!-- FABRIC DETAILS -->
-
-          <div class="input-group">
-
-            <label>
-
-              Fabric Details
-
-            </label>
-
-            <input type="text" placeholder="Fabric type / color / material">
-
-          </div>
-
-
-
-
-
-          <!-- SPECIAL NOTE -->
-
-          <div class="input-group">
-
-            <label>
-
-              Special Instructions
-
-            </label>
-
-            <textarea rows="4" placeholder="Any special stitching instructions"></textarea>
-
-          </div>
-
-
-
-
-
-          <!-- SUBMIT -->
-
-          <button type="submit" class="primary-btn">
-
-            Submit Request
-
-          </button>
-
-
-
+          <button type="submit" class="btn btn--primary booking-submit">Submit Premium Booking Request</button>
         </form>
 
+        <aside class="booking-sidebar" aria-label="Booking support details">
+          <div class="sidebar-card sidebar-card--dark">
+            <p class="eyebrow">What happens next</p>
+            <h3>Your boutique fitting plan</h3>
+            <ol>
+              <li>We review your measurements and reference design.</li>
+              <li>Our tailor confirms fabric, finish, and appointment details.</li>
+              <li>Your outfit is stitched with fitting-focused finishing.</li>
+            </ol>
+          </div>
+
+          <div class="sidebar-card tailor-card">
+            <img src="assets/design1.jpg" alt="Premium stitched boutique blouse detail">
+            <div>
+              <span>Premium Finish</span>
+              <h3>Perfect fitting, clean finishing, and personalized styling.</h3>
+            </div>
+          </div>
+
+          <div class="sidebar-card contact-mini-card">
+            <h3>Need help booking?</h3>
+            <p>Call or WhatsApp us for measurements, fabric guidance, and urgent stitching questions.</p>
+            <a href="https://wa.me/917693849472" class="btn btn--ghost">Chat on WhatsApp</a>
+            <p class="contact-line">📞 7693849472 · 📍 Damoh, Madhya Pradesh</p>
+          </div>
+        </aside>
       </div>
+    </section>
 
-
-
-
-
-      <!-- RIGHT SIDE -->
-
-      <div class="form-right">
-
-        <img src="assets/custom-stitching.jpg" alt="Custom Stitching">
-
-
-
-        <div class="right-content">
-
-          <h2>
-
-            Why Choose RD Advance Boutique?
-
-          </h2>
-
-
-
-          <div class="feature-box">
-
-            ✔ Perfect Fitting
-
-          </div>
-
-
-
-          <div class="feature-box">
-
-            ✔ Premium Stitching
-
-          </div>
-
-
-
-          <div class="feature-box">
-
-            ✔ Modern Boutique Designs
-
-          </div>
-
-
-
-          <div class="feature-box">
-
-            ✔ Personalized Styling
-
-          </div>
-
-
-
-          <div class="feature-box">
-
-            ✔ Traditional Tailoring Expertise
-
-          </div>
-
-        </div>
-
+    <section class="tailor-process">
+      <div class="process-card">
+        <span>01</span>
+        <h3>Design Brief</h3>
+        <p>Upload your dream look and note neckline, sleeve, embroidery, and fitting preferences.</p>
       </div>
+      <div class="process-card">
+        <span>02</span>
+        <h3>Measurement Review</h3>
+        <p>Our team checks each key measurement so the garment is prepared for a graceful fit.</p>
+      </div>
+      <div class="process-card">
+        <span>03</span>
+        <h3>Appointment Fitting</h3>
+        <p>Book a boutique visit or WhatsApp consultation to finalize fabric and delivery details.</p>
+      </div>
+    </section>
+  </main>
 
+  <footer class="footer custom-footer">
+    <div class="footer__brand">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo">
+      <div>
+        <h2>RD Advance Boutique</h2>
+        <p>Premium custom stitching and boutique tailoring in Damoh.</p>
+      </div>
     </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- HOW IT WORKS -->
-  <!-- ========================= -->
-
-  <section class="how-it-works">
-
-    <div class="section-title">
-
-      <h2>
-
-        How Custom Stitching Works
-
-      </h2>
-
+    <div class="footer__contact">
+      <a href="tel:+917693849472">+91 7693849472</a>
+      <a href="https://wa.me/917693849472">WhatsApp Booking</a>
+      <span>Damoh, Madhya Pradesh</span>
     </div>
-
-
-
-    <div class="steps-grid">
-
-
-
-      <div class="step-card">
-
-        <h3>
-
-          1️⃣ Upload Design
-
-        </h3>
-
-
-
-        <p>
-
-          Share your favorite outfit design.
-
-        </p>
-
-      </div>
-
-
-
-
-
-      <div class="step-card">
-
-        <h3>
-
-          2️⃣ Submit Measurements
-
-        </h3>
-
-
-
-        <p>
-
-          Add your fitting and fabric details.
-
-        </p>
-
-      </div>
-
-
-
-
-
-      <div class="step-card">
-
-        <h3>
-
-          3️⃣ Get Premium Stitching
-
-        </h3>
-
-
-
-        <p>
-
-          We stitch your outfit with perfection.
-
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CONTACT -->
-  <!-- ========================= -->
-
-  <section class="custom-contact">
-
-    <div class="contact-box">
-
-      <h2>
-
-        Need Help?
-
-      </h2>
-
-
-
-      <p>
-
-        📞 7693849472
-
-      </p>
-
-
-
-      <p>
-
-        📍 Damoh, Madhya Pradesh
-
-      </p>
-
-
-
-      <a href="https://wa.me/917693849472" class="primary-btn">
-
-        Chat On WhatsApp
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- FOOTER -->
-  <!-- ========================= -->
-
-  <footer class="footer">
-
-    <p>
-
-      © 2026 RD Advance Boutique.
-      All Rights Reserved.
-
-    </p>
-
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
   </footer>
 
-
-
-
-
-  <!-- ========================= -->
-  <!-- JS -->
-  <!-- ========================= -->
-
   <script src="js/script.js"></script>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- FUTURE FORM BACKEND -->
-  <!-- ========================= -->
-
-  <script>
-
-    /*
-    
-    FUTURE BACKEND CONNECTION
-    
-    Firebase / Admin Panel se:
-    
-    - Form submissions save honge
-    - Customer requests admin dashboard me dikhenge
-    - WhatsApp notification bhi bhej sakte ho
-    
-    */
-
-  </script>
-
 </body>
 </html>
