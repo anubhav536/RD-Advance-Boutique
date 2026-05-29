@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "/api/v1/data/settings";
+  const API_BASE = "/api/v1/admin/data/settings";
   const FALLBACK_SETTINGS = "data/settings.json";
   const MAX_IMAGE_BYTES = 1024 * 1024;
 

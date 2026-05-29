@@ -1,41 +1,42 @@
 const express = require('express');
 const contactController = require('../controllers/contactController');
+const { requireAdminApi } = require('../middleware/adminAuthMiddleware');
 
 const router = express.Router();
 
-router.get('/', contactController.getContactOverview);
+router.get('/', requireAdminApi, contactController.getContactOverview);
 router.post('/', contactController.createSubmission);
-router.get('/dashboard', contactController.getDashboard);
+router.get('/dashboard', requireAdminApi, contactController.getDashboard);
 router.get('/constants', contactController.getConstants);
 
 router
   .route('/submissions')
-  .get(contactController.getSubmissions)
+  .get(requireAdminApi, contactController.getSubmissions)
   .post(contactController.createSubmission);
 
-router.patch('/submissions/:id/status', contactController.updateSubmissionStatus);
-router.post('/submissions/:id/replies', contactController.addSubmissionReply);
+router.patch('/submissions/:id/status', requireAdminApi, contactController.updateSubmissionStatus);
+router.post('/submissions/:id/replies', requireAdminApi, contactController.addSubmissionReply);
 
 router
   .route('/submissions/:id')
-  .get(contactController.getSubmission)
-  .put(contactController.updateSubmission)
-  .patch(contactController.updateSubmission)
-  .delete(contactController.deleteSubmission);
+  .get(requireAdminApi, contactController.getSubmission)
+  .put(requireAdminApi, contactController.updateSubmission)
+  .patch(requireAdminApi, contactController.updateSubmission)
+  .delete(requireAdminApi, contactController.deleteSubmission);
 
 router
   .route('/tickets')
-  .get(contactController.getTickets)
+  .get(requireAdminApi, contactController.getTickets)
   .post(contactController.createTicket);
 
-router.patch('/tickets/:id/status', contactController.updateTicketStatus);
-router.post('/tickets/:id/replies', contactController.addTicketReply);
+router.patch('/tickets/:id/status', requireAdminApi, contactController.updateTicketStatus);
+router.post('/tickets/:id/replies', requireAdminApi, contactController.addTicketReply);
 
 router
   .route('/tickets/:id')
-  .get(contactController.getTicket)
-  .put(contactController.updateTicket)
-  .patch(contactController.updateTicket)
-  .delete(contactController.deleteTicket);
+  .get(requireAdminApi, contactController.getTicket)
+  .put(requireAdminApi, contactController.updateTicket)
+  .patch(requireAdminApi, contactController.updateTicket)
+  .delete(requireAdminApi, contactController.deleteTicket);
 
 module.exports = router;

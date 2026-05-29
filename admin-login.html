@@ -126,7 +126,10 @@
 
 
               <input
+                id="adminEmail"
+                name="email"
                 type="email"
+                autocomplete="username"
                 placeholder="Enter admin email"
                 required
               >
@@ -150,7 +153,10 @@
 
 
               <input
+                id="adminPassword"
+                name="password"
                 type="password"
+                autocomplete="current-password"
                 placeholder="Enter password"
                 required
               >
@@ -167,21 +173,15 @@
 
               <label>
 
-                <input type="checkbox">
+                <input type="checkbox" disabled>
 
-                Remember Me
+                Secure session managed by server
 
               </label>
 
-
-
-              <a href="#">
-
-                Forgot Password?
-
-              </a>
-
             </div>
+
+            <p id="adminLoginMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
 
 
 
@@ -266,34 +266,46 @@
   <script>
 
     const loginForm = document.getElementById("adminLoginForm");
+    const loginMessage = document.getElementById("adminLoginMessage");
+    const loginButton = loginForm.querySelector("button[type='submit']");
+    const params = new URLSearchParams(window.location.search);
+    const requestedNextPage = params.get("next") || "admin-dashboard.html";
+    const nextPage = requestedNextPage.startsWith("/") && !requestedNextPage.startsWith("//")
+      ? requestedNextPage
+      : "admin-dashboard.html";
 
+    const setMessage = (message, isError = false) => {
+      loginMessage.textContent = message;
+      loginMessage.classList.toggle("error", isError);
+    };
 
-
-
-
-    loginForm.addEventListener("submit", function(e){
-
+    loginForm.addEventListener("submit", async function(e){
       e.preventDefault();
+      loginButton.disabled = true;
+      setMessage("Checking credentials...");
 
+      try {
+        const response = await fetch("/api/v1/admin/auth/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("adminEmail").value,
+            password: document.getElementById("adminPassword").value,
+          }),
+        });
+        const payload = await response.json().catch(() => ({}));
 
+        if (!response.ok) {
+          throw new Error(payload.message || "Invalid admin credentials.");
+        }
 
-
-
-      alert(
-
-        "Admin Login Successful ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Redirect to dashboard
-
-      // window.location.href = "admin-dashboard.html";
-
+        setMessage("Login successful. Redirecting...");
+        window.location.replace(nextPage);
+      } catch (error) {
+        setMessage(error.message, true);
+        loginButton.disabled = false;
+      }
     });
 
   </script>
