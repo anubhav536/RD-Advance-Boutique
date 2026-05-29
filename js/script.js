@@ -101,6 +101,63 @@
     revealItems.forEach(item => observer.observe(item));
   };
 
+
+  const setupResponsiveNavigation = () => {
+    const headers = Array.from(doc.querySelectorAll(".site-header, .navbar"));
+
+    headers.forEach((header, index) => {
+      const nav = header.querySelector(".nav, .nav-links");
+      if (!nav) return;
+
+      const navId = nav.id || `primary-navigation-${index + 1}`;
+      nav.id = navId;
+
+      let toggle = header.querySelector(".nav-toggle");
+      if (!toggle) {
+        toggle = doc.createElement("button");
+        toggle.className = "nav-toggle";
+        toggle.type = "button";
+        toggle.setAttribute("aria-label", "Open navigation menu");
+        toggle.setAttribute("aria-controls", navId);
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.innerHTML = "<span></span><span></span><span></span>";
+        nav.before(toggle);
+      }
+
+      const closeMenu = () => {
+        header.classList.remove("nav-open");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Open navigation menu");
+      };
+
+      const openMenu = () => {
+        header.classList.add("nav-open");
+        toggle.setAttribute("aria-expanded", "true");
+        toggle.setAttribute("aria-label", "Close navigation menu");
+      };
+
+      toggle.addEventListener("click", () => {
+        if (header.classList.contains("nav-open")) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      nav.addEventListener("click", event => {
+        if (event.target.closest("a")) closeMenu();
+      });
+
+      doc.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMenu();
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 900) closeMenu();
+      }, { passive: true });
+    });
+  };
+
   const setupLuxuryButtons = () => {
     doc.addEventListener("pointerdown", event => {
       const button = event.target.closest(buttonSelectors);
@@ -140,6 +197,7 @@
   const init = () => {
     markPageReady();
     setupPageTransitions();
+    setupResponsiveNavigation();
     setupScrollReveal();
     setupLuxuryButtons();
     setupFloatingHero();
