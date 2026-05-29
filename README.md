@@ -23,6 +23,7 @@ data/
   categories.json         # Product/category records
   students.json           # Course student/admission records
   notifications.json      # Admin notification records
+  contact.json            # Contact submissions and support tickets
   settings.json           # Website and business settings
 ```
 
@@ -73,6 +74,31 @@ Orders are stored in `data/orders.json` and exposed through dedicated backend ro
 
 Valid order statuses are `pending`, `completed`, and `cancelled`. Valid order types are `custom-stitching` and `ready-made`.
 
+### Contact management endpoints
+
+Contact submissions and customer support tickets are stored together in `data/contact.json`:
+
+- `GET /api/v1/contact` returns contact submissions and support tickets, with optional shared `search`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
+- `POST /api/v1/contact` creates a contact form submission. Customer name, phone, and message are required.
+- `GET /api/v1/contact/dashboard` returns contact submission and support ticket status counts.
+- `GET /api/v1/contact/constants` returns allowed submission statuses, ticket statuses, ticket priorities, and support types.
+- `GET /api/v1/contact/submissions` lists contact form submissions with optional `search`, `status`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
+- `POST /api/v1/contact/submissions` creates a contact form submission with customer details, service/occasion, subject, message, source, metadata, and optional replies.
+- `GET /api/v1/contact/submissions/:id` returns one contact form submission.
+- `PUT|PATCH /api/v1/contact/submissions/:id` edits a contact form submission.
+- `PATCH /api/v1/contact/submissions/:id/status` updates the submission inquiry status.
+- `POST /api/v1/contact/submissions/:id/replies` adds an admin reply and marks the inquiry as replied by default.
+- `DELETE /api/v1/contact/submissions/:id` deletes a contact form submission.
+- `GET /api/v1/contact/tickets` lists customer support tickets with optional `search`, `status`, `priority`, `supportType`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
+- `POST /api/v1/contact/tickets` creates a support ticket with customer details, support type, priority, subject, message, optional order reference, source, metadata, and optional replies.
+- `GET /api/v1/contact/tickets/:id` returns one support ticket by internal id or ticket number.
+- `PUT|PATCH /api/v1/contact/tickets/:id` edits a support ticket.
+- `PATCH /api/v1/contact/tickets/:id/status` updates ticket inquiry status.
+- `POST /api/v1/contact/tickets/:id/replies` adds an admin reply and moves public replies to `waiting-customer` by default.
+- `DELETE /api/v1/contact/tickets/:id` deletes a support ticket.
+
+Valid contact submission statuses are `new`, `read`, `replied`, and `closed`. Valid support ticket statuses are `open`, `in-progress`, `waiting-customer`, `resolved`, and `closed`.
+
 ### Gallery management endpoints
 
 Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes:
@@ -98,6 +124,6 @@ Valid gallery layouts are `default`, `wide`, and `tall`. Gallery categories are 
 - `DELETE /api/v1/data/:collection/:id` deletes an array item by `id` or a key from `settings.json`.
 - `GET|PUT|POST|PATCH|DELETE /api/v1/admin/data...` mirrors the same JSON database endpoints for admin panel usage.
 
-Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
+Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, `contact`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
 
 Payment gateway integrations and external API calls are intentionally not included in this foundation.
