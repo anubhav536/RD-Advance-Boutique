@@ -131,21 +131,28 @@ const hashPassword = (password, encodedHash) => {
   return crypto.pbkdf2Sync(password, salt, iterations, Buffer.from(hash, 'hex').length, digest).toString('hex');
 };
 
+const passwordMatchesHash = (submittedPassword, encodedHash) => {
+  const expectedHash = encodedHash.split('$').at(-1);
+  const submittedHash = hashPassword(submittedPassword, encodedHash);
+  const expectedBuffer = Buffer.from(expectedHash, 'hex');
+  const submittedBuffer = Buffer.from(submittedHash, 'hex');
+
+  return expectedBuffer.length === submittedBuffer.length
+    && crypto.timingSafeEqual(expectedBuffer, submittedBuffer);
+};
+
 const verifyAdminCredentials = (username, password) => {
   const submittedUsername = String(username || '').trim().toLowerCase();
   const submittedPassword = String(password || '');
+  const trimmedPassword = submittedPassword.trim();
   const adminAuthConfig = getAdminAuthConfig();
-  const expectedUsername = adminAuthConfig.username;
-  const expectedHash = adminAuthConfig.passwordHash.split('$').at(-1);
-  const submittedHash = hashPassword(submittedPassword, adminAuthConfig.passwordHash);
+  const usernameMatches = submittedUsername === adminAuthConfig.username;
 
-  const usernameMatches = submittedUsername === expectedUsername;
-  const expectedBuffer = Buffer.from(expectedHash, 'hex');
-  const submittedBuffer = Buffer.from(submittedHash, 'hex');
-  const passwordMatches = expectedBuffer.length === submittedBuffer.length
-    && crypto.timingSafeEqual(expectedBuffer, submittedBuffer);
+  if (!usernameMatches) return false;
 
-  return usernameMatches && passwordMatches;
+  return passwordMatchesHash(submittedPassword, adminAuthConfig.passwordHash)
+    || (trimmedPassword !== submittedPassword
+      && passwordMatchesHash(trimmedPassword, adminAuthConfig.passwordHash));
 };
 
 module.exports = {
