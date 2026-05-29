@@ -1,560 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="description" content="Shop luxury boutique fashion, custom stitched outfits, blouses, kurtis, bridal wear, kids wear, and accessories from RD Advance Boutique.">
   <title>Shop | RD Advance Boutique</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- GOOGLE FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- NAVBAR -->
-  <!-- ========================= -->
-
-  <header class="navbar">
-
-    <div class="logo-section">
-
-      <img src="assets/logo.png" alt="RD Logo" class="logo">
-
-      <div class="logo-text">
-
-        <h2>RD Advance</h2>
-
-        <p>Boutique</p>
-
-      </div>
-
-    </div>
-
-
-
-    <nav>
-
-      <ul class="nav-links">
-
-        <li><a href="index.html">Home</a></li>
-
-        <li><a href="shop.html" class="active">Shop</a></li>
-
-        <li><a href="gallery.html">Gallery</a></li>
-
-        <li><a href="learn.html">Course</a></li>
-
-        <li><a href="contact.html">Contact</a></li>
-
-      </ul>
-
-    </nav>
-
-
-
-    <a href="https://wa.me/917693849472" class="whatsapp-btn">
-
-      WhatsApp
-
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text">
+        <strong>RD Advance</strong>
+        <span>Boutique</span>
+      </span>
     </a>
 
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="shop.html" class="nav__link nav__link--active">Shop</a>
+      <a href="gallery.html" class="nav__link">Gallery</a>
+      <a href="learn.html" class="nav__link">Course</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </nav>
+
+    <a href="https://wa.me/917693849472" class="header-cta">Book a Fitting</a>
   </header>
 
-
-
-
-
-  <!-- ========================= -->
-  <!-- SHOP HERO -->
-  <!-- ========================= -->
-
-  <section class="shop-hero">
-
-    <div class="shop-hero-content">
-
-      <span class="tag">
-
-        Boutique Fashion Collection ✨
-
-      </span>
-
-
-
-      <h1>
-
-        Discover Elegant <br>
-        Boutique Fashion
-
-      </h1>
-
-
-
-      <p>
-
-        Explore premium stitched outfits,
-        modern fashion styles, and boutique collections.
-
-      </p>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CATEGORY FILTER -->
-  <!-- ========================= -->
-
-  <section class="category-filter">
-
-    <button class="filter-btn active">
-
-      All
-
-    </button>
-
-
-
-    <button class="filter-btn">
-
-      Blouses
-
-    </button>
-
-
-
-    <button class="filter-btn">
-
-      Kurtis
-
-    </button>
-
-
-
-    <button class="filter-btn">
-
-      Bridal
-
-    </button>
-
-
-
-    <button class="filter-btn">
-
-      Kids Wear
-
-    </button>
-
-
-
-    <button class="filter-btn">
-
-      Accessories
-
-    </button>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- PRODUCTS SECTION -->
-  <!-- ========================= -->
-
-  <section class="products-section">
-
-
-
-    <!--
-    
-    FUTURE PRODUCTS WILL APPEAR HERE
-    
-    Admin Panel Se:
-    
-    - Product Image
-    - Product Name
-    - Product Price
-    - Product Description
-    - Product Category
-    - Affiliate Link / WhatsApp Link
-    
-    automatically yaha show honge.
-    
-    -->
-
-
-
-    <div class="product-grid" id="productGrid">
-
-
-
-      <!-- DYNAMIC PRODUCTS AREA -->
-
-
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- EMPTY STATE -->
-  <!-- ========================= -->
-
-  <section class="empty-products">
-
-    <div class="empty-box">
-
-      <img src="assets/logo.png" alt="Empty Shop">
-
-
-
-      <h2>
-
-        New Fashion Collection Coming Soon ✨
-
-      </h2>
-
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- SHOP INFO -->
-  <!-- ========================= -->
-
-  <section class="shop-info">
-
-    <div class="info-container">
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Premium Quality
-
-        </h3>
-
-
-
-        <p>
-
-          Elegant stitching with boutique finishing.
-
-        </p>
-
+  <main>
+    <section class="shop-hero" aria-labelledby="shop-title">
+      <div class="shop-hero__content">
+        <p class="eyebrow">Curated luxury boutique</p>
+        <h1 id="shop-title">Shop refined fashion made for memorable moments.</h1>
+        <p>Browse boutique-ready silhouettes, premium custom stitching inspiration, and upcoming collections designed with graceful detail.</p>
+        <div class="shop-hero__actions">
+          <a href="#shop-products" class="btn btn--primary">Explore Shop</a>
+          <a href="custom.html" class="btn btn--ghost">Custom Order</a>
+        </div>
       </div>
 
+      <aside class="shop-hero__panel" aria-label="Shop highlights">
+        <span>New season preview</span>
+        <strong>Blouses, kurtis, bridal edits & occasion wear.</strong>
+        <p>Products will connect dynamically from the admin panel soon.</p>
+      </aside>
+    </section>
 
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Custom Fashion
-
-        </h3>
-
-
-
-        <p>
-
-          Personalized outfits based on your style.
-
-        </p>
-
+    <section class="shop-toolbar" aria-label="Shop search and filters">
+      <div class="shop-toolbar__intro">
+        <p class="eyebrow">Collection room</p>
+        <h2>Find your signature piece.</h2>
       </div>
 
-
-
-
-
-      <div class="info-card">
-
-        <h3>
-
-          Modern Boutique
-
-        </h3>
-
-
-
-        <p>
-
-          Traditional fashion with modern elegance.
-
-        </p>
-
+      <div class="shop-search" role="search">
+        <label class="sr-only" for="productSearch">Search products</label>
+        <span aria-hidden="true">⌕</span>
+        <input id="productSearch" type="search" placeholder="Search blouses, bridal, kurtis..." autocomplete="off">
       </div>
 
-    </div>
+      <div class="category-filter" role="list" aria-label="Product categories">
+        <button class="filter-btn active" type="button" data-category="all" role="listitem">All</button>
+        <button class="filter-btn" type="button" data-category="blouses" role="listitem">Blouses</button>
+        <button class="filter-btn" type="button" data-category="kurtis" role="listitem">Kurtis</button>
+        <button class="filter-btn" type="button" data-category="bridal" role="listitem">Bridal</button>
+        <button class="filter-btn" type="button" data-category="kids-wear" role="listitem">Kids Wear</button>
+        <button class="filter-btn" type="button" data-category="accessories" role="listitem">Accessories</button>
+      </div>
+    </section>
 
-  </section>
+    <section class="products-section" id="shop-products" aria-labelledby="products-title">
+      <div class="products-section__header">
+        <div>
+          <p class="eyebrow">Boutique selection</p>
+          <h2 id="products-title">Luxury product gallery</h2>
+        </div>
+        <p id="productCount" aria-live="polite">Preparing collection</p>
+      </div>
 
+      <div class="product-grid" id="productGrid">
+        <!-- Dynamic product cards render here. -->
+      </div>
 
+      <div class="empty-products" id="emptyProducts" aria-live="polite">
+        <div class="empty-box">
+          <img src="assets/logo.png" alt="RD Advance Boutique emblem">
+          <h2>New fashion collection coming soon.</h2>
+          <p>Empty product cards are ready now; live products will appear here automatically once connected.</p>
+          <a href="https://wa.me/917693849472" class="btn btn--primary">Ask on WhatsApp</a>
+        </div>
+      </div>
+    </section>
 
+    <section class="shop-info" aria-label="Boutique promises">
+      <article class="info-card">
+        <span>01</span>
+        <h3>Premium Quality</h3>
+        <p>Elegant stitching, neat finishing, and carefully selected boutique detailing.</p>
+      </article>
+      <article class="info-card">
+        <span>02</span>
+        <h3>Custom Fashion</h3>
+        <p>Personalized outfits shaped around your occasion, measurements, and style.</p>
+      </article>
+      <article class="info-card">
+        <span>03</span>
+        <h3>Modern Boutique</h3>
+        <p>Traditional craft blended with modern silhouettes and luxury presentation.</p>
+      </article>
+    </section>
 
+    <section class="custom-stitching-banner">
+      <div class="custom-banner-content">
+        <p class="eyebrow">Bespoke appointment</p>
+        <h2>Want custom stitching?</h2>
+        <p>Share your favorite design and get premium boutique stitching for your next celebration.</p>
+        <a href="custom.html" class="btn btn--primary">Start Custom Order</a>
+      </div>
+    </section>
 
-  <!-- ========================= -->
-  <!-- CUSTOM STITCHING CTA -->
-  <!-- ========================= -->
-
-  <section class="custom-stitching-banner">
-
-    <div class="custom-banner-content">
-
-      <h2>
-
-        Want Custom Stitching?
-
-      </h2>
-
-
-
-      <p>
-
-        Share your favorite design and
-        get premium boutique stitching.
-
-      </p>
-
-
-
-      <a href="custom.html" class="primary-btn">
-
-        Start Custom Order
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- CONTACT SECTION -->
-  <!-- ========================= -->
-
-  <section class="shop-contact">
-
-    <div class="contact-card">
-
-      <h2>
-
-        RD Advance Boutique
-
-      </h2>
-
-
-
-      <p>
-
-        📍 Damoh, Madhya Pradesh
-
-      </p>
-
-
-
-      <p>
-
-        📞 +91 7693849472
-
-      </p>
-
-
-
-      <a href="https://wa.me/917693849472" class="primary-btn">
-
-        Chat On WhatsApp
-
-      </a>
-
-    </div>
-
-  </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- FOOTER -->
-  <!-- ========================= -->
+    <section class="shop-contact" aria-label="Shop contact details">
+      <div class="contact-card">
+        <p class="eyebrow">Visit or message us</p>
+        <h2>RD Advance Boutique</h2>
+        <p>📍 Damoh, Madhya Pradesh</p>
+        <p>📞 +91 7693849472</p>
+        <a href="https://wa.me/917693849472" class="btn btn--ghost">Chat on WhatsApp</a>
+      </div>
+    </section>
+  </main>
 
   <footer class="footer">
-
-    <p>
-
-      © 2026 RD Advance Boutique.
-      All Rights Reserved.
-
-    </p>
-
+    <div class="footer__brand">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo">
+      <h2>RD Advance Boutique</h2>
+    </div>
+    <div class="footer__links">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="learn.html">Course</a>
+    </div>
+    <div class="footer__contact">
+      <a href="https://wa.me/917693849472">WhatsApp</a>
+      <span>Damoh, Madhya Pradesh</span>
+    </div>
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
   </footer>
 
-
-
-
-
-  <!-- ========================= -->
-  <!-- FUTURE DYNAMIC PRODUCTS -->
-  <!-- ========================= -->
-
   <script>
-
-    /*
-    
-    FUTURE PRODUCT STRUCTURE
-    
-    Example:
-    
-    {
-      image:"",
-      title:"",
-      price:"",
-      description:"",
-      category:"",
-      type:"",
-      link:""
-    }
-    
-    type:
-    - affiliate
-    - own
-    
-    */
-    
-    
-    
-    
-    
-    // FUTURE PRODUCTS ARRAY
-    
     const products = [
-
-      // Products added from admin panel
-      // will appear here dynamically
-
+      // Future products from the admin panel will be pushed here dynamically.
+      // Example shape:
+      // { image: "", title: "", price: "", description: "", category: "bridal", link: "" }
     ];
 
-    
-    
-    
-    
-    // PRODUCT GRID
-
     const productGrid = document.getElementById("productGrid");
+    const productSearch = document.getElementById("productSearch");
+    const productCount = document.getElementById("productCount");
+    const emptyProducts = document.getElementById("emptyProducts");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const placeholderCategories = ["Blouses", "Kurtis", "Bridal", "Kids Wear", "Accessories", "Custom Edit"];
+    let activeCategory = "all";
 
-    
-    
-    
-    
-    // RENDER PRODUCTS
-
-    function renderProducts(){
-
-      if(products.length === 0){
-
-        document.querySelector(".empty-products").style.display = "block";
-
-      }
-
-      else{
-
-        document.querySelector(".empty-products").style.display = "none";
-
-
-
-        products.forEach(product => {
-
-          productGrid.innerHTML += `
-
-            <div class="product-card">
-
-              <img src="${product.image}" alt="${product.title}">
-
-              <div class="product-content">
-
-                <h3>${product.title}</h3>
-
-                <p class="product-price">
-
-                  ₹${product.price}
-
-                </p>
-
-                <p class="product-description">
-
-                  ${product.description}
-
-                </p>
-
-                <div class="product-buttons">
-
-                  <a href="${product.link}" class="order-btn">
-
-                    View Product
-
-                  </a>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          `;
-
-        });
-
-      }
-
+    function normalize(value) {
+      return String(value || "").trim().toLowerCase().replace(/\s+/g, "-");
     }
 
-    
-    
-    
-    
-    // INITIAL RENDER
+    function placeholderCard(category, index) {
+      return `
+        <article class="product-card product-card--empty" aria-label="Empty ${category} product card">
+          <div class="product-card__media">
+            <div class="product-card__placeholder" aria-hidden="true"></div>
+            <button class="wishlist-btn" type="button" aria-label="Add future ${category} product to wishlist">♡</button>
+            <button class="quick-view-btn" type="button" disabled>Quick View</button>
+          </div>
+          <div class="product-content">
+            <span class="product-category">${category}</span>
+            <h3>Product slot ${index + 1}</h3>
+            <p class="product-price">Coming soon</p>
+            <p class="product-description">This dynamic card is ready for product image, price, category, and purchase link.</p>
+          </div>
+        </article>
+      `;
+    }
 
+    function productCard(product) {
+      const title = product.title || "Boutique Product";
+      const category = product.category || "Boutique";
+      const image = product.image || "assets/logo.png";
+      const price = product.price ? `₹${product.price}` : "Price on request";
+      const description = product.description || "Premium boutique fashion piece.";
+      const link = product.link || "https://wa.me/917693849472";
+
+      return `
+        <article class="product-card" data-category="${normalize(category)}">
+          <div class="product-card__media">
+            <img src="${image}" alt="${title}">
+            <button class="wishlist-btn" type="button" aria-label="Add ${title} to wishlist">♡</button>
+            <a class="quick-view-btn" href="${link}">Quick View</a>
+          </div>
+          <div class="product-content">
+            <span class="product-category">${category}</span>
+            <h3>${title}</h3>
+            <p class="product-price">${price}</p>
+            <p class="product-description">${description}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderProducts() {
+      const searchTerm = normalize(productSearch.value);
+      const filteredProducts = products.filter((product) => {
+        const matchesCategory = activeCategory === "all" || normalize(product.category) === activeCategory;
+        const productText = normalize(`${product.title} ${product.category} ${product.description}`);
+        const matchesSearch = !searchTerm || productText.includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (products.length === 0) {
+        productGrid.innerHTML = placeholderCategories.map(placeholderCard).join("");
+        emptyProducts.hidden = false;
+        productCount.textContent = "6 empty dynamic cards ready";
+        return;
+      }
+
+      productGrid.innerHTML = filteredProducts.map(productCard).join("");
+      emptyProducts.hidden = filteredProducts.length > 0;
+      productCount.textContent = `${filteredProducts.length} product${filteredProducts.length === 1 ? "" : "s"} found`;
+    }
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        activeCategory = button.dataset.category;
+        renderProducts();
+      });
+    });
+
+    productSearch.addEventListener("input", renderProducts);
     renderProducts();
-
   </script>
-
 </body>
 </html>
