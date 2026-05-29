@@ -15,7 +15,15 @@ src/
   middleware/             # Error, security, and request middleware
   models/                 # Domain/data models
   routes/                 # Versioned API route definitions
-  utils/                  # Shared utilities
+  utils/                  # Shared utilities, including local JSON database helpers
+data/
+  products.json           # Product catalogue records
+  orders.json             # Customer order records
+  gallery.json            # Gallery image records
+  categories.json         # Product/category records
+  students.json           # Course student/admission records
+  notifications.json      # Admin notification records
+  settings.json           # Website and business settings
 ```
 
 ### Getting started
@@ -24,8 +32,17 @@ src/
 2. Install dependencies with `npm install`.
 3. Start development mode with `npm run dev` or production mode with `npm start`.
 
-### Available endpoint
+### Available endpoints
 
 - `GET /api/v1/health` returns the current API health status.
+- `GET /api/v1/data` lists every supported local JSON collection.
+- `GET /api/v1/data/:collection` reads a JSON collection.
+- `PUT /api/v1/data/:collection` replaces an entire JSON collection.
+- `POST /api/v1/data/:collection` creates an item in an array collection or merges settings into `settings.json`.
+- `PATCH /api/v1/data/:collection/:id` updates an array item by `id` or merges updates into `settings.json`.
+- `DELETE /api/v1/data/:collection/:id` deletes an array item by `id` or a key from `settings.json`.
+- `GET|PUT|POST|PATCH|DELETE /api/v1/admin/data...` mirrors the same JSON database endpoints for admin panel usage.
+
+Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
 
 Payment gateway integrations and external API calls are intentionally not included in this foundation.

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "blouses",
+    "name": "Blouses",
+    "description": "Designer blouse stitching and ready-made blouse inspirations.",
+    "status": "active"
+  },
+  {
+    "id": "kurtis",
+    "name": "Kurtis",
+    "description": "Custom and boutique kurti collections.",
+    "status": "active"
+  },
+  {
+    "id": "bridal",
+    "name": "Bridal",
+    "description": "Bridal and occasion-wear boutique designs.",
+    "status": "active"
+  },
+  {
+    "id": "kids-wear",
+    "name": "Kids Wear",
+    "description": "Boutique outfits for children and celebrations.",
+    "status": "active"
+  },
+  {
+    "id": "accessories",
+    "name": "Accessories",
+    "description": "Curated boutique accessories and styling additions.",
+    "status": "active"
+  }
+]
