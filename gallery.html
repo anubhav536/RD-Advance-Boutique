@@ -69,78 +69,8 @@
           <label class="filter-btn" for="tab-kids">Kids Wear</label>
         </div>
 
-        <div class="masonry-gallery">
-          <a class="gallery-card gallery-card--tall" data-category="blouse" href="#preview-design1">
-            <img src="assets/design1.jpg" alt="Designer blouse with premium boutique detailing">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Blouse</small>
-              <strong>Designer Blouse</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card" data-category="kurti" href="#preview-design2">
-            <img src="assets/design2.jpg" alt="Boutique kurti with graceful custom stitching">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Kurti</small>
-              <strong>Boutique Kurti</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card gallery-card--wide" data-category="bridal" href="#preview-design3">
-            <img src="assets/design3.jpg" alt="Bridal boutique collection with ornate festive styling">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Bridal</small>
-              <strong>Bridal Collection</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card" data-category="kids" href="#preview-design4">
-            <img src="assets/design4.jpg" alt="Kids wear boutique design with soft premium finishing">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Kids Wear</small>
-              <strong>Little Occasion Wear</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card gallery-card--wide" data-category="blouse" href="#preview-design5">
-            <img src="assets/design5.jpg" alt="Custom stitched blouse with luxury boutique finish">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Blouse</small>
-              <strong>Custom Stitching</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card gallery-card--tall" data-category="kurti" href="#preview-design6">
-            <img src="assets/design6.png" alt="Modern kurti pattern from RD Advance Boutique">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Kurti</small>
-              <strong>Modern Patterns</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card" data-category="bridal" href="#preview-course1">
-            <img src="assets/coursedesign1.jpg" alt="Bridal-inspired course design with refined tailoring">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Bridal</small>
-              <strong>Celebration Detail</strong>
-            </span>
-          </a>
-
-          <a class="gallery-card" data-category="kids" href="#preview-course2">
-            <img src="assets/coursedesign2.jpg" alt="Kids boutique sample with polished sewing detail">
-            <span class="gallery-card__shade"></span>
-            <span class="gallery-card__content">
-              <small>Kids Wear</small>
-              <strong>Playful Couture</strong>
-            </span>
-          </a>
+        <div class="masonry-gallery" id="galleryGrid" aria-live="polite">
+          <!-- Dynamic gallery cards render here from data/gallery.json. -->
         </div>
       </div>
     </section>
@@ -183,38 +113,11 @@
     </section>
   </main>
 
-  <div class="lightbox" id="preview-design1" aria-label="Fullscreen preview of designer blouse">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design1.jpg" alt="Designer blouse fullscreen preview">
+  <div id="galleryLightboxes">
+    <!-- Dynamic fullscreen previews render here from data/gallery.json. -->
   </div>
-  <div class="lightbox" id="preview-design2" aria-label="Fullscreen preview of boutique kurti">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design2.jpg" alt="Boutique kurti fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-design3" aria-label="Fullscreen preview of bridal collection">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design3.jpg" alt="Bridal collection fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-design4" aria-label="Fullscreen preview of kids wear">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design4.jpg" alt="Kids wear fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-design5" aria-label="Fullscreen preview of custom stitching">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design5.jpg" alt="Custom stitching fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-design6" aria-label="Fullscreen preview of modern patterns">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/design6.png" alt="Modern patterns fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-course1" aria-label="Fullscreen preview of celebration detail">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/coursedesign1.jpg" alt="Celebration detail fullscreen preview">
-  </div>
-  <div class="lightbox" id="preview-course2" aria-label="Fullscreen preview of playful couture">
-    <a href="#gallery-title" class="lightbox__close" aria-label="Close image preview">×</a>
-    <img src="assets/coursedesign2.jpg" alt="Playful couture fullscreen preview">
-  </div>
+
+  <script src="products.js" defer></script>
 
   <footer class="footer gallery-footer">
     <p>© 2026 RD Advance Boutique. All Rights Reserved.</p>
