@@ -518,6 +518,8 @@
     return parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
   };
 
+  const getPublicOrderTrackingUrl = orderId => `/api/v1/orders/public/track/${encodeURIComponent(orderId)}`;
+
   const setupCustomStitchingRequests = () => {
     const form = doc.querySelector("#custom-stitching-request-form");
     const message = doc.querySelector("#custom-booking-message");
@@ -639,7 +641,7 @@
 
           form.reset();
           setMessage(`Request saved! Your order ID is ${result.data.orderNumber || result.data.id}. Payment is pending admin verification. Current order status: ${formatStatus(result.data.status)}.`, "success");
-          const trackingResponse = await fetch(`/api/v1/orders/track/${encodeURIComponent(result.data.orderNumber || result.data.id)}`);
+          const trackingResponse = await fetch(getPublicOrderTrackingUrl(result.data.orderNumber || result.data.id));
           const trackingPayload = await trackingResponse.json();
           renderTrackingResult(trackingPayload.success ? trackingPayload.data : null);
         } catch (error) {
@@ -663,7 +665,7 @@
             trackingResult.textContent = "Checking request status...";
           }
 
-          const response = await fetch(`/api/v1/orders/track/${encodeURIComponent(query)}`);
+          const response = await fetch(getPublicOrderTrackingUrl(query));
           const result = await response.json();
 
           if (!response.ok || !result.success) {

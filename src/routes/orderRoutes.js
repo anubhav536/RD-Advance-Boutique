@@ -10,6 +10,7 @@ router
   .post(orderController.createOrder);
 
 router.get('/summary', requireAdminApi, orderController.getOrderSummary);
+router.get('/public/track/:id', orderController.trackOrder);
 router.get('/track/:id', orderController.trackOrder);
 router.get('/payment-methods', orderController.getPaymentMethods);
 router.get('/pending', requireAdminApi, orderController.getPendingOrders);
