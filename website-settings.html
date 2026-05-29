@@ -251,6 +251,8 @@
 
               <input
                 type="text"
+                id="siteName"
+                name="siteName"
                 placeholder="RD Advance Boutique"
               >
 
@@ -274,6 +276,8 @@
 
               <input
                 type="text"
+                id="siteTagline"
+                name="siteTagline"
                 placeholder="Luxury Boutique & Tailoring"
               >
 
@@ -296,6 +300,8 @@
 
 
               <textarea
+                id="siteDescription"
+                name="siteDescription"
                 rows="5"
                 placeholder="Write boutique website description..."
               ></textarea>
@@ -403,6 +409,8 @@
 
               <input
                 type="color"
+                id="primaryColor"
+                name="primaryColor"
                 value="#ff4d6d"
               >
 
@@ -426,6 +434,8 @@
 
               <input
                 type="color"
+                id="secondaryColor"
+                name="secondaryColor"
                 value="#111111"
               >
 
@@ -447,9 +457,9 @@
 
 
 
-              <select>
+              <select id="websiteStatus" name="websiteStatus">
 
-                <option>
+                <option value="live">
 
                   Live
 
@@ -457,7 +467,7 @@
 
 
 
-                <option>
+                <option value="maintenance">
 
                   Maintenance Mode
 
@@ -485,6 +495,8 @@
 
               <input
                 type="text"
+                id="footerText"
+                name="footerText"
                 placeholder="© 2026 RD Advance Boutique"
               >
 
@@ -492,6 +504,179 @@
 
 
 
+
+
+
+
+
+
+            <!-- HOMEPAGE BANNER -->
+
+            <div class="input-group">
+
+              <label>Homepage Banner Eyebrow</label>
+
+              <input type="text" id="bannerEyebrow" name="bannerEyebrow" placeholder="Luxury custom tailoring studio">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Homepage Banner Title</label>
+
+              <input type="text" id="bannerTitle" name="bannerTitle" placeholder="Handcrafted boutique fashion for your signature moments.">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Homepage Banner Description</label>
+
+              <textarea id="bannerDescription" name="bannerDescription" rows="4" placeholder="Write homepage banner description..."></textarea>
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Upload Homepage Banner Image</label>
+
+              <input type="file" id="bannerImageUpload" accept="image/*">
+
+              <small>Upload a wide homepage hero/banner image (1MB max).</small>
+
+            </div>
+
+
+
+            <div class="image-preview-container" id="bannerPreviewContainer"></div>
+
+
+
+            <div class="input-group">
+
+              <label>Primary Button Text</label>
+
+              <input type="text" id="bannerPrimaryText" name="bannerPrimaryText" placeholder="Explore Collection">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Primary Button URL</label>
+
+              <input type="text" id="bannerPrimaryUrl" name="bannerPrimaryUrl" placeholder="shop.html">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Secondary Button Text</label>
+
+              <input type="text" id="bannerSecondaryText" name="bannerSecondaryText" placeholder="Start Custom Order">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Secondary Button URL</label>
+
+              <input type="text" id="bannerSecondaryUrl" name="bannerSecondaryUrl" placeholder="custom.html">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Banner Highlight Label</label>
+
+              <input type="text" id="bannerHighlightLabel" name="bannerHighlightLabel" placeholder="Premium Finish">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Banner Highlight Text</label>
+
+              <input type="text" id="bannerHighlightText" name="bannerHighlightText" placeholder="Custom bridal, blouse & occasion wear">
+
+            </div>
+
+
+
+            <!-- CONTACT INFORMATION -->
+
+            <div class="input-group">
+
+              <label>Contact Phone Display</label>
+
+              <input type="text" id="contactPhone" name="contactPhone" placeholder="+91 76938 49472">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Contact Phone Link Number</label>
+
+              <input type="text" id="contactPhoneHref" name="contactPhoneHref" placeholder="+917693849472">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Contact Email</label>
+
+              <input type="email" id="contactEmail" name="contactEmail" placeholder="hello@example.com">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Contact Address</label>
+
+              <input type="text" id="contactAddress" name="contactAddress" placeholder="Damoh, Madhya Pradesh">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>Business Hours</label>
+
+              <input type="text" id="contactHours" name="contactHours" placeholder="Mon - Sat · 10:30 AM - 7:30 PM">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+              <label>WhatsApp URL</label>
+
+              <input type="url" id="contactWhatsapp" name="contactWhatsapp" placeholder="https://wa.me/917693849472">
+
+            </div>
 
 
             <!-- BUTTONS -->
@@ -639,152 +824,7 @@
   <!-- SCRIPT -->
   <!-- ========================= -->
 
-  <script>
-
-    // LOGO PREVIEW
-
-    const logoUpload = document.getElementById(
-
-      "logoUpload"
-
-    );
-
-
-
-
-
-    const logoPreviewContainer = document.getElementById(
-
-      "logoPreviewContainer"
-
-    );
-
-
-
-
-
-    logoUpload.addEventListener("change", function(){
-
-      logoPreviewContainer.innerHTML = "";
-
-
-
-
-
-      const file = this.files[0];
-
-
-
-
-
-      if(file){
-
-        const reader = new FileReader();
-
-
-
-
-
-        reader.onload = function(e){
-
-          const imageBox = document.createElement(
-
-            "div"
-
-          );
-
-
-
-
-
-          imageBox.classList.add(
-
-            "preview-image-box"
-
-          );
-
-
-
-
-
-          imageBox.innerHTML = `
-
-            <img src="${e.target.result}" alt="Logo Preview">
-
-          `;
-
-
-
-
-
-          logoPreviewContainer.appendChild(
-
-            imageBox
-
-          );
-
-        };
-
-
-
-
-
-        reader.readAsDataURL(file);
-
-      }
-
-    });
-
-
-
-
-
-    // FORM SUBMIT
-
-    const websiteSettingsForm = document.getElementById(
-
-      "websiteSettingsForm"
-
-    );
-
-
-
-
-
-    websiteSettingsForm.addEventListener("submit", function(e){
-
-      e.preventDefault();
-
-
-
-
-
-      alert(
-
-        "Website Settings Saved Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Save settings into database
-
-    });
-
-
-
-
-
-    console.log(
-
-      "Website Settings Panel Loaded ✨"
-
-    );
-
-  </script>
+  <script src="js/admin-website-settings.js" defer></script>
 
 </body>
 </html>

@@ -250,6 +250,8 @@
 
 
               <input
+                id="metaTitle"
+                name="metaTitle"
                 type="text"
                 placeholder="RD Advance Boutique | Premium Fashion & Tailoring"
               >
@@ -273,6 +275,8 @@
 
 
               <textarea
+                id="metaDescription"
+                name="metaDescription"
                 rows="5"
                 placeholder="Write website meta description for Google search..."
               ></textarea>
@@ -296,6 +300,8 @@
 
 
               <textarea
+                id="metaKeywords"
+                name="metaKeywords"
                 rows="4"
                 placeholder="boutique, tailoring, fashion, stitching, bridal wear"
               ></textarea>
@@ -318,9 +324,9 @@
 
 
 
-              <select>
+              <select id="googleIndexing" name="googleIndexing">
 
-                <option>
+                <option value="enabled">
 
                   Enabled
 
@@ -328,7 +334,7 @@
 
 
 
-                <option>
+                <option value="disabled">
 
                   Disabled
 
@@ -354,9 +360,9 @@
 
 
 
-              <select>
+              <select id="robotsMeta" name="robotsMeta">
 
-                <option>
+                <option value="index, follow">
 
                   index, follow
 
@@ -364,7 +370,7 @@
 
 
 
-                <option>
+                <option value="noindex, nofollow">
 
                   noindex, nofollow
 
@@ -391,6 +397,8 @@
 
 
               <input
+                id="canonicalUrl"
+                name="canonicalUrl"
                 type="url"
                 placeholder="https://www.rdadvanceboutique.com"
               >
@@ -414,6 +422,8 @@
 
 
               <input
+                id="googleAnalyticsId"
+                name="googleAnalyticsId"
                 type="text"
                 placeholder="G-XXXXXXXXXX"
               >
@@ -437,6 +447,8 @@
 
 
               <input
+                id="openGraphTitle"
+                name="openGraphTitle"
                 type="text"
                 placeholder="Luxury Boutique & Tailoring"
               >
@@ -460,6 +472,8 @@
 
 
               <textarea
+                id="twitterDescription"
+                name="twitterDescription"
                 rows="4"
                 placeholder="Premium fashion boutique & tailoring services."
               ></textarea>
@@ -482,9 +496,9 @@
 
 
 
-              <select>
+              <select id="sitemapEnabled" name="sitemapEnabled">
 
-                <option>
+                <option value="enabled">
 
                   Enabled
 
@@ -492,7 +506,7 @@
 
 
 
-                <option>
+                <option value="disabled">
 
                   Disabled
 
@@ -799,54 +813,7 @@
   <!-- SCRIPT -->
   <!-- ========================= -->
 
-  <script>
-
-    // SEO SETTINGS SAVE
-
-    const seoSettingsForm = document.getElementById(
-
-      "seoSettingsForm"
-
-    );
-
-
-
-
-
-    seoSettingsForm.addEventListener("submit", function(e){
-
-      e.preventDefault();
-
-
-
-
-
-      alert(
-
-        "SEO Settings Saved Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Save SEO settings into database
-
-    });
-
-
-
-
-
-    console.log(
-
-      "SEO Settings Panel Loaded ✨"
-
-    );
-
-  </script>
+  <script src="js/admin-seo-settings.js" defer></script>
 
 </body>
 </html>

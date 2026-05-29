@@ -1,9 +1,59 @@
 {
   "siteName": "RD Advance Boutique",
   "tagline": "Premium boutique fashion, stitching, and design courses.",
-  "contactPhone": "+91 76938 49472",
-  "whatsapp": "https://wa.me/917693849472",
-  "currency": "INR",
+  "description": "Luxury tailoring, boutique fashion, and professional stitching courses in Damoh.",
+  "logo": "assets/logo.png",
+  "favicon": "assets/logo.png",
+  "theme": {
+    "primaryColor": "#be6b72",
+    "secondaryColor": "#100d0b"
+  },
   "maintenanceMode": false,
+  "currency": "INR",
+  "footerText": "© 2026 RD Advance Boutique. All rights reserved.",
+  "homepageBanner": {
+    "eyebrow": "Luxury custom tailoring studio",
+    "title": "Handcrafted boutique fashion for your signature moments.",
+    "description": "Experience graceful Indian silhouettes, precision stitching, and thoughtful styling designed to make every celebration feel unforgettable.",
+    "image": "assets/hero-bg.jpg",
+    "primaryButtonText": "Explore Collection",
+    "primaryButtonUrl": "shop.html",
+    "secondaryButtonText": "Start Custom Order",
+    "secondaryButtonUrl": "custom.html",
+    "highlightLabel": "Premium Finish",
+    "highlightText": "Custom bridal, blouse & occasion wear"
+  },
+  "socialLinks": {
+    "instagram": "https://www.instagram.com/",
+    "facebook": "https://www.facebook.com/",
+    "youtube": "https://www.youtube.com/",
+    "whatsapp": "https://wa.me/917693849472",
+    "telegram": "",
+    "pinterest": "",
+    "twitter": "",
+    "linkedin": "",
+    "showInFooter": true
+  },
+  "seo": {
+    "metaTitle": "RD Advance Boutique | Luxury Tailoring & Design",
+    "metaDescription": "RD Advance Boutique creates luxury custom boutique outfits and teaches professional tailoring courses in Damoh.",
+    "metaKeywords": "boutique, tailoring, fashion, stitching, bridal wear, Damoh",
+    "googleIndexing": true,
+    "robots": "index, follow",
+    "canonicalUrl": "",
+    "googleAnalyticsId": "",
+    "openGraphTitle": "RD Advance Boutique | Premium Fashion & Tailoring",
+    "twitterDescription": "Premium fashion boutique and tailoring services in Damoh.",
+    "sitemapEnabled": true
+  },
+  "contact": {
+    "phone": "+91 76938 49472",
+    "phoneHref": "+917693849472",
+    "email": "",
+    "address": "Damoh, Madhya Pradesh",
+    "hours": "Mon - Sat · 10:30 AM - 7:30 PM",
+    "whatsappNumber": "+91 76938 49472",
+    "whatsappUrl": "https://wa.me/917693849472"
+  },
   "updatedAt": "2026-05-29T00:00:00.000Z"
 }
