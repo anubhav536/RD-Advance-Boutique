@@ -12,6 +12,7 @@ const COLLECTIONS = Object.freeze({
   categories: { file: 'categories.json', type: 'array' },
   students: { file: 'students.json', type: 'array' },
   notifications: { file: 'notifications.json', type: 'array' },
+  contact: { file: 'contact.json', type: 'object' },
   settings: { file: 'settings.json', type: 'object' },
 });
 
