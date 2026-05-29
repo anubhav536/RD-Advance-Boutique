@@ -1,1 +1,43 @@
-[]
+{
+  "courseCategories": [
+    {
+      "id": "basic-tailoring",
+      "name": "Basic Tailoring",
+      "description": "Beginner-friendly stitching, measurement, cutting, and finishing lessons.",
+      "level": "Beginner",
+      "duration": "3 months",
+      "fees": 12000,
+      "skills": [
+        "Measurements",
+        "Machine stitching",
+        "Basic cutting",
+        "Alterations"
+      ],
+      "status": "active",
+      "createdAt": "2026-05-29T00:00:00.000Z",
+      "updatedAt": "2026-05-29T00:00:00.000Z"
+    },
+    {
+      "id": "boutique-design",
+      "name": "Boutique Design",
+      "description": "Advanced boutique garment design, fitting, pattern drafting, and finishing.",
+      "level": "Advanced",
+      "duration": "6 months",
+      "fees": 24000,
+      "skills": [
+        "Pattern drafting",
+        "Designer blouse",
+        "Suit fitting",
+        "Garment finishing"
+      ],
+      "status": "active",
+      "createdAt": "2026-05-29T00:00:00.000Z",
+      "updatedAt": "2026-05-29T00:00:00.000Z"
+    }
+  ],
+  "enquiries": [],
+  "admissions": [],
+  "studentRecords": [],
+  "enrollments": [],
+  "updatedAt": "2026-05-29T00:00:00.000Z"
+}
