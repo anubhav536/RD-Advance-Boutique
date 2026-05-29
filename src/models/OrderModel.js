@@ -5,7 +5,7 @@ const { DEFAULT_PAYMENT_METHOD, DEFAULT_PAYMENT_STATUS, PAYMENT_STATUSES } = req
 
 const ORDER_COLLECTION = 'orders';
 
-const ORDER_STATUSES = Object.freeze(['pending', 'in-progress', 'completed', 'cancelled']);
+const ORDER_STATUSES = Object.freeze(['pending', 'in-progress', 'ready', 'completed', 'delivered', 'cancelled']);
 const ORDER_TYPES = Object.freeze(['custom-stitching', 'ready-made']);
 
 const DEFAULT_STATUS = 'pending';
@@ -22,7 +22,7 @@ const normalizeStatus = (status = DEFAULT_STATUS) => {
   const normalizedStatus = normalizeSlug(status || DEFAULT_STATUS);
 
   if (!ORDER_STATUSES.includes(normalizedStatus)) {
-    throw new AppError('Order status must be pending, in-progress, completed, or cancelled.', 400, {
+    throw new AppError('Order status must be pending, in-progress, ready, completed, delivered, or cancelled.', 400, {
       allowedStatuses: ORDER_STATUSES,
     });
   }
@@ -236,7 +236,6 @@ const normalizeCustomer = (payload = {}, currentCustomer = {}) => {
   }, {});
 };
 
-
 const normalizeMeasurementValue = (value, fieldName) => {
   if (value === undefined || value === null || value === '') {
     return undefined;
@@ -409,6 +408,75 @@ const matchesText = (order, search) => {
   return searchableText.includes(normalizedSearch);
 };
 
+const isPaymentVerified = (order = {}) => order.payment?.status === 'approved'
+  || ['in-progress', 'ready', 'completed', 'delivered'].includes(order.status);
+
+const buildTrackingTimeline = (order = {}) => {
+  const status = order.status || DEFAULT_STATUS;
+  const paymentVerified = isPaymentVerified(order);
+  const inProductionReached = ['in-progress', 'ready', 'completed', 'delivered'].includes(status);
+  const readyReached = ['ready', 'completed', 'delivered'].includes(status);
+  const deliveredReached = ['completed', 'delivered'].includes(status);
+
+  const steps = [
+    {
+      key: 'order-received',
+      label: 'Order Received',
+      state: 'completed',
+      date: order.createdAt || null,
+    },
+    {
+      key: 'payment-verified',
+      label: 'Payment Verified',
+      state: paymentVerified ? 'completed' : 'current',
+      date: order.payment?.verifiedAt || null,
+    },
+    {
+      key: 'in-production',
+      label: 'In Production',
+      state: inProductionReached ? (status === 'in-progress' ? 'current' : 'completed') : 'upcoming',
+      date: order.startedAt || null,
+    },
+    {
+      key: 'ready',
+      label: 'Ready',
+      state: readyReached ? (status === 'ready' ? 'current' : 'completed') : 'upcoming',
+      date: order.readyAt || null,
+    },
+    {
+      key: 'delivered',
+      label: 'Delivered',
+      state: deliveredReached ? 'completed' : 'upcoming',
+      date: order.deliveredAt || order.completedAt || null,
+    },
+  ];
+
+  if (status === 'cancelled') {
+    return steps.map((step) => (step.key === 'order-received'
+      ? step
+      : { ...step, state: 'cancelled' }));
+  }
+
+  return steps;
+};
+
+const toPublicTrackingOrder = (order = {}) => ({
+  id: order.id,
+  orderNumber: order.orderNumber,
+  status: order.status || DEFAULT_STATUS,
+  orderType: order.orderType,
+  item: order.stitchingDetails?.outfit || order.productName || order.items?.[0]?.name || order.items?.[0]?.title || 'Boutique order',
+  fabric: order.fabricSelection?.type || null,
+  appointmentDate: order.appointmentDate || null,
+  appointmentTime: order.appointmentTime || null,
+  payment: {
+    status: order.payment?.status || DEFAULT_PAYMENT_STATUS,
+  },
+  createdAt: order.createdAt || null,
+  updatedAt: order.updatedAt || null,
+  timeline: buildTrackingTimeline(order),
+});
+
 const parseDateFilter = (value, fieldName) => {
   if (!value) {
     return null;
@@ -451,6 +519,24 @@ class OrderModel extends BaseModel {
     }
 
     return order;
+  }
+
+  static async findByTrackingId(id) {
+    const trackingId = String(id || '').trim();
+
+    if (!trackingId) {
+      throw new AppError('Order ID is required for tracking.', 400);
+    }
+
+    const orders = await OrderModel.findAll();
+    const order = orders.find((entry) => String(entry.id) === trackingId
+      || String(entry.orderNumber || '').toLowerCase() === trackingId.toLowerCase());
+
+    if (!order) {
+      throw new AppError('No public tracking details were found for that order ID.', 404);
+    }
+
+    return toPublicTrackingOrder(order);
   }
 
   static async create(payload) {
@@ -519,13 +605,23 @@ class OrderModel extends BaseModel {
     const normalizedStatus = normalizeStatus(status);
     const statusUpdates = { status: normalizedStatus };
 
-    if (normalizedStatus === 'completed') {
-      statusUpdates.completedAt = new Date().toISOString();
+    if (normalizedStatus === 'completed' || normalizedStatus === 'delivered') {
+      statusUpdates.deliveredAt = new Date().toISOString();
+      statusUpdates.completedAt = statusUpdates.deliveredAt;
+      statusUpdates.cancelledAt = null;
+    }
+
+    if (normalizedStatus === 'ready') {
+      statusUpdates.readyAt = new Date().toISOString();
+      statusUpdates.deliveredAt = null;
+      statusUpdates.completedAt = null;
       statusUpdates.cancelledAt = null;
     }
 
     if (normalizedStatus === 'in-progress') {
       statusUpdates.startedAt = new Date().toISOString();
+      statusUpdates.readyAt = null;
+      statusUpdates.deliveredAt = null;
       statusUpdates.completedAt = null;
       statusUpdates.cancelledAt = null;
     }
@@ -533,11 +629,14 @@ class OrderModel extends BaseModel {
     if (normalizedStatus === 'cancelled') {
       statusUpdates.cancelledAt = new Date().toISOString();
       statusUpdates.completedAt = null;
+      statusUpdates.deliveredAt = null;
     }
 
     if (normalizedStatus === 'pending') {
       statusUpdates.startedAt = null;
+      statusUpdates.readyAt = null;
       statusUpdates.completedAt = null;
+      statusUpdates.deliveredAt = null;
       statusUpdates.cancelledAt = null;
     }
 
@@ -789,6 +888,14 @@ class OrderModel extends BaseModel {
 
     if (payload.completedAt !== undefined) {
       order.completedAt = payload.completedAt;
+    }
+
+    if (payload.readyAt !== undefined) {
+      order.readyAt = payload.readyAt;
+    }
+
+    if (payload.deliveredAt !== undefined) {
+      order.deliveredAt = payload.deliveredAt;
     }
 
     if (payload.cancelledAt !== undefined) {

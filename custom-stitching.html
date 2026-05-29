@@ -56,7 +56,9 @@
               <option value="">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
+              <option value="ready">Ready</option>
               <option value="completed">Completed</option>
+              <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
@@ -143,13 +145,17 @@
     const statusLabels = {
       pending: "Pending",
       "in-progress": "In Progress",
+      ready: "Ready",
       completed: "Completed",
+      delivered: "Delivered",
       cancelled: "Cancelled"
     };
     const statusClasses = {
       pending: "status-pending",
       "in-progress": "status-active",
+      ready: "status-active",
       completed: "status-completed",
+      delivered: "status-completed",
       cancelled: "status-cancelled"
     };
     let stitchingOrders = [];
@@ -189,7 +195,7 @@
     const updateAnalytics = () => {
       document.querySelector("#total-requests-count").textContent = stitchingOrders.length;
       document.querySelector("#in-progress-count").textContent = stitchingOrders.filter(order => order.status === "in-progress").length;
-      document.querySelector("#completed-count").textContent = stitchingOrders.filter(order => order.status === "completed").length;
+      document.querySelector("#completed-count").textContent = stitchingOrders.filter(order => ["completed", "delivered"].includes(order.status)).length;
       document.querySelector("#appointment-count").textContent = stitchingOrders.filter(order => order.appointmentDate).length;
     };
 

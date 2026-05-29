@@ -33,6 +33,15 @@ const getOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const trackOrder = asyncHandler(async (req, res) => {
+  const order = await OrderModel.findByTrackingId(req.params.id);
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
 const updateOrder = asyncHandler(async (req, res) => {
   const order = await OrderModel.update(req.params.id, req.body);
 
@@ -160,6 +169,7 @@ module.exports = {
   getCustomStitchingOrders,
   getOrder,
   getOrderSummary,
+  trackOrder,
   getPaymentMethods,
   getOrders,
   getPendingOrders,
