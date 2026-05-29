@@ -211,7 +211,28 @@
             </div>
           </fieldset>
 
-          <button type="submit" class="btn btn--primary booking-submit">Submit Premium Booking Request</button>
+          <fieldset class="form-card payment-card">
+            <legend><span>06</span> Manual UPI Payment Verification</legend>
+            <p class="payment-note">No payment gateway is used. Please pay by UPI, enter your transaction ID, and upload the payment screenshot for admin verification.</p>
+            <div class="form-grid form-grid--two">
+              <label class="field">
+                <span>UPI Transaction ID</span>
+                <input type="text" name="upi_transaction_id" placeholder="Example: 412345678901" required>
+              </label>
+              <label class="field">
+                <span>Payment Amount (₹)</span>
+                <input type="number" name="payment_amount" min="0" step="1" placeholder="Amount paid">
+              </label>
+            </div>
+            <label class="upload-box">
+              <input type="file" name="payment_screenshot" accept="image/*" required>
+              <span class="upload-icon">₹</span>
+              <strong>Upload UPI payment screenshot</strong>
+              <small>Admin will approve or reject payment after matching this screenshot with your UPI transaction ID.</small>
+            </label>
+          </fieldset>
+
+          <button type="submit" class="btn btn--primary booking-submit">Submit Booking & Payment Proof</button>
           <p class="booking-message" id="custom-booking-message" role="status" aria-live="polite"></p>
         </form>
 

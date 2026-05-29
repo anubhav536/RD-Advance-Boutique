@@ -321,15 +321,19 @@
   };
 
 
-  const readReferenceFile = (file) => new Promise((resolve, reject) => {
-    if (!file) {
+  const readUploadFile = (file, { label = "Upload", maxFileSize = 4 * 1024 * 1024, required = false } = {}) => new Promise((resolve, reject) => {
+    if (!file || !file.name) {
+      if (required) {
+        reject(new Error(`${label} is required.`));
+        return;
+      }
+
       resolve({});
       return;
     }
 
-    const maxFileSize = 4 * 1024 * 1024;
     if (file.size > maxFileSize) {
-      reject(new Error("Reference design must be smaller than 4 MB."));
+      reject(new Error(`${label} must be smaller than ${Math.round(maxFileSize / (1024 * 1024))} MB.`));
       return;
     }
 
@@ -342,7 +346,7 @@
         dataUrl: reader.result
       });
     });
-    reader.addEventListener("error", () => reject(new Error("Unable to read the reference design file.")));
+    reader.addEventListener("error", () => reject(new Error(`Unable to read the ${label.toLowerCase()} file.`)));
     reader.readAsDataURL(file);
   });
 
@@ -379,6 +383,7 @@
         <span>${order.customer?.name || "Customer"} · ${order.stitchingDetails?.outfit || "Custom Stitching"}</span>
         <span>Fabric: ${order.fabricSelection?.type || "To be confirmed"}</span>
         <span>Appointment: ${appointment}</span>
+        <span>Payment: ${formatStatus(order.payment?.status || "not-submitted")} · UPI ID: ${order.payment?.upiTransactionId || "Not submitted"}</span>
       `;
     };
 
@@ -392,7 +397,12 @@
           if (submitButton) submitButton.disabled = true;
           setMessage("Saving your custom stitching request...", "info");
 
-          const designReference = await readReferenceFile(formData.get("reference_design"));
+          const designReference = await readUploadFile(formData.get("reference_design"), { label: "Reference design" });
+          const paymentScreenshot = await readUploadFile(formData.get("payment_screenshot"), {
+            label: "Payment screenshot",
+            maxFileSize: 2 * 1024 * 1024,
+            required: true
+          });
           const payload = {
             orderType: "custom-stitching",
             status: "pending",
@@ -425,6 +435,13 @@
             designReference,
             appointmentDate: formData.get("appointment_date"),
             appointmentTime: formData.get("appointment_time"),
+            payment: {
+              method: "manual-upi",
+              status: "pending-verification",
+              upiTransactionId: formData.get("upi_transaction_id"),
+              amount: formData.get("payment_amount"),
+              screenshot: paymentScreenshot
+            },
             notes: formData.get("design_instructions")
           };
 
@@ -440,7 +457,7 @@
           }
 
           form.reset();
-          setMessage(`Request saved! Your order number is ${result.data.orderNumber}. Current status: ${formatStatus(result.data.status)}.`, "success");
+          setMessage(`Request saved! Your order number is ${result.data.orderNumber}. Payment is pending admin verification. Current order status: ${formatStatus(result.data.status)}.`, "success");
           renderTrackingResult(result.data);
         } catch (error) {
           setMessage(error.message || "Unable to save the request right now.", "error");

@@ -6,9 +6,11 @@ const ORDER_COLLECTION = 'orders';
 
 const ORDER_STATUSES = Object.freeze(['pending', 'in-progress', 'completed', 'cancelled']);
 const ORDER_TYPES = Object.freeze(['custom-stitching', 'ready-made']);
+const PAYMENT_STATUSES = Object.freeze(['not-submitted', 'pending-verification', 'approved', 'rejected']);
 
 const DEFAULT_STATUS = 'pending';
 const DEFAULT_CURRENCY = 'INR';
+const DEFAULT_PAYMENT_STATUS = 'not-submitted';
 
 const normalizeSlug = (value) => String(value || '')
   .trim()
@@ -23,6 +25,18 @@ const normalizeStatus = (status = DEFAULT_STATUS) => {
   if (!ORDER_STATUSES.includes(normalizedStatus)) {
     throw new AppError('Order status must be pending, in-progress, completed, or cancelled.', 400, {
       allowedStatuses: ORDER_STATUSES,
+    });
+  }
+
+  return normalizedStatus;
+};
+
+const normalizePaymentStatus = (status = DEFAULT_PAYMENT_STATUS) => {
+  const normalizedStatus = normalizeSlug(status || DEFAULT_PAYMENT_STATUS);
+
+  if (!PAYMENT_STATUSES.includes(normalizedStatus)) {
+    throw new AppError('Payment status must be not-submitted, pending-verification, approved, or rejected.', 400, {
+      allowedStatuses: PAYMENT_STATUSES,
     });
   }
 
@@ -91,6 +105,99 @@ const cleanObject = (value) => {
 
     return result;
   }, {});
+};
+
+const normalizePaymentScreenshot = (screenshot = {}, currentScreenshot = {}) => {
+  const source = {
+    ...currentScreenshot,
+    ...cleanObject(screenshot),
+  };
+
+  if (source.fileSize !== undefined) {
+    source.fileSize = toNumber(source.fileSize, 'payment.screenshot.fileSize', {
+      integer: true,
+      minimum: 0,
+    });
+  }
+
+  ['fileName', 'fileType', 'dataUrl', 'url'].forEach((field) => {
+    if (source[field] !== undefined && source[field] !== null && source[field] !== '') {
+      source[field] = String(source[field]).trim();
+    }
+  });
+
+  return cleanObject(source);
+};
+
+const normalizePayment = (payload = {}, currentPayment = {}) => {
+  const incomingPayment = payload.payment || {};
+  const payment = {
+    ...currentPayment,
+    ...cleanObject(incomingPayment),
+  };
+
+  const transactionId = payload.upiTransactionId
+    ?? payload.upi_transaction_id
+    ?? incomingPayment.upiTransactionId
+    ?? incomingPayment.upi_transaction_id
+    ?? payment.upiTransactionId;
+  if (transactionId !== undefined && transactionId !== null && transactionId !== '') {
+    payment.upiTransactionId = String(transactionId).trim();
+  }
+
+  const method = incomingPayment.method ?? payload.paymentMethod ?? payment.method;
+  if (method !== undefined && method !== null && method !== '') {
+    payment.method = String(method).trim();
+  }
+
+  const amount = incomingPayment.amount ?? payload.paymentAmount ?? payment.amount;
+  const normalizedAmount = toNumber(amount, 'payment.amount', { minimum: 0 });
+  if (normalizedAmount !== undefined) {
+    payment.amount = normalizedAmount;
+  }
+
+  const screenshot = normalizePaymentScreenshot(
+    incomingPayment.screenshot ?? payload.paymentScreenshot ?? {},
+    currentPayment.screenshot || {},
+  );
+  if (Object.keys(screenshot).length > 0) {
+    payment.screenshot = screenshot;
+  }
+
+  const explicitStatus = incomingPayment.status ?? payload.paymentStatus;
+  if (explicitStatus !== undefined && explicitStatus !== null && explicitStatus !== '') {
+    payment.status = normalizePaymentStatus(explicitStatus);
+  } else if (payment.upiTransactionId || payment.screenshot?.dataUrl || payment.screenshot?.url) {
+    payment.status = currentPayment.status && currentPayment.status !== 'not-submitted'
+      ? normalizePaymentStatus(currentPayment.status)
+      : 'pending-verification';
+  } else {
+    payment.status = normalizePaymentStatus(payment.status || DEFAULT_PAYMENT_STATUS);
+  }
+
+  ['submittedAt', 'verifiedAt', 'rejectedAt'].forEach((field) => {
+    const value = incomingPayment[field] ?? payment[field];
+    if (value !== undefined) {
+      payment[field] = value;
+    }
+  });
+
+  ['verifiedBy', 'rejectionReason'].forEach((field) => {
+    const value = incomingPayment[field] ?? payment[field];
+    if (value !== undefined && value !== null && value !== '') {
+      payment[field] = String(value).trim();
+    }
+  });
+
+  if ((payment.upiTransactionId || payment.screenshot) && !payment.method) {
+    payment.method = 'manual-upi';
+  }
+
+  if ((payment.upiTransactionId || payment.screenshot) && !payment.submittedAt) {
+    payment.submittedAt = new Date().toISOString();
+  }
+
+  return cleanObject(payment);
 };
 
 const normalizeCustomer = (payload = {}, currentCustomer = {}) => {
@@ -286,6 +393,8 @@ const matchesText = (order, search) => {
     order.productId,
     order.productName,
     order.notes,
+    order.payment?.status,
+    order.payment?.upiTransactionId,
     order.appointmentDate,
     order.fabricSelection?.type,
     order.fabricSelection?.details,
@@ -320,6 +429,7 @@ class OrderModel extends BaseModel {
     return {
       ORDER_STATUSES,
       ORDER_TYPES,
+      PAYMENT_STATUSES,
     };
   }
 
@@ -435,6 +545,85 @@ class OrderModel extends BaseModel {
     return OrderModel.update(id, statusUpdates);
   }
 
+  static async updatePayment(id, payload) {
+    const orders = await OrderModel.findAll();
+    const itemIndex = orders.findIndex((entry) => String(entry.id) === String(id));
+
+    if (itemIndex === -1) {
+      throw new AppError(`No order with id "${id}" exists.`, 404);
+    }
+
+    const currentOrder = orders[itemIndex];
+    const payment = normalizePayment(payload, currentOrder.payment || {});
+
+    if (!payment.upiTransactionId) {
+      throw new AppError('UPI transaction ID is required for manual payment verification.', 400);
+    }
+
+    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url) {
+      throw new AppError('Payment screenshot is required for manual payment verification.', 400);
+    }
+
+    payment.status = 'pending-verification';
+    payment.submittedAt = payment.submittedAt || new Date().toISOString();
+    payment.verifiedAt = null;
+    payment.rejectedAt = null;
+    payment.verifiedBy = null;
+    payment.rejectionReason = null;
+
+    const updatedOrder = {
+      ...currentOrder,
+      payment,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updatedOrders = [...orders];
+    updatedOrders[itemIndex] = updatedOrder;
+
+    await jsonDatabase.writeData(ORDER_COLLECTION, updatedOrders);
+    return updatedOrder;
+  }
+
+  static async approvePayment(id, verifier = 'admin') {
+    const order = await OrderModel.findById(id);
+
+    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url)) {
+      throw new AppError('Payment cannot be approved until a UPI transaction ID and screenshot are submitted.', 400);
+    }
+
+    return OrderModel.update(id, {
+      status: 'in-progress',
+      payment: {
+        ...order.payment,
+        status: 'approved',
+        verifiedAt: new Date().toISOString(),
+        verifiedBy: verifier,
+        rejectedAt: null,
+        rejectionReason: null,
+      },
+    });
+  }
+
+  static async rejectPayment(id, reason = '') {
+    const order = await OrderModel.findById(id);
+
+    if (!order.payment?.upiTransactionId && !order.payment?.screenshot) {
+      throw new AppError('No submitted payment details are available to reject.', 400);
+    }
+
+    return OrderModel.update(id, {
+      status: 'pending',
+      payment: {
+        ...order.payment,
+        status: 'rejected',
+        verifiedAt: null,
+        verifiedBy: null,
+        rejectedAt: new Date().toISOString(),
+        rejectionReason: reason || 'Payment verification rejected by admin.',
+      },
+    });
+  }
+
   static async getSummary() {
     const orders = await OrderModel.findAll();
 
@@ -527,6 +716,11 @@ class OrderModel extends BaseModel {
     const designReference = normalizeDesignReference(payload, currentOrder.designReference || {});
     if (payload.designReference !== undefined || payload.referenceDesign !== undefined || Object.keys(designReference).length > 0) {
       order.designReference = designReference;
+    }
+
+    const payment = normalizePayment(payload, currentOrder.payment || {});
+    if (!partial || payload.payment !== undefined || payload.upiTransactionId !== undefined || payload.upi_transaction_id !== undefined || payload.paymentScreenshot !== undefined) {
+      order.payment = payment;
     }
 
     const appointmentDate = normalizeAppointmentDate(payload.appointmentDate ?? payload.appointment_date);
@@ -622,6 +816,10 @@ class OrderModel extends BaseModel {
       if (!hasProduct) {
         return false;
       }
+    }
+
+    if (filters.paymentStatus && normalizePaymentStatus(filters.paymentStatus) !== (order.payment?.status || DEFAULT_PAYMENT_STATUS)) {
+      return false;
     }
 
     if (!matchesText(order, filters.search)) {

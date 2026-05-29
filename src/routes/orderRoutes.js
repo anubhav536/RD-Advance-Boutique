@@ -16,6 +16,9 @@ router.get('/cancelled', requireAdminApi, orderController.getCancelledOrders);
 router.get('/custom-stitching', requireAdminApi, orderController.getCustomStitchingOrders);
 router.get('/ready-made', requireAdminApi, orderController.getReadyMadeOrders);
 
+router.patch('/:id/payment', orderController.updatePayment);
+router.patch('/:id/payment/approve', requireAdminApi, orderController.approvePayment);
+router.patch('/:id/payment/reject', requireAdminApi, orderController.rejectPayment);
 router.patch('/:id/status', requireAdminApi, orderController.updateOrderStatus);
 router.patch('/:id/complete', requireAdminApi, orderController.completeOrder);
 router.patch('/:id/cancel', requireAdminApi, orderController.cancelOrder);

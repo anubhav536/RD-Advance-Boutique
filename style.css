@@ -2766,3 +2766,60 @@ iframe{
 .admin-login-message.error {
   color: #b91c1c;
 }
+
+.payment-detail-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px;
+  margin:18px 0;
+}
+
+.payment-detail-grid div{
+  padding:14px;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  background:rgba(255,255,255,0.045);
+}
+
+.payment-detail-grid strong,
+.payment-detail-grid span{
+  display:block;
+}
+
+.payment-detail-grid strong{
+  color:var(--admin-gold);
+  font-size:12px;
+  letter-spacing:1px;
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+
+.payment-screenshot-preview{
+  width:100%;
+  max-height:420px;
+  object-fit:contain;
+  margin:12px 0 18px;
+  border:1px solid var(--admin-border-strong);
+  border-radius:22px;
+  background:rgba(255,255,255,0.04);
+}
+
+.admin-payment-message{
+  min-height:24px;
+  margin:16px 0 0;
+  color:var(--admin-muted);
+  font-weight:700;
+}
+
+.admin-payment-message[data-type="success"]{
+  color:#9df0bf;
+}
+
+.admin-payment-message[data-type="error"]{
+  color:#ff9ead;
+}
+
+button:disabled{
+  cursor:not-allowed;
+  opacity:0.58;
+}
