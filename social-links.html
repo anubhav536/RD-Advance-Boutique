@@ -256,6 +256,8 @@
 
 
               <input
+                id="instagramUrl"
+                name="instagramUrl"
                 type="url"
                 placeholder="https://instagram.com/yourprofile"
               >
@@ -281,6 +283,8 @@
 
 
               <input
+                id="facebookUrl"
+                name="facebookUrl"
                 type="url"
                 placeholder="https://facebook.com/yourpage"
               >
@@ -306,6 +310,8 @@
 
 
               <input
+                id="youtubeUrl"
+                name="youtubeUrl"
                 type="url"
                 placeholder="https://youtube.com/@yourchannel"
               >
@@ -331,6 +337,8 @@
 
 
               <input
+                id="whatsappUrl"
+                name="whatsappUrl"
                 type="text"
                 placeholder="+91 9876543210"
               >
@@ -356,6 +364,8 @@
 
 
               <input
+                id="telegramUrl"
+                name="telegramUrl"
                 type="url"
                 placeholder="https://t.me/yourchannel"
               >
@@ -381,6 +391,8 @@
 
 
               <input
+                id="pinterestUrl"
+                name="pinterestUrl"
                 type="url"
                 placeholder="https://pinterest.com/yourprofile"
               >
@@ -406,6 +418,8 @@
 
 
               <input
+                id="twitterUrl"
+                name="twitterUrl"
                 type="url"
                 placeholder="https://x.com/yourprofile"
               >
@@ -431,6 +445,8 @@
 
 
               <input
+                id="linkedinUrl"
+                name="linkedinUrl"
                 type="url"
                 placeholder="https://linkedin.com/in/yourprofile"
               >
@@ -453,9 +469,9 @@
 
 
 
-              <select>
+              <select id="showSocialFooter" name="showSocialFooter">
 
-                <option>
+                <option value="yes">
 
                   Yes
 
@@ -463,7 +479,7 @@
 
 
 
-                <option>
+                <option value="no">
 
                   No
 
@@ -770,54 +786,7 @@
   <!-- SCRIPT -->
   <!-- ========================= -->
 
-  <script>
-
-    // SAVE FORM
-
-    const socialLinksForm = document.getElementById(
-
-      "socialLinksForm"
-
-    );
-
-
-
-
-
-    socialLinksForm.addEventListener("submit", function(e){
-
-      e.preventDefault();
-
-
-
-
-
-      alert(
-
-        "Social Links Saved Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Save social links into database
-
-    });
-
-
-
-
-
-    console.log(
-
-      "Social Links Panel Loaded ✨"
-
-    );
-
-  </script>
+  <script src="js/admin-social-settings.js" defer></script>
 
 </body>
 </html>
