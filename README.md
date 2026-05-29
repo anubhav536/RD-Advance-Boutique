@@ -32,6 +32,25 @@ data/
 2. Install dependencies with `npm install`.
 3. Start development mode with `npm run dev` or production mode with `npm start`.
 
+
+### Product management endpoints
+
+Products are stored in `data/products.json` and exposed through dedicated backend routes:
+
+- `GET /api/v1/products` lists products with optional `search`, `category`, `type`, `status`, `featured`, and `inStock` filters.
+- `POST /api/v1/products` adds a product with title, category, price, type, stock quantity, images, details, features, tags, featured status, and affiliate/product links.
+- `GET /api/v1/products/:id` returns complete product details.
+- `PUT|PATCH /api/v1/products/:id` edits product information.
+- `PATCH /api/v1/products/:id/stock` updates only `stockQuantity`/`stock`.
+- `DELETE /api/v1/products/:id` deletes a product.
+- `GET /api/v1/products/categories` returns product categories with product counts.
+- `GET /api/v1/products/featured` returns featured products.
+- `GET /api/v1/products/ready-made` returns ready-made products.
+- `GET /api/v1/products/boutique` returns boutique products.
+- `GET /api/v1/products/affiliate` returns affiliate products.
+
+Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product statuses are `active`, `draft`, `inactive`, and `out-of-stock`.
+
 ### Available endpoints
 
 - `GET /api/v1/health` returns the current API health status.
