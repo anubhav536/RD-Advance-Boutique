@@ -2454,3 +2454,353 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================
+   Luxury contact page
+   ========================= */
+.contact-hero {
+  align-items: end;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(201, 164, 92, 0.34), transparent 18rem),
+    linear-gradient(120deg, rgba(16, 13, 11, 0.9), rgba(32, 25, 23, 0.74), rgba(190, 107, 114, 0.18)),
+    url("../assets/design6.png") center/cover no-repeat;
+  color: var(--ivory);
+  display: grid;
+  gap: 2rem;
+  min-height: 720px;
+  overflow: hidden;
+  padding: 8rem 5% 4.5rem;
+  position: relative;
+}
+
+.contact-hero::before {
+  background: linear-gradient(90deg, rgba(255, 253, 248, 0.11) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 253, 248, 0.09) 1px, transparent 1px);
+  background-size: 86px 86px;
+  content: "";
+  inset: 0;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 82%);
+  opacity: 0.45;
+  pointer-events: none;
+  position: absolute;
+}
+
+.contact-hero::after {
+  background: linear-gradient(0deg, var(--cream), transparent);
+  bottom: 0;
+  content: "";
+  height: 24%;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+.contact-hero__content,
+.contact-hero__card {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-hero__content h1 {
+  font-size: clamp(3rem, 10vw, 6.5rem);
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+  max-width: 920px;
+}
+
+.contact-hero__content p:not(.eyebrow) {
+  color: rgba(255, 253, 248, 0.8);
+  font-size: 1.02rem;
+  margin-top: 1.4rem;
+  max-width: 660px;
+}
+
+.contact-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+}
+
+.contact-hero__card {
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--black);
+  max-width: 390px;
+  padding: 1.6rem;
+}
+
+.contact-hero__card span,
+.social-card span {
+  color: var(--rose);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.contact-hero__card strong {
+  display: block;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.7rem;
+  line-height: 1.05;
+  margin: 0.45rem 0 0.75rem;
+}
+
+.contact-hero__card p {
+  color: var(--muted);
+}
+
+.contact-panel {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.contact-form-card,
+.location-card,
+.whatsapp-card,
+.social-card,
+.faq-list details {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 54px rgba(45, 28, 18, 0.09);
+}
+
+.contact-form-card {
+  background: var(--ivory);
+  padding: clamp(1.4rem, 4vw, 2.4rem);
+}
+
+.contact-form-card h2,
+.location-card h2,
+.whatsapp-card h2 {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.luxury-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.8rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-row--split {
+  gap: 1rem;
+}
+
+.form-row label {
+  color: var(--charcoal);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  background: var(--cream);
+  border: 1px solid rgba(201, 164, 92, 0.34);
+  border-radius: 18px;
+  color: var(--black);
+  font: inherit;
+  outline: none;
+  padding: 0.95rem 1rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  width: 100%;
+}
+
+.form-row textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 164, 92, 0.14);
+  transform: translateY(-1px);
+}
+
+.contact-detail-stack {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.location-card {
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, 0.95), rgba(248, 225, 220, 0.78)),
+    url("../assets/design2.jpg") right bottom/44% no-repeat;
+  min-height: 360px;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+.location-card p:not(.eyebrow),
+.whatsapp-card p {
+  color: var(--muted);
+  margin-top: 1rem;
+  max-width: 560px;
+}
+
+.location-card__meta {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.location-card__meta span,
+.location-card__meta a {
+  background: rgba(255, 253, 248, 0.82);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.82rem 1rem;
+  width: fit-content;
+}
+
+.whatsapp-card {
+  align-items: center;
+  background:
+    radial-gradient(circle at top right, rgba(201, 164, 92, 0.24), transparent 16rem),
+    var(--black);
+  color: var(--ivory);
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+.whatsapp-card p {
+  color: rgba(255, 253, 248, 0.72);
+}
+
+.whatsapp-card .btn--primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--black);
+}
+
+.social-section {
+  background: linear-gradient(180deg, var(--cream), var(--blush));
+}
+
+.social-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.social-card {
+  background: rgba(255, 253, 248, 0.78);
+  padding: 1.5rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.social-card strong {
+  display: block;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.8rem;
+  line-height: 1.05;
+  margin-top: 0.35rem;
+}
+
+.social-card:hover {
+  border-color: var(--gold);
+  box-shadow: var(--shadow);
+  transform: translateY(-4px);
+}
+
+.faq-section {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(201, 164, 92, 0.18), transparent 24rem),
+    var(--ivory);
+}
+
+.faq-list {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0 auto;
+  max-width: 920px;
+}
+
+.faq-list details {
+  background: var(--cream);
+  overflow: hidden;
+  padding: 1.2rem 1.4rem;
+}
+
+.faq-list summary {
+  color: var(--black);
+  cursor: pointer;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.faq-list p {
+  color: var(--muted);
+  margin-top: 0.8rem;
+}
+
+@media (min-width: 700px) {
+  .contact-hero {
+    grid-template-columns: minmax(0, 1fr) 390px;
+  }
+
+  .contact-hero__card {
+    justify-self: end;
+  }
+
+  .form-row--split,
+  .social-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .contact-hero {
+    padding-left: 7%;
+    padding-right: 7%;
+  }
+
+  .contact-panel {
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  }
+
+  .whatsapp-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .social-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .contact-hero {
+    min-height: 680px;
+    padding-top: 4.5rem;
+  }
+
+  .location-card {
+    background: linear-gradient(135deg, rgba(255, 253, 248, 0.97), rgba(248, 225, 220, 0.86));
+  }
+
+  .contact-hero__actions .btn,
+  .luxury-form .btn,
+  .whatsapp-card .btn {
+    width: 100%;
+  }
+}
