@@ -1,7 +1,8 @@
 (function () {
   const API_BASE = "/api/v1/admin/data/settings";
+  const ASSET_API_BASE = "/api/v1/admin/assets";
   const FALLBACK_SETTINGS = "data/settings.json";
-  const MAX_IMAGE_BYTES = 1024 * 1024;
+  const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
   const defaults = {
     siteName: "RD Advance Boutique",
@@ -97,21 +98,29 @@
     return field.type === "checkbox" ? field.checked : field.value.trim();
   };
 
-  const readImageFile = (input) => new Promise((resolve, reject) => {
+  const uploadSettingImage = async (input, type, title) => {
     const file = input?.files?.[0];
-    if (!file) {
-      resolve("");
-      return;
-    }
+    if (!file) return "";
     if (file.size > MAX_IMAGE_BYTES) {
-      reject(new Error("Image uploads for settings must be 1MB or smaller."));
-      return;
+      throw new Error("Image uploads for settings must be 8MB or smaller.");
     }
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Unable to read selected image."));
-    reader.readAsDataURL(file);
-  });
+
+    const formData = new FormData();
+    formData.append("asset", file);
+    formData.append("title", title || file.name.replace(/\.[^.]+$/, ""));
+
+    const response = await fetch(`${ASSET_API_BASE}/${type}`, {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.message || "Unable to upload image locally.");
+    }
+
+    return payload.data?.url || payload.data?.path || "";
+  };
 
   const renderImagePreview = (containerId, image, label) => {
     const container = get(containerId);
@@ -161,8 +170,9 @@
     ].forEach(([inputId, containerId, label]) => {
       get(inputId)?.addEventListener("change", async (event) => {
         try {
-          const image = await readImageFile(event.currentTarget);
-          renderImagePreview(containerId, image, label);
+          const file = event.currentTarget.files?.[0];
+          const previewUrl = file ? URL.createObjectURL(file) : "";
+          renderImagePreview(containerId, previewUrl, label);
         } catch (error) {
           flash(error.message);
           event.currentTarget.value = "";
@@ -175,9 +185,9 @@
       event.preventDefault();
       try {
         const [logoImage, faviconImage, bannerImage] = await Promise.all([
-          readImageFile(get("logoUpload")),
-          readImageFile(get("faviconUpload")),
-          readImageFile(get("bannerImageUpload")),
+          uploadSettingImage(get("logoUpload"), "logo", "Website logo"),
+          uploadSettingImage(get("faviconUpload"), "favicons", "Website favicon"),
+          uploadSettingImage(get("bannerImageUpload"), "banners", "Homepage banner"),
         ]);
         currentSettings = await saveSettings(deepMerge(currentSettings, {
           siteName: valueOf("siteName"),

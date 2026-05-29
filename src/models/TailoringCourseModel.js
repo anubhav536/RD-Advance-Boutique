@@ -407,6 +407,10 @@ class TailoringCourseModel extends BaseModel {
       normalized.skills = toStringArray(payload.skills);
     }
 
+    if (payload.image !== undefined || payload.imageUrl !== undefined || !partial) {
+      normalized.image = compactString(payload.image || payload.imageUrl);
+    }
+
     if (payload.status !== undefined || !partial) {
       normalized.status = normalizeStatus(payload.status, COURSE_CATEGORY_STATUSES, DEFAULT_CATEGORY_STATUS, 'Course category status');
     }

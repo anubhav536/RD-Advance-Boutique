@@ -14,6 +14,7 @@ const COLLECTIONS = Object.freeze({
   notifications: { file: 'notifications.json', type: 'array' },
   contact: { file: 'contact.json', type: 'object' },
   settings: { file: 'settings.json', type: 'object' },
+  assets: { file: 'assets.json', type: 'object' },
 });
 
 const getCollectionConfig = (collection) => {

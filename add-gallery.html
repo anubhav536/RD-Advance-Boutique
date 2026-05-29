@@ -714,26 +714,58 @@
 
 
 
-    galleryForm.addEventListener("submit", function(e){
+    galleryForm.addEventListener("submit", async function(e){
 
       e.preventDefault();
 
+      const fields = Array.from(galleryForm.querySelectorAll("input, select, textarea"));
+      const title = fields[0]?.value?.trim();
+      const category = fields[1]?.value?.trim();
+      const description = fields[2]?.value?.trim();
+      const files = Array.from(document.getElementById("galleryImages")?.files || []);
+      const featured = String(fields[4]?.value || "").toLowerCase() === "yes";
+      const tags = fields[5]?.value?.trim();
 
+      if (!files.length) {
+        alert("Please choose at least one local gallery image.");
+        return;
+      }
 
+      try {
+        const uploadedImages = await Promise.all(files.map(async (file) => {
+          const formData = new FormData();
+          formData.append("asset", file);
+          formData.append("title", title || file.name.replace(/\.[^.]+$/, ""));
+          const response = await fetch("/api/v1/admin/assets/gallery", { method: "POST", body: formData });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.message || "Unable to upload gallery image locally.");
+          return payload.data;
+        }));
 
+        await Promise.all(uploadedImages.map((asset, index) => fetch("/api/v1/gallery", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: files.length > 1 ? `${title} ${index + 1}` : title,
+            category,
+            description,
+            image: asset.url,
+            alt: asset.alt || title,
+            featured,
+            tags,
+            status: fields[6]?.value || "Active",
+          }),
+        }).then(async (response) => {
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.message || "Unable to save gallery record.");
+          return payload;
+        })));
 
-      alert(
-
-        "Gallery Published Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Save gallery to database
+        alert("Gallery Published Successfully ✨");
+        window.location.href = "all-gallery.html";
+      } catch (error) {
+        alert(error.message);
+      }
 
     });
 
