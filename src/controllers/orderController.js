@@ -1,5 +1,6 @@
 const asyncHandler = require('../utils/asyncHandler');
 const OrderModel = require('../models/OrderModel');
+const PaymentService = require('../services/payment/PaymentService');
 
 const sendOrderList = (res, orders) => {
   res.status(200).json({
@@ -50,9 +51,15 @@ const deleteOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const getPaymentMethods = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: PaymentService.listMethods(),
+  });
+});
 
 const updatePayment = asyncHandler(async (req, res) => {
-  const order = await OrderModel.updatePayment(req.params.id, req.body);
+  const order = await PaymentService.submitOrderPayment(req.params.id, req.body);
 
   res.status(200).json({
     success: true,
@@ -61,7 +68,9 @@ const updatePayment = asyncHandler(async (req, res) => {
 });
 
 const approvePayment = asyncHandler(async (req, res) => {
-  const order = await OrderModel.approvePayment(req.params.id, req.body.verifiedBy || 'admin');
+  const order = await PaymentService.approveOrderPayment(req.params.id, {
+    verifiedBy: req.body.verifiedBy || 'admin',
+  });
 
   res.status(200).json({
     success: true,
@@ -70,7 +79,9 @@ const approvePayment = asyncHandler(async (req, res) => {
 });
 
 const rejectPayment = asyncHandler(async (req, res) => {
-  const order = await OrderModel.rejectPayment(req.params.id, req.body.reason || req.body.rejectionReason || '');
+  const order = await PaymentService.rejectOrderPayment(req.params.id, {
+    reason: req.body.reason || req.body.rejectionReason || '',
+  });
 
   res.status(200).json({
     success: true,
@@ -149,6 +160,7 @@ module.exports = {
   getCustomStitchingOrders,
   getOrder,
   getOrderSummary,
+  getPaymentMethods,
   getOrders,
   getPendingOrders,
   getReadyMadeOrders,

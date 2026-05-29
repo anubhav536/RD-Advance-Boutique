@@ -1,16 +1,15 @@
 const BaseModel = require('./BaseModel');
 const AppError = require('../utils/AppError');
 const jsonDatabase = require('../utils/jsonDatabase');
+const { DEFAULT_PAYMENT_METHOD, DEFAULT_PAYMENT_STATUS, PAYMENT_STATUSES } = require('../services/payment/paymentConstants');
 
 const ORDER_COLLECTION = 'orders';
 
 const ORDER_STATUSES = Object.freeze(['pending', 'in-progress', 'completed', 'cancelled']);
 const ORDER_TYPES = Object.freeze(['custom-stitching', 'ready-made']);
-const PAYMENT_STATUSES = Object.freeze(['not-submitted', 'pending-verification', 'approved', 'rejected']);
 
 const DEFAULT_STATUS = 'pending';
 const DEFAULT_CURRENCY = 'INR';
-const DEFAULT_PAYMENT_STATUS = 'not-submitted';
 
 const normalizeSlug = (value) => String(value || '')
   .trim()
@@ -190,7 +189,7 @@ const normalizePayment = (payload = {}, currentPayment = {}) => {
   });
 
   if ((payment.upiTransactionId || payment.screenshot) && !payment.method) {
-    payment.method = 'manual-upi';
+    payment.method = DEFAULT_PAYMENT_METHOD;
   }
 
   if ((payment.upiTransactionId || payment.screenshot) && !payment.submittedAt) {
@@ -543,6 +542,36 @@ class OrderModel extends BaseModel {
     }
 
     return OrderModel.update(id, statusUpdates);
+  }
+
+  static normalizePaymentPayload(payload = {}, currentPayment = {}) {
+    return normalizePayment(payload, currentPayment);
+  }
+
+  static async savePayment(id, payment, orderUpdates = {}) {
+    const orders = await OrderModel.findAll();
+    const itemIndex = orders.findIndex((entry) => String(entry.id) === String(id));
+
+    if (itemIndex === -1) {
+      throw new AppError(`No order with id "${id}" exists.`, 404);
+    }
+
+    const currentOrder = orders[itemIndex];
+    const updatedOrder = {
+      ...currentOrder,
+      ...orderUpdates,
+      id: currentOrder.id,
+      orderNumber: currentOrder.orderNumber,
+      createdAt: currentOrder.createdAt,
+      payment,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updatedOrders = [...orders];
+    updatedOrders[itemIndex] = updatedOrder;
+
+    await jsonDatabase.writeData(ORDER_COLLECTION, updatedOrders);
+    return updatedOrder;
   }
 
   static async updatePayment(id, payload) {
