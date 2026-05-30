@@ -412,6 +412,39 @@
   .adm-type-toggle { grid-template-columns: 1fr; }
 }
 
+/* ── MULTI-CATEGORY CHECKBOXES ──────────────────────────────── */
+.adm-cat-cb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .5rem;
+  padding: .5rem 0;
+}
+.adm-cat-cb-label {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .5rem .75rem;
+  border: 1.5px solid rgba(190,107,114,.25);
+  border-radius: .5rem;
+  cursor: pointer;
+  font-size: .82rem; font-weight: 500;
+  color: #3a2a22;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.adm-cat-cb-label:hover {
+  border-color: #be6b72; background: rgba(190,107,114,.05);
+}
+.adm-cat-cb-label input[type="checkbox"] {
+  accent-color: #be6b72;
+  width: 15px; height: 15px; flex-shrink: 0;
+}
+.adm-cat-cb-label:has(input:checked) {
+  border-color: #be6b72; background: rgba(190,107,114,.09);
+  color: #8a2035; font-weight: 600;
+}
+.adm-cat-tags-cell {
+  display: flex; flex-wrap: wrap; gap: .25rem; align-items: center;
+}
+
 /* ── MOBILE RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px) {
   .adm-sidebar {

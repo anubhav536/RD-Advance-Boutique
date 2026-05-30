@@ -1,5 +1,12 @@
 [
   {
+    "id": "sarees",
+    "name": "Sarees",
+    "description": "Handloom, silk, cotton, designer aur bridal sarees.",
+    "status": "active",
+    "slug": "sarees"
+  },
+  {
     "id": "blouses",
     "name": "Blouses",
     "description": "Designer blouse stitching and ready-made blouse inspirations.",
@@ -14,6 +21,34 @@
     "slug": "kurtis"
   },
   {
+    "id": "suits-salwar",
+    "name": "Suits & Salwar",
+    "description": "Designer salwar kameez, Punjabi suits, palazzo sets.",
+    "status": "active",
+    "slug": "suits-salwar"
+  },
+  {
+    "id": "lehengas",
+    "name": "Lehengas",
+    "description": "Bridal lehengas, party lehengas, designer chaniya choli.",
+    "status": "active",
+    "slug": "lehengas"
+  },
+  {
+    "id": "gowns",
+    "name": "Gowns",
+    "description": "Anarkali gowns, evening gowns, floor-length designs.",
+    "status": "active",
+    "slug": "gowns"
+  },
+  {
+    "id": "indo-western",
+    "name": "Indo-Western",
+    "description": "Fusion wear — sharara, dhoti pants, crop tops, co-ord sets.",
+    "status": "active",
+    "slug": "indo-western"
+  },
+  {
     "id": "bridal",
     "name": "Bridal",
     "description": "Bridal and occasion-wear boutique designs.",
@@ -21,11 +56,25 @@
     "slug": "bridal"
   },
   {
+    "id": "dupattas",
+    "name": "Dupattas",
+    "description": "Designer dupattas, embroidered and printed styles.",
+    "status": "active",
+    "slug": "dupattas"
+  },
+  {
     "id": "kids-wear",
     "name": "Kids Wear",
     "description": "Boutique outfits for children and celebrations.",
     "status": "active",
     "slug": "kids-wear"
+  },
+  {
+    "id": "kaftans",
+    "name": "Kaftans",
+    "description": "Printed and embroidered kaftans for casual and beach wear.",
+    "status": "active",
+    "slug": "kaftans"
   },
   {
     "id": "accessories",

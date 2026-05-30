@@ -304,16 +304,18 @@
       return;
     }
     list.innerHTML = `<table class="adm-table">
-      <thead><tr><th>Image</th><th>Title</th><th>Type</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Image</th><th>Title</th><th>Type</th><th>Categories</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>${S.products.map((p, i) => {
         const pt = (p.productType || p.type || "readymade").toLowerCase();
         const isBoutique = pt === "boutique";
+        const cats = Array.isArray(p.categories) && p.categories.length ? p.categories : (p.category ? [p.category] : []);
+        const catHtml = cats.length ? cats.map(c => `<span class="adm-tag">${esc(c)}</span>`).join(" ") : "<span style='color:#aaa'>—</span>";
         return `
         <tr>
           <td><img src="${esc(p.image || (p.images && p.images[0]) || "")}" class="adm-table-img" onerror="this.style.display='none'"></td>
           <td><strong>${esc(p.title || p.name || "—")}</strong></td>
           <td><span class="adm-badge ${isBoutique ? "adm-badge--boutique" : "adm-badge--readymade"}">${isBoutique ? "✂️ Boutique" : "🛍️ Ready-Made"}</span></td>
-          <td><span class="adm-tag">${esc(p.category || "—")}</span></td>
+          <td class="adm-cat-tags-cell">${catHtml}</td>
           <td>${p.price ? "₹" + p.price : "—"}</td>
           <td><span class="adm-badge ${p.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${p.status || "active"}</span></td>
           <td class="adm-actions">
@@ -333,7 +335,12 @@
     S.editType = "product"; S.editItem = idx >= 0 ? S.products[idx] : null; S.editIdx = idx;
     const item = S.editItem || {};
     const currentType = item.productType || item.type || "readymade";
-    const catOpts = S.categories.map(c => `<option value="${esc(c.name)}" ${item.category === c.name ? "selected" : ""}>${esc(c.name)}</option>`).join("");
+    const selectedCats = Array.isArray(item.categories) && item.categories.length ? item.categories : (item.category ? [item.category] : []);
+    const catCheckboxes = S.categories.map(c => `
+      <label class="adm-cat-cb-label">
+        <input type="checkbox" name="categories" value="${esc(c.name)}" ${selectedCats.includes(c.name) ? "checked" : ""}>
+        <span>${esc(c.name)}</span>
+      </label>`).join("");
     el("admModalTitle").textContent = idx >= 0 ? "Edit Product" : "Add Product";
     el("admModalBody").innerHTML = `<div class="adm-form-grid">
       <div class="adm-fg adm-fg--full"><label>Product Title *</label><input type="text" name="title" value="${esc(item.title || item.name || "")}" placeholder="e.g. Woven Handloom Cotton Saree"></div>
@@ -350,7 +357,10 @@
           </label>
         </div>
       </div>
-      <div class="adm-fg"><label>Category</label><select name="category"><option value="">— Select —</option>${catOpts}</select></div>
+      <div class="adm-fg adm-fg--full">
+        <label>Categories <small>(ek ya zyada select karein)</small></label>
+        <div class="adm-cat-cb-grid">${catCheckboxes}</div>
+      </div>
       <div class="adm-fg"><label>Price (₹)</label><input type="number" name="price" value="${item.price || ""}" min="0" placeholder="349"></div>
       <div class="adm-fg"><label>Status</label><select name="status"><option value="active" ${item.status !== "inactive" ? "selected" : ""}>Active</option><option value="inactive" ${item.status === "inactive" ? "selected" : ""}>Inactive</option></select></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> Featured Product</label></div>
@@ -370,11 +380,13 @@
     const v = n => fv(f, n); const ls = n => lines(v(n)); const cb = n => fcb(f, n);
     const ex = S.editItem || {};
     const pType = f.querySelector('[name="productType"]:checked')?.value || ex.productType || "readymade";
+    const selectedCategories = Array.from(f.querySelectorAll('[name="categories"]:checked')).map(cb => cb.value);
     return {
       ...ex,
       id: ex.id || slug(v("title")) || uid(),
       title: v("title"), name: v("title"),
-      category: v("category"),
+      categories: selectedCategories,
+      category: selectedCategories[0] || ex.category || "",
       productType: pType,
       type: pType,
       price: parseFloat(v("price")) || 0,
