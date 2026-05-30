@@ -299,6 +299,63 @@
       background: #f8e1dc;
     }
 
+    .image-manager {
+      border: 1px dashed rgba(190,107,114,0.35);
+      border-radius: 18px;
+      display: grid;
+      gap: 0.65rem;
+      padding: 0.75rem;
+    }
+
+    .image-manager textarea { min-height: 6.5rem; }
+
+    .image-manager__toolbar,
+    .slider-controls,
+    .detail-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .image-manager__help,
+    .image-manager__error {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .image-manager__help { color: var(--muted); }
+    .image-manager__error { color: #8b1e2d; font-weight: 700; }
+
+    .preview-slider { position: relative; }
+
+    .preview-slider__stage {
+      background: #f8e1dc;
+      display: grid;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .preview-slider__slide { display: none; }
+    .preview-slider__slide.is-active { display: block; }
+
+    .slider-controls {
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem 0;
+    }
+
+    .slider-count { color: var(--muted); font-size: 0.78rem; font-weight: 800; }
+
+    .preview-details {
+      border-top: 1px solid var(--line);
+      margin-top: 0.9rem;
+      padding-top: 0.9rem;
+    }
+
+    .detail-grid { margin-top: 0.6rem; }
+    .detail-pill { background: rgba(190,107,114,0.1); border-radius: 999px; padding: 0.32rem 0.6rem; font-size: 0.75rem; font-weight: 700; }
+
     .preview-card__content { padding: 1rem; }
     .preview-card h3 { font-size: 1.7rem; margin: 0 0 0.35rem; }
     .preview-card p { margin: 0.4rem 0; }
@@ -468,7 +525,7 @@
           filename: 'products.json',
           defaults: () => ({
             id: '', title: '', name: '', category: '', productType: 'boutique', type: 'boutique', price: 0,
-            discountPrice: 0, oldPrice: 0, image: 'assets/design1.jpg', images: [], shortDescription: '',
+            discountPrice: 0, oldPrice: 0, image: '', images: [], shortDescription: '',
             description: '', longDescription: '', details: '', features: [], tags: [], sizes: [], colors: [],
             stockQuantity: 1, stock: 1, featured: false, status: 'active', link: '', affiliateUrl: '',
             whatsappMessage: '', createdAt: nowIso(), updatedAt: nowIso()
@@ -476,7 +533,7 @@
           fields: [
             ['id', 'ID / slug', 'text'], ['title', 'Title', 'text'], ['category', 'Category', 'text'], ['status', 'Status', 'select:active,draft,inactive'],
             ['price', 'Price', 'number'], ['discountPrice', 'Discount price', 'number'], ['oldPrice', 'Old price', 'number'], ['stockQuantity', 'Stock quantity', 'number'],
-            ['image', 'Image path selector', 'image'], ['featured', 'Featured', 'checkbox'],
+            ['images', 'Product images (first becomes main image)', 'images'], ['featured', 'Featured', 'checkbox'],
             ['shortDescription', 'Short description', 'textarea'], ['longDescription', 'Long description editor', 'longtext'],
             ['features', 'Features (one per line)', 'list'], ['tags', 'Tags (one per line)', 'list'], ['sizes', 'Sizes (one per line)', 'list'], ['colors', 'Colors (one per line)', 'list'],
             ['link', 'Order / WhatsApp link', 'url'], ['whatsappMessage', 'WhatsApp message', 'textarea']
@@ -484,10 +541,10 @@
         },
         gallery: {
           label: 'Gallery Manager', title: 'Gallery Details', filename: 'gallery.json',
-          defaults: () => ({ id: '', title: '', category: '', image: 'assets/design1.jpg', alt: '', layout: 'standard', featured: false, shortDescription: '', longDescription: '', tags: [], features: [], whatsappMessage: '' }),
+          defaults: () => ({ id: '', title: '', category: '', image: '', images: [], carousel: [], alt: '', layout: 'standard', featured: false, shortDescription: '', longDescription: '', tags: [], features: [], whatsappMessage: '' }),
           fields: [
             ['id', 'ID / slug', 'text'], ['title', 'Title', 'text'], ['category', 'Category', 'text'], ['layout', 'Layout', 'select:standard,tall,wide'],
-            ['image', 'Image path selector', 'image'], ['featured', 'Featured', 'checkbox'], ['alt', 'Image alt text', 'text'],
+            ['images', 'Design images (unlimited carousel)', 'images'], ['featured', 'Featured', 'checkbox'], ['alt', 'Image alt text', 'text'],
             ['shortDescription', 'Short description', 'textarea'], ['longDescription', 'Long description editor', 'longtext'],
             ['features', 'Features (one per line)', 'list'], ['tags', 'Tags (one per line)', 'list'], ['whatsappMessage', 'WhatsApp message', 'textarea']
           ]
@@ -539,6 +596,13 @@
         .trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `item-${Date.now()}`;
 
       const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+      const allowedImageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
+      const imageExtension = value => String(value || '').split('?')[0].split('#')[0].split('.').pop().toLowerCase();
+      const isValidImagePath = value => allowedImageExtensions.includes(imageExtension(value));
+      const filenameToAssetPath = fileName => `assets/${String(fileName || '').trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '').toLowerCase()}`;
+      const splitImageLines = value => String(value || '').split(/[\n,]+/).map(item => item.trim()).filter(Boolean);
+      const validImagesFrom = value => splitImageLines(Array.isArray(value) ? value.join('\n') : value).filter(isValidImagePath);
+      const unique = items => [...new Set(items.filter(Boolean))];
 
       const getPath = (object, path) => path.split('.').reduce((target, key) => target?.[key], object);
       const setPath = (object, path, value) => {
@@ -575,25 +639,47 @@
         const fromData = sections.flatMap(section => {
           const data = section === 'settings' ? [state.settings] : state[section];
           return JSON.stringify(data).match(/assets\/[A-Za-z0-9._/-]+/g) || [];
-        });
-        imagePathOptions.innerHTML = [...new Set([...assetPaths, ...fromData])].sort().map(path => `<option value="${escapeHtml(path)}"></option>`).join('');
+        }).filter(isValidImagePath);
+        imagePathOptions.innerHTML = unique([...assetPaths, ...fromData]).sort().map(path => `<option value="${escapeHtml(path)}"></option>`).join('');
       };
 
-      const normalizeItem = item => {
+      const imagesFor = item => {
+        const images = unique([...(Array.isArray(item.images) ? item.images : []), item.image, item.logo, getPath(item, 'homepageBanner.image')].filter(Boolean));
+        const validImages = images.filter(isValidImagePath);
+        return validImages.length ? validImages : ['assets/logo.png'];
+      };
+
+      const normalizeImages = copy => {
+        const images = unique([...(Array.isArray(copy.images) ? copy.images : validImagesFrom(copy.images)), copy.image].filter(Boolean)).filter(isValidImagePath);
+        if (images.length) {
+          copy.images = images;
+          copy.image = images[0];
+        } else {
+          copy.images = [];
+          copy.image = '';
+        }
+        return images;
+      };
+
+      const normalizeItem = (item, section = currentSection) => {
         const copy = structuredClone(item);
         if (!copy.id && (copy.title || copy.name || copy.siteName)) copy.id = slugify(copy.title || copy.name || copy.siteName);
-        if (currentSection === 'products') {
+        if (section === 'products') {
           copy.name = copy.name || copy.title;
           copy.title = copy.title || copy.name;
           copy.description = copy.shortDescription || copy.description || '';
           copy.details = copy.longDescription || copy.details || '';
-          copy.images = copy.image ? [copy.image] : [];
+          normalizeImages(copy);
           copy.stock = Number(copy.stockQuantity || copy.stock || 0);
           copy.updatedAt = nowIso();
         }
-        if (currentSection === 'categories') copy.slug = copy.slug || slugify(copy.name || copy.id);
-        if (currentSection === 'notifications') copy.updatedAt = nowIso();
-        if (currentSection === 'settings') copy.updatedAt = nowIso();
+        if (section === 'gallery') {
+          const images = normalizeImages(copy);
+          copy.carousel = images.map((src, index) => ({ src, alt: copy.alt || copy.title || `Gallery image ${index + 1}`, isMain: index === 0 }));
+        }
+        if (section === 'categories') copy.slug = copy.slug || slugify(copy.name || copy.id);
+        if (section === 'notifications') copy.updatedAt = nowIso();
+        if (section === 'settings') copy.updatedAt = nowIso();
         return copy;
       };
 
@@ -601,6 +687,8 @@
         if (type === 'checkbox') return element.checked;
         if (type === 'number') return Number(element.value || 0);
         if (type === 'list') return element.value.split('\n').map(item => item.trim()).filter(Boolean);
+        if (type === 'images') return validImagesFrom(element.value);
+        if (type === 'image') return isValidImagePath(element.value) ? element.value.trim() : '';
         return element.value.trim();
       };
 
@@ -621,14 +709,25 @@
           return `<div class="${fieldClass}"><label for="${id}">${label}</label><textarea id="${id}" name="${path}" data-type="${type}" class="${type === 'longtext' ? 'long-editor' : ''}">${escapeHtml(textValue)}</textarea></div>`;
         }
         if (type === 'image') {
-          return `<div class="${fieldClass}"><label for="${id}">${label}</label><input id="${id}" name="${path}" data-type="image" type="text" list="imagePathOptions" value="${escapeHtml(value || '')}" placeholder="assets/design1.jpg"></div>`;
+          return `<div class="${fieldClass}"><label for="${id}">${label}</label><input id="${id}" name="${path}" data-type="image" type="text" list="imagePathOptions" value="${escapeHtml(value || '')}" placeholder="assets/design1.jpg" pattern=".*\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$"><p class="image-manager__help">Allowed: JPG, PNG, WebP, GIF, AVIF.</p></div>`;
+        }
+        if (type === 'images') {
+          const imageValue = validImagesFrom(value).join('\n') || (isValidImagePath(getPath(item, 'image')) ? getPath(item, 'image') : '');
+          return `<div class="field field--full image-manager"><label for="${id}">${label}</label><textarea id="${id}" name="${path}" data-type="images" list="imagePathOptions" placeholder="assets/design1.jpg&#10;assets/design2.jpg">${escapeHtml(imageValue)}</textarea><div class="image-manager__toolbar"><input id="${id}-upload" class="image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,.jpg,.jpeg,.png,.webp,.gif,.avif" multiple data-target="${path}"></div><p class="image-manager__help">Choose one or many images. This static manager writes asset paths into JSON; copy the selected files into the repository <code>assets/</code> folder before publishing. The first valid image automatically becomes <code>image</code> and all valid images become <code>images</code>.</p><p class="image-manager__error" data-error-for="${path}" aria-live="polite"></p></div>`;
         }
         return `<div class="${fieldClass}"><label for="${id}">${label}</label><input id="${id}" name="${path}" data-type="${type}" type="${type}" value="${escapeHtml(value || '')}"></div>`;
       };
 
       const labelFor = item => item.title || item.name || item.siteName || item.id || 'Untitled item';
-      const imageFor = item => item.image || item.logo || getPath(item, 'homepageBanner.image') || 'assets/logo.png';
+      const imageFor = item => imagesFor(item)[0];
       const descriptionFor = item => item.shortDescription || item.description || item.longDescription || item.message || item.tagline || '';
+      const detailValues = item => [
+        item.category,
+        item.status,
+        item.layout,
+        item.stockQuantity ? `${item.stockQuantity} in stock` : '',
+        item.featured ? 'Featured' : ''
+      ].filter(Boolean);
 
       const renderList = () => {
         const collection = getCollection();
@@ -658,22 +757,41 @@
 
       const renderPreview = () => {
         const item = selectedItem();
+        const imageList = imagesFor(item);
         const tags = [item.category, item.status, item.priority, item.currency, ...(Array.isArray(item.tags) ? item.tags.slice(0, 3) : [])].filter(Boolean);
+        const details = detailValues(item);
         preview.innerHTML = `
           <div class="preview-card">
-            <img src="${escapeHtml(imageFor(item))}" alt="" onerror="this.src='assets/logo.png'">
+            <div class="preview-slider" data-slider-index="0">
+              <div class="preview-slider__stage">
+                ${imageList.map((src, index) => `<img class="preview-slider__slide ${index === 0 ? 'is-active' : ''}" src="${escapeHtml(src)}" alt="${escapeHtml(labelFor(item))} image ${index + 1}" onerror="this.src='assets/logo.png'">`).join('')}
+              </div>
+              <div class="slider-controls">
+                <button class="ghost-button slider-prev" type="button" ${imageList.length < 2 ? 'disabled' : ''}>Previous</button>
+                <span class="slider-count">1 / ${imageList.length}</span>
+                <button class="ghost-button slider-next" type="button" ${imageList.length < 2 ? 'disabled' : ''}>Next</button>
+              </div>
+            </div>
             <div class="preview-card__content">
               <h3>${escapeHtml(labelFor(item))}</h3>
               <p>${escapeHtml(descriptionFor(item) || 'Add a description to preview customer-facing content.')}</p>
-              ${item.price ? `<p><strong>${escapeHtml(state.settings.currency || 'INR')} ${escapeHtml(item.discountPrice || item.price)}</strong></p>` : ''}
+              ${item.price ? `<p><strong>${escapeHtml(state.settings.currency || 'INR')} ${escapeHtml(item.discountPrice || item.price)}</strong>${item.oldPrice ? ` <s>${escapeHtml(item.oldPrice)}</s>` : ''}</p>` : ''}
               <div class="chips">${tags.map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
+              <div class="preview-details">
+                <strong>${currentSection === 'gallery' ? 'Gallery details preview' : currentSection === 'products' ? 'Product details preview' : 'Details preview'}</strong>
+                <div class="detail-grid">${details.map(detail => `<span class="detail-pill">${escapeHtml(detail)}</span>`).join('') || '<span class="detail-pill">Add item details</span>'}</div>
+                ${Array.isArray(item.features) && item.features.length ? `<ul>${item.features.slice(0, 4).map(feature => `<li>${escapeHtml(feature)}</li>`).join('')}</ul>` : ''}
+              </div>
             </div>
           </div>`;
       };
 
+      const buildExportData = section => section === 'settings'
+        ? normalizeItem(state.settings || {}, 'settings')
+        : (state[section] || []).map(item => normalizeItem(item, section));
+
       const updateJsonOutput = () => {
-        const data = currentSection === 'settings' ? state.settings : state[currentSection];
-        output.value = JSON.stringify(data, null, 2);
+        output.value = JSON.stringify(buildExportData(currentSection), null, 2);
       };
 
       const render = () => {
@@ -685,11 +803,18 @@
         updateStatus();
       };
 
+      const validateImageField = (path, element) => {
+        const invalidImages = splitImageLines(element.value).filter(item => !isValidImagePath(item));
+        const error = form.querySelector(`[data-error-for="${path}"]`);
+        if (error) error.textContent = invalidImages.length ? `Skipped invalid image format: ${invalidImages.join(', ')}` : '';
+      };
+
       const readForm = () => {
         const base = structuredClone(selectedItem());
         sectionConfig[currentSection].fields.forEach(([path, , type]) => {
           const element = form.elements[path];
           if (!element) return;
+          if (type === 'images') validateImageField(path, element);
           setPath(base, path, parseValue(element, type));
         });
         return normalizeItem(base);
@@ -780,11 +905,39 @@
         updateJsonOutput();
       });
 
+      form.addEventListener('change', event => {
+        const upload = event.target.closest('.image-upload');
+        if (!upload) return;
+        const target = form.elements[upload.dataset.target];
+        const files = [...upload.files];
+        const invalidFiles = files.filter(file => !file.type.startsWith('image/') || !isValidImagePath(file.name));
+        const validPaths = files.filter(file => file.type.startsWith('image/') && isValidImagePath(file.name)).map(file => filenameToAssetPath(file.name));
+        target.value = unique([...splitImageLines(target.value), ...validPaths]).join('\n');
+        const error = form.querySelector(`[data-error-for="${upload.dataset.target}"]`);
+        if (error) error.textContent = invalidFiles.length ? `Skipped unsupported file type: ${invalidFiles.map(file => file.name).join(', ')}` : '';
+        upload.value = '';
+        form.dispatchEvent(new Event('input', { bubbles: true }));
+        showToast(validPaths.length ? `${validPaths.length} image path${validPaths.length === 1 ? '' : 's'} added.` : 'No valid image files selected.');
+      });
+
       itemList.addEventListener('click', event => {
         const button = event.target.closest('.item-button');
         if (!button) return;
         selectedIndex = Number(button.dataset.index);
         render();
+      });
+
+      preview.addEventListener('click', event => {
+        const slider = event.target.closest('.preview-slider');
+        if (!slider || (!event.target.closest('.slider-prev') && !event.target.closest('.slider-next'))) return;
+        const slides = [...slider.querySelectorAll('.preview-slider__slide')];
+        if (slides.length < 2) return;
+        const direction = event.target.closest('.slider-next') ? 1 : -1;
+        const current = Number(slider.dataset.sliderIndex || 0);
+        const next = (current + direction + slides.length) % slides.length;
+        slider.dataset.sliderIndex = String(next);
+        slides.forEach((slide, index) => slide.classList.toggle('is-active', index === next));
+        slider.querySelector('.slider-count').textContent = `${next + 1} / ${slides.length}`;
       });
 
       document.querySelectorAll('.tab-button').forEach(button => button.addEventListener('click', () => switchSection(button.dataset.section)));
@@ -834,8 +987,11 @@
         await navigator.clipboard.writeText(output.value);
         showToast('JSON copied.');
       });
-      $('#exportSectionButton').addEventListener('click', () => downloadFile(sectionConfig[currentSection].filename, output.value));
-      $('#exportAllButton').addEventListener('click', () => downloadFile('rd-advance-boutique-content.json', JSON.stringify(state, null, 2)));
+      $('#exportSectionButton').addEventListener('click', () => downloadFile(sectionConfig[currentSection].filename, JSON.stringify(buildExportData(currentSection), null, 2)));
+      $('#exportAllButton').addEventListener('click', () => {
+        const exportState = sections.reduce((acc, section) => ({ ...acc, [section]: buildExportData(section) }), {});
+        downloadFile('rd-advance-boutique-content.json', JSON.stringify(exportState, null, 2));
+      });
       $('#applyJsonButton').addEventListener('click', () => {
         try {
           const parsed = JSON.parse(output.value);
