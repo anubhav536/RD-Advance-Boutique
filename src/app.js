@@ -60,7 +60,6 @@ const protectedAdminPages = new Set([
   '/edit-gallery.html',
   '/edit-product.html',
   '/pending-orders.html',
-  '/product-details.html',
   '/seo-settings.html',
   '/social-links.html',
   '/students.html',
@@ -77,15 +76,10 @@ app.use((req, res, next) => {
 
 app.use(config.apiPrefix, routes);
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'RD Advance Boutique API is running.',
-    docs: `${config.apiPrefix}/health`,
-  });
-});
-
-app.use(express.static(path.resolve(__dirname, '..')));
+app.use(express.static(path.resolve(__dirname, '..'), {
+  index: 'index.html',
+  extensions: ['html'],
+}));
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

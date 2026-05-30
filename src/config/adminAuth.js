@@ -22,12 +22,47 @@ const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
 
+const backupMalformedJsonFile = (filePath, raw, error) => {
+  const backupPath = `${filePath}.corrupt-${Date.now()}.bak`;
+  try {
+    fs.writeFileSync(backupPath, raw || '', 'utf8');
+  } catch (backupError) {
+    console.error('Unable to write malformed admin JSON backup.', {
+      filePath,
+      backupPath,
+      error: backupError.message,
+    });
+  }
+  console.error('Recovered malformed admin JSON storage file.', {
+    filePath,
+    backupPath,
+    error: error.message,
+  });
+};
+
 const readJsonFile = (filePath, fallback = null) => {
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
-    return raw.trim() ? JSON.parse(raw) : fallback;
+    if (!raw.trim()) return fallback;
+    try {
+      return JSON.parse(raw);
+    } catch (parseError) {
+      if (fallback !== null) {
+        backupMalformedJsonFile(filePath, raw, parseError);
+        writeJsonFile(filePath, fallback);
+        return fallback;
+      }
+      throw parseError;
+    }
   } catch (error) {
     if (error.code === 'ENOENT' && fallback !== null) return fallback;
+    if (fallback !== null) {
+      console.error('Unable to read admin JSON storage file; using fallback.', {
+        filePath,
+        error: error.message,
+      });
+      return fallback;
+    }
     throw error;
   }
 };
@@ -65,9 +100,20 @@ const ensureConfigFile = () => {
   return null;
 };
 
+const buildRecoverableConfig = (parsedConfig = {}) => ({
+  username: normalizeEmail(parsedConfig.username || process.env.ADMIN_USERNAME || ADMIN_APPROVAL_EMAIL),
+  passwordHash: String(parsedConfig.passwordHash || process.env.ADMIN_PASSWORD_HASH || FALLBACK_PASSWORD_HASH),
+  sessionSecret: String(parsedConfig.sessionSecret || crypto.randomBytes(64).toString('hex')),
+  sessionDurationMinutes: Number(parsedConfig.sessionDurationMinutes || DEFAULT_SESSION_MINUTES),
+  rememberSessionDurationMinutes: Number(parsedConfig.rememberSessionDurationMinutes || REMEMBER_SESSION_MINUTES),
+  securityQuestion: String(parsedConfig.securityQuestion || DEFAULT_SECURITY_QUESTION),
+  securityAnswerHash: String(parsedConfig.securityAnswerHash || ''),
+  pendingSignups: Array.isArray(parsedConfig.pendingSignups) ? parsedConfig.pendingSignups : [],
+});
+
 const readConfigFile = () => {
   const createdConfig = ensureConfigFile();
-  return createdConfig || readJsonFile(CONFIG_PATH);
+  return createdConfig || readJsonFile(CONFIG_PATH, buildRecoverableConfig());
 };
 
 const normalizeAdminUser = (user) => {
@@ -141,10 +187,11 @@ const getLegacyUsersFromConfig = (parsedConfig, now = Date.now()) => uniqueUsers
 ]);
 
 const normalizeConfig = (parsedConfig) => {
-  const username = normalizeEmail(parsedConfig.username);
-  const passwordHash = String(parsedConfig.passwordHash || '').trim();
-  const sessionSecret = String(parsedConfig.sessionSecret || '').trim();
-  const sessionDurationMinutes = Number(parsedConfig.sessionDurationMinutes || DEFAULT_SESSION_MINUTES);
+  const recoveredConfig = buildRecoverableConfig(parsedConfig);
+  const username = normalizeEmail(recoveredConfig.username);
+  const passwordHash = String(recoveredConfig.passwordHash || '').trim();
+  const sessionSecret = String(recoveredConfig.sessionSecret || '').trim();
+  const sessionDurationMinutes = Number(recoveredConfig.sessionDurationMinutes || DEFAULT_SESSION_MINUTES);
   const now = Date.now();
 
   if (!username || !passwordHash || !sessionSecret) {
@@ -155,8 +202,8 @@ const normalizeConfig = (parsedConfig) => {
     throw new Error('Admin authentication sessionSecret must be at least 32 characters long.');
   }
 
-  const pendingSignups = Array.isArray(parsedConfig.pendingSignups)
-    ? parsedConfig.pendingSignups.map((request) => normalizePendingSignup(request, now)).filter(Boolean)
+  const pendingSignups = Array.isArray(recoveredConfig.pendingSignups)
+    ? recoveredConfig.pendingSignups.map((request) => normalizePendingSignup(request, now)).filter(Boolean)
     : [];
 
   return {
@@ -169,7 +216,7 @@ const normalizeConfig = (parsedConfig) => {
     sessionDurationMs: Number.isFinite(sessionDurationMinutes)
       ? sessionDurationMinutes * 60 * 1000
       : DEFAULT_SESSION_MINUTES * 60 * 1000,
-    rememberSessionDurationMinutes: Number(parsedConfig.rememberSessionDurationMinutes || REMEMBER_SESSION_MINUTES),
+    rememberSessionDurationMinutes: Number(recoveredConfig.rememberSessionDurationMinutes || REMEMBER_SESSION_MINUTES),
     pendingSignups,
   };
 };
@@ -207,7 +254,10 @@ const writeConfigFile = (nextConfig, users) => {
   cachedConfigMtimeMs = 0;
 };
 
-const readUsersFromDisk = () => readJsonFile(USERS_PATH, []);
+const readUsersFromDisk = () => {
+  const users = readJsonFile(USERS_PATH, []);
+  return Array.isArray(users) ? users : [];
+};
 
 const ensureUsersFile = () => {
   const config = getAdminAuthConfig();
@@ -243,7 +293,21 @@ const getAdminUsers = () => {
   const stats = fs.statSync(USERS_PATH);
 
   if (!cachedUsers || stats.mtimeMs !== cachedUsersMtimeMs) {
-    cachedUsers = uniqueUsers(readUsersFromDisk().map(normalizeAdminUser));
+    const loadedUsers = uniqueUsers(readUsersFromDisk().map(normalizeAdminUser));
+    const config = getAdminAuthConfig();
+    const fallbackUser = normalizeAdminUser({
+      username: config.username,
+      passwordHash: config.passwordHash,
+      role: 'owner',
+      name: 'Primary Admin',
+      securityQuestion: DEFAULT_SECURITY_QUESTION,
+      securityAnswerHash: '',
+      approvedAt: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    cachedUsers = loadedUsers.length ? loadedUsers : [fallbackUser];
+    if (!loadedUsers.length) writeJsonFile(USERS_PATH, cachedUsers);
     cachedUsersMtimeMs = stats.mtimeMs;
   }
 

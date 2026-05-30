@@ -38,7 +38,7 @@ const config = {
   },
   rateLimit: {
     windowMs: toNumber(process.env.RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000),
-    max: toNumber(process.env.RATE_LIMIT_MAX, 100),
+    max: toNumber(process.env.RATE_LIMIT_MAX, 1000),
   },
 };
 

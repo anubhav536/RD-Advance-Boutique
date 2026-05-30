@@ -7,9 +7,10 @@ const PAYMENT_STATUSES = Object.freeze([
 
 const PAYMENT_METHODS = Object.freeze({
   MANUAL_UPI: 'manual-upi',
+  COD: 'cod',
 });
 
-const DEFAULT_PAYMENT_METHOD = PAYMENT_METHODS.MANUAL_UPI;
+const DEFAULT_PAYMENT_METHOD = PAYMENT_METHODS.COD;
 const DEFAULT_PAYMENT_STATUS = 'not-submitted';
 
 module.exports = {

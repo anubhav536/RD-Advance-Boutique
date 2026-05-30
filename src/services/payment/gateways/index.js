@@ -1,7 +1,7 @@
 const ManualPaymentGateway = require('./ManualPaymentGateway');
+const CodPaymentGateway = require('./CodPaymentGateway');
 
-const gateways = [
+module.exports = [
   new ManualPaymentGateway(),
+  new CodPaymentGateway(),
 ];
-
-module.exports = gateways;

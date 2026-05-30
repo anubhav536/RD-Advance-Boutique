@@ -3,30 +3,35 @@
     "id": "blouses",
     "name": "Blouses",
     "description": "Designer blouse stitching and ready-made blouse inspirations.",
-    "status": "active"
+    "status": "active",
+    "slug": "blouses"
   },
   {
     "id": "kurtis",
     "name": "Kurtis",
     "description": "Custom and boutique kurti collections.",
-    "status": "active"
+    "status": "active",
+    "slug": "kurtis"
   },
   {
     "id": "bridal",
     "name": "Bridal",
     "description": "Bridal and occasion-wear boutique designs.",
-    "status": "active"
+    "status": "active",
+    "slug": "bridal"
   },
   {
     "id": "kids-wear",
     "name": "Kids Wear",
     "description": "Boutique outfits for children and celebrations.",
-    "status": "active"
+    "status": "active",
+    "slug": "kids-wear"
   },
   {
     "id": "accessories",
     "name": "Accessories",
     "description": "Curated boutique accessories and styling additions.",
-    "status": "active"
+    "status": "active",
+    "slug": "accessories"
   }
 ]

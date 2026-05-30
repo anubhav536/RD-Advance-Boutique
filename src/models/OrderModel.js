@@ -145,6 +145,15 @@ const normalizePayment = (payload = {}, currentPayment = {}) => {
     payment.upiTransactionId = String(transactionId).trim();
   }
 
+  const proofPath = payload.paymentProofPath
+    ?? payload.payment_proof_path
+    ?? incomingPayment.proofPath
+    ?? incomingPayment.paymentProofPath
+    ?? payment.proofPath;
+  if (proofPath !== undefined && proofPath !== null && proofPath !== '') {
+    payment.proofPath = String(proofPath).trim();
+  }
+
   const method = incomingPayment.method ?? payload.paymentMethod ?? payment.method;
   if (method !== undefined && method !== null && method !== '') {
     payment.method = String(method).trim();
@@ -167,7 +176,7 @@ const normalizePayment = (payload = {}, currentPayment = {}) => {
   const explicitStatus = incomingPayment.status ?? payload.paymentStatus;
   if (explicitStatus !== undefined && explicitStatus !== null && explicitStatus !== '') {
     payment.status = normalizePaymentStatus(explicitStatus);
-  } else if (payment.upiTransactionId || payment.screenshot?.dataUrl || payment.screenshot?.url || payment.screenshot?.path) {
+  } else if (payment.upiTransactionId || payment.proofPath || payment.screenshot?.dataUrl || payment.screenshot?.url || payment.screenshot?.path) {
     payment.status = currentPayment.status && currentPayment.status !== 'not-submitted'
       ? normalizePaymentStatus(currentPayment.status)
       : 'pending-verification';
@@ -189,11 +198,11 @@ const normalizePayment = (payload = {}, currentPayment = {}) => {
     }
   });
 
-  if ((payment.upiTransactionId || payment.screenshot) && !payment.method) {
+  if ((payment.upiTransactionId || payment.proofPath || payment.screenshot) && !payment.method) {
     payment.method = DEFAULT_PAYMENT_METHOD;
   }
 
-  if ((payment.upiTransactionId || payment.screenshot) && !payment.submittedAt) {
+  if ((payment.upiTransactionId || payment.proofPath || payment.screenshot) && !payment.submittedAt) {
     payment.submittedAt = new Date().toISOString();
   }
 
@@ -735,8 +744,8 @@ class OrderModel extends BaseModel {
       throw new AppError('UPI transaction ID is required for manual payment verification.', 400);
     }
 
-    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url && !payment.screenshot?.path) {
-      throw new AppError('Payment screenshot is required for manual payment verification.', 400);
+    if (!payment.proofPath && !payment.screenshot?.dataUrl && !payment.screenshot?.url && !payment.screenshot?.path) {
+      throw new AppError('Payment proof path or screenshot reference is required for manual payment verification.', 400);
     }
 
     payment.status = 'pending-verification';
@@ -762,8 +771,8 @@ class OrderModel extends BaseModel {
   static async approvePayment(id, verifier = 'admin') {
     const order = await OrderModel.findById(id);
 
-    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url && !order.payment?.screenshot?.path)) {
-      throw new AppError('Payment cannot be approved until a UPI transaction ID and screenshot are submitted.', 400);
+    if (!order.payment?.upiTransactionId || (!order.payment?.proofPath && !order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url && !order.payment?.screenshot?.path)) {
+      throw new AppError('Payment cannot be approved until a UPI transaction ID and payment proof reference are submitted.', 400);
     }
 
     return OrderModel.update(id, {
@@ -782,7 +791,7 @@ class OrderModel extends BaseModel {
   static async rejectPayment(id, reason = '') {
     const order = await OrderModel.findById(id);
 
-    if (!order.payment?.upiTransactionId && !order.payment?.screenshot) {
+    if (!order.payment?.upiTransactionId && !order.payment?.proofPath && !order.payment?.screenshot) {
       throw new AppError('No submitted payment details are available to reject.', 400);
     }
 
@@ -894,7 +903,7 @@ class OrderModel extends BaseModel {
     }
 
     const payment = normalizePayment(payload, currentOrder.payment || {});
-    if (!partial || payload.payment !== undefined || payload.upiTransactionId !== undefined || payload.upi_transaction_id !== undefined || payload.paymentScreenshot !== undefined) {
+    if (!partial || payload.payment !== undefined || payload.upiTransactionId !== undefined || payload.upi_transaction_id !== undefined || payload.paymentProofPath !== undefined || payload.payment_proof_path !== undefined || payload.paymentScreenshot !== undefined) {
       order.payment = payment;
     }
 
