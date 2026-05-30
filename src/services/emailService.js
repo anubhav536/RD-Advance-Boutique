@@ -167,31 +167,6 @@ const sendSmtpEmail = async ({ to, subject, text, html }) => {
   }
 };
 
-const sendPasswordResetEmail = async ({ to, resetLink, expiresInMinutes }) => {
-  if (!config.email.smtpHost) {
-    console.info(`Admin password reset link for ${to}: ${resetLink}`);
-    return { sent: false, previewLink: resetLink };
-  }
-
-  const subject = 'RD Advance Boutique admin password reset';
-  const text = [
-    'A password reset was requested for your RD Advance Boutique admin account.',
-    '',
-    `Reset your password here: ${resetLink}`,
-    '',
-    `This link will expire in ${expiresInMinutes} minutes. If you did not request this, ignore this email.`,
-  ].join('\n');
-  const safeLink = resetLink.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const html = `
-    <p>A password reset was requested for your RD Advance Boutique admin account.</p>
-    <p><a href="${safeLink}">Reset your admin password</a></p>
-    <p>This link will expire in ${expiresInMinutes} minutes. If you did not request this, ignore this email.</p>
-  `;
-
-  await sendSmtpEmail({ to, subject, text, html });
-  return { sent: true };
-};
-
 const escapeHtml = (value) => String(value || '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
@@ -228,5 +203,4 @@ const sendAdminSignupApprovalEmail = async ({ to, signupEmail, approvalLink, exp
 
 module.exports = {
   sendAdminSignupApprovalEmail,
-  sendPasswordResetEmail,
 };

@@ -173,9 +173,9 @@
 
               <label>
 
-                <input type="checkbox" disabled>
+                <input id="rememberAdmin" type="checkbox">
 
-                Secure session managed by server
+                Remember me
 
               </label>
 
@@ -226,11 +226,51 @@
 
             </div>
 
+            <div id="securityResetFields" hidden>
+              <div class="input-group">
+                <label>Security Question</label>
+                <p id="securityQuestionText" class="admin-login-message"></p>
+              </div>
+
+              <div class="input-group">
+                <label for="securityAnswer">Security Answer</label>
+                <input
+                  id="securityAnswer"
+                  name="securityAnswer"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Enter security answer"
+                >
+              </div>
+
+              <div class="input-group">
+                <label for="resetNewPassword">New Password</label>
+                <input
+                  id="resetNewPassword"
+                  name="newPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Enter new password"
+                >
+              </div>
+
+              <div class="input-group">
+                <label for="resetConfirmPassword">Confirm New Password</label>
+                <input
+                  id="resetConfirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Confirm new password"
+                >
+              </div>
+            </div>
+
             <p id="forgotPasswordMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
 
             <button type="submit" class="primary-btn admin-btn">
 
-              Send Reset Link
+              Load Security Question
 
             </button>
 
@@ -318,6 +358,9 @@
     const forgotPasswordMessage = document.getElementById("forgotPasswordMessage");
     const forgotPasswordButton = forgotPasswordForm.querySelector("button[type='submit']");
     const backToLoginButton = document.getElementById("backToLoginButton");
+    const securityResetFields = document.getElementById("securityResetFields");
+    const securityQuestionText = document.getElementById("securityQuestionText");
+    let resetQuestionLoaded = false;
     const params = new URLSearchParams(window.location.search);
     const requestedNextPage = params.get("next") || "admin-dashboard.html";
     const nextPage = requestedNextPage.startsWith("/") && !requestedNextPage.startsWith("//")
@@ -334,13 +377,18 @@
     const showForgotPassword = () => {
       forgotPasswordForm.hidden = false;
       loginForm.hidden = true;
+      resetQuestionLoaded = false;
+      securityResetFields.hidden = true;
+      forgotPasswordButton.textContent = "Load Security Question";
       document.getElementById("forgotAdminEmail").value = document.getElementById("adminEmail").value;
-      setMessage("Enter your admin email to receive a reset link.", false, forgotPasswordMessage);
+      setMessage("Enter your admin email to load your security question.", false, forgotPasswordMessage);
     };
 
     const showLogin = () => {
       forgotPasswordForm.hidden = true;
       loginForm.hidden = false;
+      resetQuestionLoaded = false;
+      securityResetFields.hidden = true;
       setMessage("", false, forgotPasswordMessage);
     };
 
@@ -358,30 +406,49 @@
       showForgotPassword();
     });
 
+    if (window.location.hash === "#forgot-password") {
+      showForgotPassword();
+    }
+
     backToLoginButton.addEventListener("click", showLogin);
 
     forgotPasswordForm.addEventListener("submit", async function(e){
       e.preventDefault();
       forgotPasswordButton.disabled = true;
-      setMessage("Sending reset link...", false, forgotPasswordMessage);
+      setMessage(resetQuestionLoaded ? "Resetting password..." : "Loading security question...", false, forgotPasswordMessage);
 
       try {
-        const response = await fetch("/api/v1/admin/auth/password-reset/request", {
+        const email = document.getElementById("forgotAdminEmail").value;
+        const response = await fetch(resetQuestionLoaded
+          ? "/api/v1/admin/auth/password-reset/complete"
+          : "/api/v1/admin/auth/password-reset/question", {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: document.getElementById("forgotAdminEmail").value,
-          }),
+          body: JSON.stringify(resetQuestionLoaded ? {
+            email,
+            securityAnswer: document.getElementById("securityAnswer").value,
+            newPassword: document.getElementById("resetNewPassword").value,
+            confirmPassword: document.getElementById("resetConfirmPassword").value,
+          } : { email }),
         });
         const payload = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          throw new Error(payload.message || "Unable to send reset link.");
+          throw new Error(payload.message || "Unable to reset password.");
         }
 
-        const preview = payload.data?.previewLink ? ` Development preview: ${payload.data.previewLink}` : "";
-        setMessage(`${payload.message}${preview}`, false, forgotPasswordMessage);
+        if (!resetQuestionLoaded) {
+          resetQuestionLoaded = true;
+          securityResetFields.hidden = false;
+          securityQuestionText.textContent = payload.data?.securityQuestion || "Security question unavailable.";
+          forgotPasswordButton.textContent = "Set New Password";
+          setMessage(payload.message || "Answer the security question to set a new password.", false, forgotPasswordMessage);
+          return;
+        }
+
+        setMessage(payload.message || "Password reset successfully. You can login now.", false, forgotPasswordMessage);
+        setTimeout(showLogin, 1400);
       } catch (error) {
         setMessage(error.message, true, forgotPasswordMessage);
       } finally {
@@ -402,6 +469,7 @@
           body: JSON.stringify({
             email: document.getElementById("adminEmail").value,
             password: document.getElementById("adminPassword").value,
+            rememberMe: document.getElementById("rememberAdmin").checked,
           }),
         });
         const payload = await response.json().catch(() => ({}));

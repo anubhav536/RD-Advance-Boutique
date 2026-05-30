@@ -163,7 +163,7 @@
     const trigger = doc.querySelector(".site-header .brand__logo");
     if (!trigger) return;
 
-    const shortcutPath = "/rd-secret-admin";
+    const shortcutPath = "admin-signup.html";
     const requiredTapCount = 5;
     const tapWindowMs = 2800;
     const requiredHoldDurationMs = 2500;
@@ -184,7 +184,7 @@
       holdTimer = 0;
     };
 
-    const openAdminLogin = () => {
+    const openAdminSignup = () => {
       cancelHold();
       resetTaps();
       window.location.assign(shortcutPath);
@@ -193,7 +193,7 @@
     const registerTap = () => {
       tapCount += 1;
       if (tapCount >= requiredTapCount) {
-        openAdminLogin();
+        openAdminSignup();
         return;
       }
 
@@ -203,7 +203,7 @@
 
     trigger.addEventListener("pointerdown", () => {
       cancelHold();
-      holdTimer = window.setTimeout(openAdminLogin, requiredHoldDurationMs);
+      holdTimer = window.setTimeout(openAdminSignup, requiredHoldDurationMs);
     });
 
     trigger.addEventListener("pointerup", () => {

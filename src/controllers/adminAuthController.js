@@ -3,16 +3,14 @@ const config = require('../config/env');
 const {
   ADMIN_APPROVAL_EMAIL,
   approveAdminSignupWithToken,
-  createAdminPasswordResetToken,
   createAdminSignupApprovalToken,
   getAdminAuthConfig,
-  getAdminUserByUsername,
+  getPasswordResetChallenge,
   isValidEmail,
-  resetAdminPasswordWithToken,
+  resetAdminPasswordWithSecurityAnswer,
   updateAdminCredentials,
-  verifyAdminPasswordResetToken,
 } = require('../config/adminAuth');
-const { sendAdminSignupApprovalEmail, sendPasswordResetEmail } = require('../services/emailService');
+const { sendAdminSignupApprovalEmail } = require('../services/emailService');
 const {
   createAdminSession,
   destroyAdminSession,
@@ -26,31 +24,66 @@ const getRequestBaseUrl = (req) => {
   return `${protocol}://${req.get('host')}`;
 };
 
-const login = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body || {};
-  const submittedUsername = username || email;
+const getCredentialErrorMessage = (reason) => ({
+  USER_NOT_FOUND: 'No admin account exists for this email address.',
+  MISSING_PASSWORD: 'Password is required.',
+  WRONG_PASSWORD: 'Wrong password. Please try again.',
+  CORRUPT_HASH: 'Stored password hash is corrupt or unsupported. Reset the password with the security question flow.',
+}[reason] || 'Invalid admin credentials.');
 
-  if (!verifyAdminCredentials(submittedUsername, password)) {
-    return res.status(401).json({
+const login = asyncHandler(async (req, res) => {
+  const {
+    username,
+    email,
+    password,
+    rememberMe,
+  } = req.body || {};
+  const submittedUsername = String(username || email || '').trim().toLowerCase();
+
+  if (!submittedUsername || !password) {
+    return res.status(400).json({
       success: false,
-      message: 'Invalid admin credentials.',
+      message: 'Admin email and password are required.',
     });
   }
 
-  const session = createAdminSession(req, res, String(submittedUsername).trim().toLowerCase());
+  if (!isValidEmail(submittedUsername)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid admin email address.',
+    });
+  }
+
+  const verification = await verifyAdminCredentials(submittedUsername, password);
+  if (!verification.ok) {
+    return res.status(verification.reason === 'CORRUPT_HASH' ? 500 : 401).json({
+      success: false,
+      message: getCredentialErrorMessage(verification.reason),
+    });
+  }
+
+  const session = createAdminSession(req, res, verification.user.username, Boolean(rememberMe));
 
   return res.status(200).json({
     success: true,
+    message: 'Login successful.',
     data: {
       username: session.username,
       expiresAt: new Date(session.expiresAt).toISOString(),
+      rememberMe: session.rememberMe,
     },
   });
 });
 
-
 const requestSignup = asyncHandler(async (req, res) => {
-  const { name, email, password, confirmPassword } = req.body || {};
+  const {
+    name,
+    email,
+    password,
+    confirmPassword,
+    securityQuestion,
+    securityAnswer,
+  } = req.body || {};
   const submittedEmail = String(email || '').trim().toLowerCase();
   const submittedPassword = String(password || '');
 
@@ -77,10 +110,12 @@ const requestSignup = asyncHandler(async (req, res) => {
 
   let approval;
   try {
-    approval = createAdminSignupApprovalToken({
+    approval = await createAdminSignupApprovalToken({
       email: submittedEmail,
       password: submittedPassword,
       name,
+      securityQuestion,
+      securityAnswer,
     });
   } catch (error) {
     return res.status(409).json({
@@ -121,55 +156,56 @@ const approveSignup = asyncHandler(async (req, res) => {
   return res.redirect(302, `/admin-login.html?approved=success&email=${encodeURIComponent(approved.username)}`);
 });
 
-const requestPasswordReset = asyncHandler(async (req, res) => {
+const requestPasswordResetQuestion = asyncHandler(async (req, res) => {
   const submittedEmail = String(req.body?.email || '').trim().toLowerCase();
-  let delivery = null;
 
-  const adminUser = submittedEmail ? getAdminUserByUsername(submittedEmail) : null;
+  if (!isValidEmail(submittedEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid admin email address.',
+    });
+  }
 
-  if (adminUser) {
-    const reset = createAdminPasswordResetToken(adminUser.username);
-    const resetLink = `${getRequestBaseUrl(req)}/admin-reset-password.html?token=${encodeURIComponent(reset.token)}`;
-
-    delivery = await sendPasswordResetEmail({
-      to: adminUser.username,
-      resetLink,
-      expiresInMinutes: reset.expiresInMinutes,
+  const challenge = getPasswordResetChallenge(submittedEmail);
+  if (!challenge) {
+    return res.status(404).json({
+      success: false,
+      message: 'No admin account exists for this email address.',
     });
   }
 
   return res.status(200).json({
     success: true,
-    message: 'If the email matches the admin account, a password reset link has been sent.',
-    ...(delivery?.previewLink && config.env !== 'production'
-      ? { data: { previewLink: delivery.previewLink } }
-      : {}),
-  });
-});
-
-const validatePasswordResetToken = asyncHandler(async (req, res) => {
-  const token = String(req.query?.token || '').trim();
-
-  return res.status(200).json({
-    success: true,
+    message: 'Security question loaded. Answer it to set a new password.',
     data: {
-      valid: verifyAdminPasswordResetToken(token),
+      email: challenge.email,
+      securityQuestion: challenge.securityQuestion,
+      configured: challenge.configured,
     },
   });
 });
 
 const completePasswordReset = asyncHandler(async (req, res) => {
   const {
-    token,
+    email,
+    securityAnswer,
     newPassword,
     confirmPassword,
   } = req.body || {};
+  const submittedEmail = String(email || '').trim().toLowerCase();
   const nextPassword = String(newPassword || '');
 
-  if (!String(token || '').trim()) {
+  if (!isValidEmail(submittedEmail)) {
     return res.status(400).json({
       success: false,
-      message: 'Password reset token is required.',
+      message: 'Please enter a valid admin email address.',
+    });
+  }
+
+  if (!String(securityAnswer || '').trim()) {
+    return res.status(400).json({
+      success: false,
+      message: 'Security answer is required.',
     });
   }
 
@@ -187,15 +223,16 @@ const completePasswordReset = asyncHandler(async (req, res) => {
     });
   }
 
-  const updatedConfig = resetAdminPasswordWithToken({
-    token,
+  const updatedUser = await resetAdminPasswordWithSecurityAnswer({
+    email: submittedEmail,
+    securityAnswer,
     password: nextPassword,
   });
 
-  if (!updatedConfig) {
-    return res.status(400).json({
+  if (!updatedUser) {
+    return res.status(401).json({
       success: false,
-      message: 'Password reset link is invalid or expired.',
+      message: 'Security answer is incorrect or the admin account was not found.',
     });
   }
 
@@ -208,7 +245,7 @@ const completePasswordReset = asyncHandler(async (req, res) => {
 const logout = asyncHandler(async (req, res) => {
   destroyAdminSession(req, res);
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     message: 'Logged out successfully.',
   });
@@ -239,11 +276,14 @@ const updateCredentials = asyncHandler(async (req, res) => {
     email,
     newPassword,
     confirmPassword,
+    securityQuestion,
+    securityAnswer,
   } = req.body || {};
   const nextEmail = String(email || '').trim().toLowerCase();
   const nextPassword = String(newPassword || '');
 
-  if (!verifyAdminCredentials(getAdminAuthConfig().username, currentPassword)) {
+  const currentVerification = await verifyAdminCredentials(getAdminAuthConfig().username, currentPassword);
+  if (!currentVerification.ok) {
     return res.status(401).json({
       success: false,
       message: 'Current admin password is incorrect.',
@@ -254,6 +294,13 @@ const updateCredentials = asyncHandler(async (req, res) => {
     return res.status(400).json({
       success: false,
       message: 'New admin email and password are required.',
+    });
+  }
+
+  if (!isValidEmail(nextEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid admin email address.',
     });
   }
 
@@ -271,9 +318,11 @@ const updateCredentials = asyncHandler(async (req, res) => {
     });
   }
 
-  const updatedConfig = updateAdminCredentials({
+  const updatedConfig = await updateAdminCredentials({
     username: nextEmail,
     password: nextPassword,
+    securityQuestion,
+    securityAnswer,
   });
   const session = createAdminSession(req, res, updatedConfig.username);
 
@@ -294,8 +343,7 @@ module.exports = {
   getSession,
   login,
   logout,
-  requestPasswordReset,
+  requestPasswordResetQuestion,
   requestSignup,
   updateCredentials,
-  validatePasswordResetToken,
 };

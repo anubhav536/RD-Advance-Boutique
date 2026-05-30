@@ -1,0 +1,14 @@
+[
+  {
+    "username": "rdadvanceboutique@gmail.com",
+    "email": "rdadvanceboutique@gmail.com",
+    "passwordHash": "pbkdf2_sha256$310000$c52ff135d0af706f09dc31040360e323$22aacaf9919bd7777bbd2cb2e4960bf075030b67e1029dfdc7fcb082e52ff116",
+    "role": "owner",
+    "name": "",
+    "securityQuestion": "What is the registered admin email address?",
+    "securityAnswerHash": "",
+    "approvedAt": 1780099676994,
+    "createdAt": 1780099676994,
+    "updatedAt": 1780099676994
+  }
+]

@@ -1,103 +1,53 @@
-const crypto = require('crypto');
-const { getAdminAuthConfig, getAdminUserByUsername } = require('../config/adminAuth');
-
-const COOKIE_NAME = 'rd_admin_session';
-const sessions = new Map();
-
-const parseCookies = (cookieHeader = '') => cookieHeader
-  .split(';')
-  .map((cookie) => cookie.trim())
-  .filter(Boolean)
-  .reduce((cookies, cookie) => {
-    const separatorIndex = cookie.indexOf('=');
-    if (separatorIndex === -1) return cookies;
-    const name = decodeURIComponent(cookie.slice(0, separatorIndex).trim());
-    const value = decodeURIComponent(cookie.slice(separatorIndex + 1).trim());
-    return { ...cookies, [name]: value };
-  }, {});
-
-const signSessionId = (sessionId) => crypto
-  .createHmac('sha256', getAdminAuthConfig().sessionSecret)
-  .update(sessionId)
-  .digest('base64url');
-
-const createCookieValue = (sessionId) => `${sessionId}.${signSessionId(sessionId)}`;
-
-const isSecureRequest = (req) => req.secure || req.get('x-forwarded-proto') === 'https';
-
-const buildCookieOptions = (req, sessionId, maxAgeSeconds) => [
-  `${COOKIE_NAME}=${maxAgeSeconds > 0 ? createCookieValue(sessionId) : ''}`,
-  'HttpOnly',
-  'Path=/',
-  'SameSite=Lax',
-  `Max-Age=${maxAgeSeconds}`,
-  ...(isSecureRequest(req) ? ['Secure'] : []),
-].join('; ');
-
-const clearExpiredSessions = () => {
-  const now = Date.now();
-  sessions.forEach((session, sessionId) => {
-    if (session.expiresAt <= now) sessions.delete(sessionId);
-  });
-};
-
-const getSessionFromRequest = (req) => {
-  clearExpiredSessions();
-
-  const cookieValue = parseCookies(req.headers.cookie)[COOKIE_NAME];
-  if (!cookieValue) return null;
-
-  const [sessionId, signature] = cookieValue.split('.');
-  if (!sessionId || !signature) return null;
-
-  const expectedSignature = signSessionId(sessionId);
-  const expectedBuffer = Buffer.from(expectedSignature);
-  const actualBuffer = Buffer.from(signature);
-
-  if (expectedBuffer.length !== actualBuffer.length || !crypto.timingSafeEqual(expectedBuffer, actualBuffer)) {
-    return null;
-  }
-
-  const session = sessions.get(sessionId);
-  if (!session || session.expiresAt <= Date.now()) {
-    sessions.delete(sessionId);
-    return null;
-  }
-
-  return { ...session, id: sessionId };
-};
+const bcrypt = require('../utils/bcrypt');
+const {
+  getAdminAuthConfig,
+  getAdminUserByUsername,
+  replaceAdminUser,
+  hashPassword,
+} = require('../config/adminAuth');
 
 const attachAdminSession = (req, res, next) => {
-  const session = getSessionFromRequest(req);
-  if (session) {
-    req.adminSession = session;
-    req.adminSessionId = session.id;
+  if (req.session?.admin?.username) {
+    req.adminSession = {
+      username: req.session.admin.username,
+      createdAt: req.session.admin.createdAt,
+      expiresAt: req.session.cookie?.expires || Date.now() + getAdminAuthConfig().sessionDurationMs,
+    };
+    req.adminSessionId = req.sessionID;
   }
   next();
 };
 
-const createAdminSession = (req, res, username) => {
-  clearExpiredSessions();
-
-  const sessionId = crypto.randomBytes(32).toString('base64url');
+const createAdminSession = (req, res, username, rememberMe = false) => {
   const now = Date.now();
-  const session = {
+  const config = getAdminAuthConfig();
+  const maxAge = rememberMe
+    ? config.rememberSessionDurationMinutes * 60 * 1000
+    : config.sessionDurationMs;
+
+  req.session.admin = {
     username,
     createdAt: now,
-    expiresAt: now + getAdminAuthConfig().sessionDurationMs,
   };
+  req.session.cookie.maxAge = maxAge;
+  req.session.cookie.originalMaxAge = maxAge;
+  req.session.cookie.expires = now + maxAge;
+  req.session.save();
+  req.adminSessionId = req.sessionID;
 
-  sessions.set(sessionId, session);
-  req.adminSessionId = sessionId;
-  res.setHeader('Set-Cookie', buildCookieOptions(req, sessionId, Math.floor(getAdminAuthConfig().sessionDurationMs / 1000)));
-
-  return { ...session, id: sessionId };
+  return {
+    username,
+    createdAt: now,
+    expiresAt: req.session.cookie.expires,
+    rememberMe,
+  };
 };
 
 const destroyAdminSession = (req, res) => {
-  if (req.adminSessionId) sessions.delete(req.adminSessionId);
-  res.setHeader('Set-Cookie', buildCookieOptions(req, '', 0));
   req.adminSessionId = '';
+  if (req.session?.destroy) {
+    req.session.destroy();
+  }
 };
 
 const requireAdminApi = (req, res, next) => {
@@ -119,38 +69,41 @@ const requireAdminPage = (req, res, next) => {
   return res.redirect(302, `/admin-login.html?next=${nextPath}`);
 };
 
-const hashPassword = (password, encodedHash) => {
-  const [algorithmName, iterationsText, salt, hash] = encodedHash.split('$');
-  const digest = algorithmName?.replace('pbkdf2_', '');
-  const iterations = Number(iterationsText);
-
-  if (!digest || !iterations || !salt || !hash) {
-    throw new Error('Unsupported admin password hash format.');
-  }
-
-  return crypto.pbkdf2Sync(password, salt, iterations, Buffer.from(hash, 'hex').length, digest).toString('hex');
-};
-
-const passwordMatchesHash = (submittedPassword, encodedHash) => {
-  const expectedHash = encodedHash.split('$').at(-1);
-  const submittedHash = hashPassword(submittedPassword, encodedHash);
-  const expectedBuffer = Buffer.from(expectedHash, 'hex');
-  const submittedBuffer = Buffer.from(submittedHash, 'hex');
-
-  return expectedBuffer.length === submittedBuffer.length
-    && crypto.timingSafeEqual(expectedBuffer, submittedBuffer);
-};
-
-const verifyAdminCredentials = (username, password) => {
+const verifyAdminCredentials = async (username, password) => {
   const submittedPassword = String(password || '');
   const trimmedPassword = submittedPassword.trim();
   const adminUser = getAdminUserByUsername(username);
 
-  if (!adminUser) return false;
+  if (!adminUser) {
+    return { ok: false, reason: 'USER_NOT_FOUND' };
+  }
 
-  return passwordMatchesHash(submittedPassword, adminUser.passwordHash)
-    || (trimmedPassword !== submittedPassword
-      && passwordMatchesHash(trimmedPassword, adminUser.passwordHash));
+  if (!submittedPassword) {
+    return { ok: false, reason: 'MISSING_PASSWORD' };
+  }
+
+  try {
+    const directMatch = await bcrypt.compare(submittedPassword, adminUser.passwordHash);
+    const trimmedMatch = trimmedPassword !== submittedPassword
+      ? await bcrypt.compare(trimmedPassword, adminUser.passwordHash)
+      : false;
+
+    if (!directMatch && !trimmedMatch) {
+      return { ok: false, reason: 'WRONG_PASSWORD' };
+    }
+
+    if (adminUser.passwordHash.startsWith('pbkdf2_')) {
+      replaceAdminUser({
+        ...adminUser,
+        passwordHash: await hashPassword(trimmedMatch ? trimmedPassword : submittedPassword),
+        updatedAt: Date.now(),
+      });
+    }
+
+    return { ok: true, user: adminUser };
+  } catch (error) {
+    return { ok: false, reason: 'CORRUPT_HASH', error };
+  }
 };
 
 module.exports = {

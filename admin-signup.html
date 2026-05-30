@@ -108,6 +108,35 @@
               >
 
             </div>
+            <div class="input-group">
+
+              <label>Security Question</label>
+
+              <input
+                id="adminSignupSecurityQuestion"
+                name="securityQuestion"
+                type="text"
+                autocomplete="off"
+                placeholder="Example: What is your shop code?"
+                required
+              >
+
+            </div>
+
+            <div class="input-group">
+
+              <label>Security Answer</label>
+
+              <input
+                id="adminSignupSecurityAnswer"
+                name="securityAnswer"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter answer for password reset"
+                required
+              >
+
+            </div>
 
             <p id="adminSignupMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
 
@@ -150,6 +179,8 @@
             email: document.getElementById("adminSignupEmail").value,
             password: document.getElementById("adminSignupPassword").value,
             confirmPassword: document.getElementById("adminSignupConfirmPassword").value,
+            securityQuestion: document.getElementById("adminSignupSecurityQuestion").value,
+            securityAnswer: document.getElementById("adminSignupSecurityAnswer").value,
           }),
         });
         const payload = await response.json().catch(() => ({}));
