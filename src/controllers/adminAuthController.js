@@ -4,7 +4,7 @@ const {
   ADMIN_APPROVAL_EMAIL,
   approveAdminSignupWithToken,
   createAdminSignupApprovalToken,
-  getAdminAuthConfig,
+  getAdminUserByUsername,
   getPasswordResetChallenge,
   isValidEmail,
   resetAdminPasswordWithSecurityAnswer,
@@ -62,7 +62,7 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  const session = createAdminSession(req, res, verification.user.username, Boolean(rememberMe));
+  const session = await createAdminSession(req, res, verification.user.username, Boolean(rememberMe));
 
   return res.status(200).json({
     success: true,
@@ -243,7 +243,7 @@ const completePasswordReset = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  destroyAdminSession(req, res);
+  await destroyAdminSession(req, res);
 
   return res.status(200).json({
     success: true,
@@ -261,11 +261,24 @@ const getSession = asyncHandler(async (req, res) => {
   });
 });
 
+const getAuthenticatedAdminUser = (req) => getAdminUserByUsername(req.adminSession?.username);
+
 const getProfile = asyncHandler(async (req, res) => {
-  res.status(200).json({
+  const adminUser = getAuthenticatedAdminUser(req);
+
+  if (!adminUser) {
+    return res.status(401).json({
+      success: false,
+      message: 'Admin session is no longer valid. Please login again.',
+    });
+  }
+
+  return res.status(200).json({
     success: true,
     data: {
-      email: getAdminAuthConfig().username,
+      email: adminUser.username,
+      name: adminUser.name || '',
+      role: adminUser.role || 'admin',
     },
   });
 });
@@ -282,7 +295,15 @@ const updateCredentials = asyncHandler(async (req, res) => {
   const nextEmail = String(email || '').trim().toLowerCase();
   const nextPassword = String(newPassword || '');
 
-  const currentVerification = await verifyAdminCredentials(getAdminAuthConfig().username, currentPassword);
+  const currentAdmin = getAuthenticatedAdminUser(req);
+  if (!currentAdmin) {
+    return res.status(401).json({
+      success: false,
+      message: 'Admin session is no longer valid. Please login again.',
+    });
+  }
+
+  const currentVerification = await verifyAdminCredentials(currentAdmin.username, currentPassword);
   if (!currentVerification.ok) {
     return res.status(401).json({
       success: false,
@@ -318,19 +339,20 @@ const updateCredentials = asyncHandler(async (req, res) => {
     });
   }
 
-  const updatedConfig = await updateAdminCredentials({
+  const updatedCredentials = await updateAdminCredentials({
+    currentUsername: currentAdmin.username,
     username: nextEmail,
     password: nextPassword,
     securityQuestion,
     securityAnswer,
   });
-  const session = createAdminSession(req, res, updatedConfig.username);
+  const session = await createAdminSession(req, res, updatedCredentials.user.username);
 
   return res.status(200).json({
     success: true,
     message: 'Admin login credentials updated successfully.',
     data: {
-      email: updatedConfig.username,
+      email: updatedCredentials.user.username,
       expiresAt: new Date(session.expiresAt).toISOString(),
     },
   });

@@ -6,24 +6,61 @@ const {
   hashPassword,
 } = require('../config/adminAuth');
 
+const getSessionExpiryTime = (session) => {
+  const expires = session?.cookie?.expires;
+  if (expires instanceof Date) return expires.getTime();
+  const parsed = Number(expires);
+  return Number.isFinite(parsed) ? parsed : Date.now() + getAdminAuthConfig().sessionDurationMs;
+};
+
 const attachAdminSession = (req, res, next) => {
-  if (req.session?.admin?.username) {
+  const username = req.session?.admin?.username;
+  if (username && getAdminUserByUsername(username)) {
     req.adminSession = {
-      username: req.session.admin.username,
+      username,
       createdAt: req.session.admin.createdAt,
-      expiresAt: req.session.cookie?.expires || Date.now() + getAdminAuthConfig().sessionDurationMs,
+      expiresAt: getSessionExpiryTime(req.session),
     };
     req.adminSessionId = req.sessionID;
+  } else if (username) {
+    req.session.admin = null;
   }
   next();
 };
 
-const createAdminSession = (req, res, username, rememberMe = false) => {
+const saveSession = (req) => new Promise((resolve, reject) => {
+  if (!req.session?.save) {
+    resolve();
+    return;
+  }
+
+  req.session.save((error) => {
+    if (error) reject(error);
+    else resolve();
+  });
+});
+
+const regenerateSession = (req) => new Promise((resolve, reject) => {
+  if (!req.session?.regenerate) {
+    resolve();
+    return;
+  }
+
+  req.session.regenerate((error) => {
+    if (error) reject(error);
+    else resolve();
+  });
+});
+
+const createAdminSession = async (req, res, username, rememberMe = false) => {
+  await regenerateSession(req);
+
   const now = Date.now();
   const config = getAdminAuthConfig();
   const maxAge = rememberMe
     ? config.rememberSessionDurationMinutes * 60 * 1000
     : config.sessionDurationMs;
+  const expiresAt = now + maxAge;
 
   req.session.admin = {
     username,
@@ -31,24 +68,38 @@ const createAdminSession = (req, res, username, rememberMe = false) => {
   };
   req.session.cookie.maxAge = maxAge;
   req.session.cookie.originalMaxAge = maxAge;
-  req.session.cookie.expires = now + maxAge;
-  req.session.save();
+  req.session.cookie.expires = expiresAt;
+  await saveSession(req);
+
+  req.adminSession = {
+    username,
+    createdAt: now,
+    expiresAt,
+  };
   req.adminSessionId = req.sessionID;
 
   return {
     username,
     createdAt: now,
-    expiresAt: req.session.cookie.expires,
+    expiresAt,
     rememberMe,
   };
 };
 
-const destroyAdminSession = (req, res) => {
+const destroyAdminSession = (req, res) => new Promise((resolve, reject) => {
+  req.adminSession = null;
   req.adminSessionId = '';
-  if (req.session?.destroy) {
-    req.session.destroy();
+
+  if (!req.session?.destroy) {
+    resolve();
+    return;
   }
-};
+
+  req.session.destroy((error) => {
+    if (error) reject(error);
+    else resolve();
+  });
+});
 
 const requireAdminApi = (req, res, next) => {
   if (req.adminSession) return next();

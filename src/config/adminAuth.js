@@ -243,46 +243,57 @@ const adminSignupExists = (username) => {
     || currentConfig.pendingSignups.some((request) => request.username === submittedUsername);
 };
 
-const updateAdminCredentials = async ({ username, password, securityQuestion, securityAnswer }) => {
+const updateAdminCredentials = async ({ currentUsername, username, password, securityQuestion, securityAnswer }) => {
   const currentConfig = getAdminAuthConfig();
+  const currentUser = getAdminUserByUsername(currentUsername || currentConfig.username) || getPrimaryAdminUser();
   const nextUsername = normalizeEmail(username);
+
+  if (!currentUser) {
+    throw new Error('Admin account was not found.');
+  }
 
   if (!nextUsername || !String(password || '').trim()) {
     throw new Error('Admin email and password are required.');
   }
 
-  const currentPrimary = getPrimaryAdminUser();
   const nextPasswordHash = await hashPassword(password);
-  const nextSecurityQuestion = String(securityQuestion || currentPrimary?.securityQuestion || DEFAULT_SECURITY_QUESTION).trim();
+  const nextSecurityQuestion = String(securityQuestion || currentUser.securityQuestion || DEFAULT_SECURITY_QUESTION).trim();
   const nextSecurityAnswerHash = String(securityAnswer || '').trim()
     ? await hashSecurityAnswer(securityAnswer)
-    : currentPrimary?.securityAnswerHash || '';
+    : currentUser.securityAnswerHash || '';
   const updatedAt = Date.now();
-  const users = [
-    {
-      ...(currentPrimary || {}),
-      username: nextUsername,
-      email: nextUsername,
-      passwordHash: nextPasswordHash,
-      role: currentPrimary?.role || 'owner',
-      securityQuestion: nextSecurityQuestion,
-      securityAnswerHash: nextSecurityAnswerHash,
-      approvedAt: currentPrimary?.approvedAt || updatedAt,
-      createdAt: currentPrimary?.createdAt || updatedAt,
-      updatedAt,
-    },
-    ...getAdminUsers().filter((user) => user.username !== currentConfig.username && user.username !== nextUsername),
-  ];
+  const updatedUser = {
+    ...currentUser,
+    username: nextUsername,
+    email: nextUsername,
+    passwordHash: nextPasswordHash,
+    role: currentUser.role || 'admin',
+    securityQuestion: nextSecurityQuestion,
+    securityAnswerHash: nextSecurityAnswerHash,
+    approvedAt: currentUser.approvedAt || updatedAt,
+    createdAt: currentUser.createdAt || updatedAt,
+    updatedAt,
+  };
+  const users = uniqueUsers([
+    updatedUser,
+    ...getAdminUsers().filter((user) => (
+      user.username !== currentUser.username && user.username !== nextUsername
+    )),
+  ]);
+  const updatesPrimaryAdmin = currentUser.username === currentConfig.username;
 
   writeAdminUsers(users);
   writeConfigFile({
     ...currentConfig,
-    username: nextUsername,
-    passwordHash: nextPasswordHash,
-    pendingSignups: [],
+    username: updatesPrimaryAdmin ? nextUsername : currentConfig.username,
+    passwordHash: updatesPrimaryAdmin ? nextPasswordHash : currentConfig.passwordHash,
+    pendingSignups: updatesPrimaryAdmin ? [] : currentConfig.pendingSignups,
   }, users);
 
-  return getAdminAuthConfig();
+  return {
+    config: getAdminAuthConfig(),
+    user: getAdminUserByUsername(nextUsername),
+  };
 };
 
 const createTokenHash = (token, sessionSecret = getAdminAuthConfig().sessionSecret) => crypto
