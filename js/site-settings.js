@@ -1,5 +1,4 @@
 (function () {
-  const SETTINGS_ENDPOINT = "/api/v1/data/settings";
   const STATIC_SETTINGS = "data/settings.json";
   const DEFAULT_LOGO = "assets/logo.png";
 
@@ -10,9 +9,10 @@
       element.textContent = value;
     });
   };
-  const setHref = (selector, value, root = document) => {
+  const setHref = (selector, value, root = document, { preservePrefilledWhatsapp = false } = {}) => {
     if (!value) return;
     selectAll(selector, root).forEach((element) => {
+      if (preservePrefilledWhatsapp && element.href.includes("wa.me") && element.href.includes("text=")) return;
       element.href = value;
     });
   };
@@ -24,7 +24,7 @@
   };
 
   const getSettings = async () => {
-    const sources = [SETTINGS_ENDPOINT, STATIC_SETTINGS];
+    const sources = [STATIC_SETTINGS];
 
     for (const source of sources) {
       try {
@@ -134,7 +134,7 @@
     const whatsappUrl = contact.whatsappUrl || settings.socialLinks?.whatsapp;
     const phoneUrl = normalizePhoneHref(contact.phoneHref, contact.phone);
 
-    setHref('a[href^="https://wa.me/"]', whatsappUrl);
+    setHref('a[href^="https://wa.me/"]', whatsappUrl, document, { preservePrefilledWhatsapp: true });
     setHref('a[href^="tel:"]', phoneUrl);
     setText(".footer__contact p", contact.address);
     setText(".footer__contact a", contact.phone);

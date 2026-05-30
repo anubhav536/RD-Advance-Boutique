@@ -1,157 +1,192 @@
-# RD-Advance-Boutique
+# RD Advance Boutique — Static GitHub Pages Website
 
-## Backend foundation
+RD Advance Boutique is now a **fully static GitHub Pages compatible website**. There is no Express server, no API route dependency, no authentication, no server-side storage, and no browser-to-JSON write operation.
 
-This repository includes a Node.js and Express backend scaffold using an MVC-oriented structure that is ready for future feature growth.
+All customer actions are completed through **WhatsApp Business** with prefilled messages.
 
-### Structure
+## What changed
 
-```text
-src/
-  app.js                  # Express application setup
-  server.js               # HTTP server and process lifecycle handling
-  config/                 # Environment and application configuration
-  controllers/            # Request handlers
-  middleware/             # Error, security, and request middleware
-  models/                 # Domain/data models
-  routes/                 # Versioned API route definitions
-  utils/                  # Shared utilities, including local JSON database helpers
-data/
-  products.json           # Product catalogue records
-  orders.json             # Customer order records
-  gallery.json            # Gallery image records
-  categories.json         # Product/category records
-  students.json           # Course student/admission records
-  notifications.json      # Admin notification records
-  contact.json            # Contact submissions and support tickets
-  settings.json           # Website and business settings
+- Public pages load content from static JSON files in `data/`.
+- Product ordering opens WhatsApp with product name, category, price, and current product URL.
+- Gallery design enquiries open WhatsApp with design name and current design URL.
+- Custom stitching and contact forms generate WhatsApp messages instead of submitting to a backend.
+- Course enquiry buttons open WhatsApp with the course name.
+- Former admin URLs are preserved as static content-management guide pages.
+- Backend source, Express dependencies, API writes, admin login, sessions, and server storage were removed.
+
+## Static content files
+
+> Documentation comments are not valid inside JSON, so use this guide when editing the files below.
+
+### `data/products.json`
+
+Use this file to add, edit, or delete products. The shop reads this file dynamically.
+
+Recommended product object:
+
+```json
+{
+  "id": "designer-blouse-001",
+  "title": "Designer Blouse",
+  "category": "Blouse",
+  "productType": "boutique",
+  "price": 2499,
+  "discountPrice": 1999,
+  "stock": 1,
+  "image": "assets/design1.jpg",
+  "alt": "Designer blouse by RD Advance Boutique",
+  "description": "Premium custom blouse with elegant finishing.",
+  "tags": ["blouse", "custom", "women"]
+}
 ```
 
-### Getting started
+- **Add:** append a new object to the array.
+- **Edit:** change the fields for the matching `id`.
+- **Delete:** remove the object from the array.
+- If the file is empty or invalid, the shop shows a friendly fallback message and WhatsApp contact option.
 
-1. Copy `.env.example` to `.env` and adjust values for your environment.
-2. Install dependencies with `npm install`.
-3. Start development mode with `npm run dev` or production mode with `npm start`.
+### `data/gallery.json`
 
+Use this file to manage gallery designs.
 
-### Admin authentication
+Recommended gallery object:
 
-Admin authentication uses only local credentials from `data/users.json` plus session settings from `config/admin-auth.json`; no Firebase, external identity provider, or third-party identity API is used. Signup and password changes store hashed passwords, login verifies the stored hash with `bcrypt.compare()`, and successful logins receive an HTTP-only same-site admin session cookie.
+```json
+{
+  "id": "bridal-design-001",
+  "title": "Bridal Design",
+  "category": "Bridal",
+  "image": "assets/design5.jpg",
+  "alt": "Bridal boutique design",
+  "layout": "tall",
+  "description": "Luxury bridal stitching inspiration."
+}
+```
 
-Default local development admin email is `rdadvanceboutique@gmail.com`. The admin password is stored only as a hash; do not publish the plaintext password in documentation. Legacy PBKDF2 hashes are still recognized so old admins can login once and be upgraded to the new hash format automatically.
+- **Add:** append a new object.
+- **Edit:** update title, category, image, or layout.
+- **Delete:** remove the object.
+- Supported `layout` values include `default`, `tall`, and `wide`.
+- If the file is empty or invalid, the gallery displays a fallback error instead of breaking the page.
 
-Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: `/rd-secret-admin`) to open admin access without adding an admin link to the public site navigation. The server shortcut and public-site logo long-press now send unauthenticated visitors to `admin-signup.html`; already-authenticated admins are sent to `admin-dashboard.html`.
+### `data/categories.json`
 
-Change both the password hash, `sessionSecret`, and `ADMIN_SHORTCUT_PATH` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
+Use this file for category labels and filters.
 
-Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Email reset links have been removed; the page now loads the admin user's security question and allows a new password only after the security answer is verified. Existing legacy users without a saved security answer can use the registered admin email as the initial answer, then update credentials from the admin settings page.
+```json
+{
+  "id": "bridal",
+  "name": "Bridal",
+  "description": "Bridal boutique fashion and custom stitching.",
+  "status": "active",
+  "slug": "bridal"
+}
+```
 
-Admin auth endpoints:
+### `data/settings.json`
 
-- `POST /api/v1/admin/auth/login` creates an admin session from the configured local credentials.
-- `POST /api/v1/admin/auth/password-reset/question` returns the stored security question for a valid admin email.
-- `POST /api/v1/admin/auth/password-reset/complete` changes the admin password after the security answer is verified.
-- `GET /api/v1/admin/auth/session` verifies the current admin session.
-- `POST /api/v1/admin/auth/logout` destroys the current admin session.
+Manage site branding, homepage banner, SEO, contact details, and social links.
 
-Protected admin HTML pages redirect unauthenticated users to `admin-login.html`. Admin-only JSON database writes are available under `/api/v1/admin/data...`; public `/api/v1/data...` is read-only.
+Important fields:
 
-### Product management endpoints
+- `siteName`
+- `tagline`
+- `description`
+- `logo`
+- `homepageBanner`
+- `socialLinks.whatsapp`
+- `contact.phone`
+- `contact.whatsappUrl`
+- `seo.metaTitle`
+- `seo.metaDescription`
 
-Products are stored in `data/products.json` and exposed through dedicated backend routes. Product reads are public; create, update, stock update, and delete operations require an admin session:
+### `data/notifications.json`
 
-- `GET /api/v1/products` lists products with optional `search`, `category`, `type`, `status`, `featured`, and `inStock` filters.
-- `POST /api/v1/products` adds a product with title, category, price, type, stock quantity, images, details, features, tags, featured status, and affiliate/product links.
-- `GET /api/v1/products/:id` returns complete product details.
-- `PUT|PATCH /api/v1/products/:id` edits product information.
-- `PATCH /api/v1/products/:id/stock` updates only `stockQuantity`/`stock`.
-- `DELETE /api/v1/products/:id` deletes a product.
-- `GET /api/v1/products/categories` returns product categories with product counts.
-- `GET /api/v1/products/featured` returns featured products.
-- `GET /api/v1/products/ready-made` returns ready-made products.
-- `GET /api/v1/products/boutique` returns boutique products.
-- `GET /api/v1/products/affiliate` returns affiliate products.
+Manage static notices and popups.
 
-Valid product types are `ready-made`, `boutique`, and `affiliate`. Valid product statuses are `active`, `draft`, `inactive`, and `out-of-stock`.
+```json
+{
+  "id": "course-admissions-open",
+  "title": "Tailoring course admissions are open",
+  "scope": "course",
+  "status": "active",
+  "message": "Ask about batch timing, course fees, and seat availability.",
+  "ctaLabel": "WhatsApp Now",
+  "ctaUrl": "https://wa.me/917693849472",
+  "showAsPopup": false
+}
+```
 
+Useful scopes: `homepage`, `product`, `course`, `admin`, and `popup`.
 
-### Order management endpoints
+## WhatsApp message flows
 
-Orders are stored in `data/orders.json` and exposed through dedicated backend routes. Public customers can create orders and submit manual payment details; admin order lists, detail reads, status changes, payment approvals/rejections, edits, and deletes require an admin session:
+### Product order
 
-- `GET /api/v1/orders` lists orders with optional `search`, `status`, `type`/`orderType`, `customerPhone`, `customerEmail`, `productId`, `createdFrom`, and `createdTo` filters.
-- `POST /api/v1/orders` creates an order for either a ready-made product order or a custom stitching order. Customer name and phone are required.
-- `GET /api/v1/orders/:id` returns one order.
-- `GET /api/v1/orders/payment-methods` returns the currently enabled payment methods and required submission fields.
-- `PATCH /api/v1/orders/:id/payment` submits manual UPI payment details for admin verification.
-- `PATCH /api/v1/orders/:id/payment/approve` approves a submitted manual payment and moves the order to `in-progress`.
-- `PATCH /api/v1/orders/:id/payment/reject` rejects submitted manual payment details with an optional reason.
-- `PUT|PATCH /api/v1/orders/:id` edits order details, customer details, items, measurements, stitching details, due date, notes, and totals.
-- `PATCH /api/v1/orders/:id/status` updates an order status with `pending`, `in-progress`, `completed`, or `cancelled`.
-- `PATCH /api/v1/orders/:id/complete` marks an order completed.
-- `PATCH /api/v1/orders/:id/cancel` marks an order cancelled.
-- `DELETE /api/v1/orders/:id` deletes an order.
-- `GET /api/v1/orders/summary` returns status and order-type counts.
-- `GET /api/v1/orders/pending` returns pending orders.
-- `GET /api/v1/orders/completed` returns completed orders.
-- `GET /api/v1/orders/cancelled` returns cancelled orders.
-- `GET /api/v1/orders/custom-stitching` returns custom stitching orders.
-- `GET /api/v1/orders/ready-made` returns ready-made product orders.
+Every shop product gets a **WhatsApp Order** button. The generated message contains:
 
-Valid order statuses are `pending`, `in-progress`, `completed`, and `cancelled`. Valid order types are `custom-stitching` and `ready-made`. Valid payment statuses are `not-submitted`, `pending-verification`, `approved`, and `rejected`.
+- Product Name
+- Category
+- Price
+- Product Link
 
-### Payment architecture
+### Gallery enquiry
 
-Payment handling is intentionally modular but does not integrate any external gateway yet. `src/services/payment/PaymentService.js` resolves the payment method for an order, delegates method-specific behavior to a gateway adapter, and persists the resulting payment state through `OrderModel`. The only registered adapter is `manual-upi`, which captures a customer-provided UPI transaction ID and screenshot for admin verification.
+Every gallery design gets an **Enquire on WhatsApp** button. The generated message contains:
 
-Future payment gateways can be added by creating a gateway adapter with `getMetadata`, `submit`, `approve`, and `reject` behaviors under `src/services/payment/gateways/`, then registering the adapter in `src/services/payment/gateways/index.js`. No Razorpay SDK, credentials, checkout flow, or webhook handling is included at this stage.
+- Design Name
+- Design Link
 
-### Contact management endpoints
+### Custom stitching
 
-Contact submissions and customer support tickets are stored together in `data/contact.json`:
+The custom stitching form generates a WhatsApp message with:
 
-- `GET /api/v1/contact` returns contact submissions and support tickets, with optional shared `search`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
-- `POST /api/v1/contact` creates a contact form submission. Customer name, phone, and message are required.
-- `GET /api/v1/contact/dashboard` returns contact submission and support ticket status counts.
-- `GET /api/v1/contact/constants` returns allowed submission statuses, ticket statuses, ticket priorities, and support types.
-- `GET /api/v1/contact/submissions` lists contact form submissions with optional `search`, `status`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
-- `POST /api/v1/contact/submissions` creates a contact form submission with customer details, service/occasion, subject, message, source, metadata, and optional replies.
-- `GET /api/v1/contact/submissions/:id` returns one contact form submission.
-- `PUT|PATCH /api/v1/contact/submissions/:id` edits a contact form submission.
-- `PATCH /api/v1/contact/submissions/:id/status` updates the submission inquiry status.
-- `POST /api/v1/contact/submissions/:id/replies` adds an admin reply and marks the inquiry as replied by default.
-- `DELETE /api/v1/contact/submissions/:id` deletes a contact form submission.
-- `GET /api/v1/contact/tickets` lists customer support tickets with optional `search`, `status`, `priority`, `supportType`, `phone`, `email`, `createdFrom`, and `createdTo` filters.
-- `POST /api/v1/contact/tickets` creates a support ticket with customer details, support type, priority, subject, message, optional order reference, source, metadata, and optional replies.
-- `GET /api/v1/contact/tickets/:id` returns one support ticket by internal id or ticket number.
-- `PUT|PATCH /api/v1/contact/tickets/:id` edits a support ticket.
-- `PATCH /api/v1/contact/tickets/:id/status` updates ticket inquiry status.
-- `POST /api/v1/contact/tickets/:id/replies` adds an admin reply and moves public replies to `waiting-customer` by default.
-- `DELETE /api/v1/contact/tickets/:id` deletes a support ticket.
+- Name
+- Mobile
+- Measurements
+- Design preferences
+- Fabric preference
 
-Valid contact submission statuses are `new`, `read`, `replied`, and `closed`. Valid support ticket statuses are `open`, `in-progress`, `waiting-customer`, `resolved`, and `closed`.
+### Course enquiry
 
-### Gallery management endpoints
+Course buttons generate a WhatsApp message with:
 
-Gallery images are stored in `data/gallery.json` and exposed through dedicated backend routes. Gallery reads are public; create, update, and delete operations require an admin session:
+- Course Name
 
-- `GET /api/v1/gallery` lists gallery images with optional `search`, `category`, `layout`, and `featured` filters.
-- `POST /api/v1/gallery` adds a gallery image with title, category, image URL/path, alt text, layout, featured status, tags, description, and sort order.
-- `GET /api/v1/gallery/:id` returns one gallery image.
-- `PUT|PATCH /api/v1/gallery/:id` edits gallery image information.
-- `DELETE /api/v1/gallery/:id` deletes a gallery image.
-- `GET /api/v1/gallery/categories` returns gallery categories with image and featured counts.
-- `GET /api/v1/gallery/featured` returns featured gallery images.
+### Contact form
 
-Valid gallery layouts are `default`, `wide`, and `tall`. Gallery categories are derived from `data/gallery.json`, so no separate gallery category file is required.
+The contact form generates a WhatsApp message with customer name, mobile, service/occasion, notes, and page link.
 
-### Available endpoints
+## GitHub Pages deployment guide
 
-- `GET /api/v1/health` returns the current API health status.
-- `GET /api/v1/data` lists every supported local JSON collection.
-- `GET /api/v1/data/:collection` reads a JSON collection.
-- `GET|PUT|POST|PATCH|DELETE /api/v1/admin/data...` provides authenticated JSON database management for the admin panel.
+1. Commit the website files to the repository.
+2. Push the branch to GitHub.
+3. Open the repository on GitHub.
+4. Go to **Settings → Pages**.
+5. Under **Build and deployment**, choose **Deploy from a branch**.
+6. Select the branch and the repository root folder (`/`).
+7. Save.
+8. Wait for GitHub Pages to publish the site.
+9. Open the Pages URL and verify:
+   - `index.html`
+   - `shop.html`
+   - `gallery.html`
+   - `custom.html`
+   - `learn.html`
+   - `contact.html`
 
-Supported collections are `products`, `orders`, `gallery`, `categories`, `students`, `notifications`, `contact`, and `settings`. These endpoints let the admin panel manage site content with local JSON files instead of MongoDB.
+## Local checks
 
-External payment gateway SDKs, credentials, webhooks, and checkout API calls are intentionally not included in this foundation.
+Run JavaScript syntax checks:
+
+```bash
+npm run check
+```
+
+You can also preview locally with any static file server, for example:
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open `http://localhost:8080/`.

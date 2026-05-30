@@ -3,227 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Notifications | RD Advance Boutique</title>
+  <title>Notifications JSON Manager | RD Advance Boutique</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <section class="dashboard-section">
     <div class="dashboard-container">
-      <div class="dashboard-sidebar">
+      <aside class="dashboard-sidebar">
         <div class="dashboard-logo">
-          <img src="assets/logo.png" alt="Logo">
+          <img src="assets/logo.png" alt="RD Advance Boutique logo">
           <h2>RD Advance</h2>
-          <p>Admin Panel</p>
+          <p>Static Website</p>
         </div>
-
-        <div class="dashboard-menu">
-          <a href="admin-dashboard.html" class="menu-item">📊 Dashboard</a>
-          <a href="admin-products.html" class="menu-item">🛍 Products</a>
-          <a href="admin-gallery.html" class="menu-item">🖼 Gallery</a>
-          <a href="admin.orders.html" class="menu-item">📦 Orders</a>
-          <a href="admin-course.html" class="menu-item">✂️ Course</a>
-          <a href="admin-categories.html" class="menu-item">📂 Categories</a>
-          <a href="admin-contact.html" class="menu-item">📞 Contact</a>
-          <a href="admin-notifications.html" class="menu-item active">🔔 Notifications</a>
-          <a href="admin-settings.html" class="menu-item">⚙ Settings</a>
-        </div>
-      </div>
-
-      <div class="dashboard-main">
-        <div class="dashboard-topbar">
+        <nav class="dashboard-menu" aria-label="Static content management navigation">
+          <a href="admin-dashboard.html" class="menu-item">📋 Guide</a>
+          <a href="admin-products.html" class="menu-item">🛍 Products JSON</a>
+          <a href="admin-gallery.html" class="menu-item">🖼 Gallery JSON</a>
+          <a href="admin-categories.html" class="menu-item">🏷 Categories JSON</a>
+          <a href="admin-settings.html" class="menu-item">⚙ Settings JSON</a>
+          <a href="admin-notifications.html" class="menu-item">🔔 Notifications JSON</a>
+          <a href="index.html" class="menu-item">🏠 View Website</a>
+        </nav>
+      </aside>
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
           <div>
-            <h1>Notification Management</h1>
-            <p>Create admin alerts, homepage announcements, course updates, product notices, and popup messages.</p>
+            <h1>Notifications JSON Manager</h1>
+            <p>This URL is preserved for GitHub Pages, but backend admin authentication and API writes have been removed.</p>
           </div>
-          <div class="admin-profile">
-            <img src="assets/logo.png" alt="Admin">
+          <a href="README.md" class="primary-btn">Read Guide</a>
+        </header>
+        <section class="dashboard-box">
+          <h2>How website management works now</h2>
+          <p>RD Advance Boutique is a fully static website. Update content by editing JSON files in the repository and committing the changes.</p>
+          <ul>
+            <li><strong>Products:</strong> edit <code>data/products.json</code> to add, edit, or delete products.</li>
+            <li><strong>Gallery:</strong> edit <code>data/gallery.json</code> to add, edit, or delete designs.</li>
+            <li><strong>Categories:</strong> edit <code>data/categories.json</code>.</li>
+            <li><strong>Settings:</strong> edit <code>data/settings.json</code> for branding, contact, SEO, and social links.</li>
+            <li><strong>Notifications:</strong> edit <code>data/notifications.json</code>.</li>
+          </ul>
+          <p>No login, sessions, server-side storage, Express backend, or JSON write operations are used. Customer product orders, gallery enquiries, custom stitching requests, course enquiries, and contact messages all open WhatsApp Business with prefilled messages.</p>
+          <div class="admin-form-buttons">
+            <a class="primary-btn" href="shop.html">Preview Shop</a>
+            <a class="secondary-btn" href="gallery.html">Preview Gallery</a>
+            <a class="secondary-btn" href="custom.html">Preview Custom Stitching</a>
+            <a class="secondary-btn" href="contact.html">Preview Contact</a>
           </div>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2 id="formMode">Create Notification</h2>
-            <p id="notificationStatus" aria-live="polite">Changes are stored in data/notifications.json.</p>
-          </div>
-
-          <form class="admin-product-form" id="notificationForm">
-            <div class="input-group">
-              <label for="notificationTitle">Notification Title</label>
-              <input id="notificationTitle" name="title" type="text" placeholder="Example: New bridal collection launched" required>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationScope">Notification Placement</label>
-              <select id="notificationScope" name="scope" required>
-                <option value="admin">Admin Notification</option>
-                <option value="homepage" selected>Homepage Announcement</option>
-                <option value="course">Course Announcement</option>
-                <option value="product">Product Announcement</option>
-                <option value="popup">Popup Notice</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationCategory">Notification Type</label>
-              <select id="notificationCategory" name="category">
-                <option>General Update</option>
-                <option>Product Launch</option>
-                <option>Sale Offer</option>
-                <option>Course Update</option>
-                <option>Order Update</option>
-                <option>Emergency Notice</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationAudience">Send To</label>
-              <select id="notificationAudience" name="audience">
-                <option>All Users</option>
-                <option>Admins Only</option>
-                <option>Customers Only</option>
-                <option>Students Only</option>
-                <option>Boutique Customers</option>
-                <option>Tailoring Students</option>
-              </select>
-            </div>
-
-            <div class="input-group input-group--wide">
-              <label for="notificationMessage">Notification Message</label>
-              <textarea id="notificationMessage" name="message" rows="6" placeholder="Write announcement message..." required></textarea>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationImage">Upload Notification Banner</label>
-              <input type="file" id="notificationImage" accept="image/*">
-              <small>Store uploaded image files inside the assets folder before publishing.</small>
-            </div>
-
-            <div class="image-preview-container" id="notificationPreview" aria-live="polite"></div>
-
-            <div class="input-group">
-              <label for="notificationPriority">Notification Priority</label>
-              <select id="notificationPriority" name="priority">
-                <option value="normal">Normal</option>
-                <option value="important">Important</option>
-                <option value="urgent">Urgent</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationDelivery">Delivery Method</label>
-              <select id="notificationDelivery" name="deliveryMethod">
-                <option>Website Notification</option>
-                <option>Email Notification</option>
-                <option>SMS Notification</option>
-                <option>WhatsApp Notification</option>
-                <option>All Methods</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationStatusSelect">Status</label>
-              <select id="notificationStatusSelect" name="status">
-                <option value="active">Active</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="draft">Draft</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="notificationStart">Start Date & Time</label>
-              <input id="notificationStart" name="startAt" type="datetime-local">
-            </div>
-
-            <div class="input-group">
-              <label for="notificationEnd">End Date & Time</label>
-              <input id="notificationEnd" name="endAt" type="datetime-local">
-            </div>
-
-            <div class="input-group">
-              <label for="notificationCtaLabel">Button Text</label>
-              <input id="notificationCtaLabel" name="ctaLabel" type="text" placeholder="Shop Now">
-            </div>
-
-            <div class="input-group">
-              <label for="notificationCtaUrl">Button Link</label>
-              <input id="notificationCtaUrl" name="ctaUrl" type="text" placeholder="https://example.com or shop.html">
-            </div>
-
-            <div class="notification-options input-group--wide">
-              <label><input type="checkbox" name="showAsPopup"> Also show as popup notice</label>
-              <label><input type="checkbox" name="dismissible" checked> Visitors can dismiss popup</label>
-            </div>
-
-            <div class="admin-form-buttons">
-              <button type="reset" class="secondary-btn">Reset</button>
-              <button type="submit" class="primary-btn" id="submitNotification">Save Notification</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2>Saved Notifications</h2>
-            <p>All records below are read from notifications.json.</p>
-          </div>
-
-          <div class="products-table-wrapper">
-            <table class="products-table">
-              <thead>
-                <tr>
-                  <th>Title & Message</th>
-                  <th>Placement</th>
-                  <th>Audience</th>
-                  <th>Priority</th>
-                  <th>Delivery</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="notificationsTableBody">
-                <tr><td colspan="7">Loading notifications...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2>Notification Analytics</h2>
-          </div>
-
-          <div class="analytics-grid">
-            <div class="analytics-card">
-              <h3>Total Notifications</h3>
-              <h2 id="totalNotifications">0</h2>
-              <p>Stored records</p>
-            </div>
-            <div class="analytics-card">
-              <h3>Active Campaigns</h3>
-              <h2 id="activeNotifications">0</h2>
-              <p>Visible or scheduled</p>
-            </div>
-            <div class="analytics-card">
-              <h3>Popup Notices</h3>
-              <h2 id="popupNotifications">0</h2>
-              <p>Modal messages</p>
-            </div>
-            <div class="analytics-card">
-              <h3>Targeted Updates</h3>
-              <h2 id="targetedNotifications">0</h2>
-              <p>Course + product notices</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   </section>
-
-  <script src="js/admin-notifications.js"></script>
-  <script src="js/admin-auth.js"></script>
 </body>
 </html>

@@ -2,7 +2,6 @@
   "use strict";
 
   const DATA_SOURCE = "data/notifications.json";
-  const DISMISS_PREFIX = "rd_notification_dismissed_";
 
   const page = (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
   const isAdmin = page.startsWith("admin") || page.includes("orders") || page.includes("dashboard");
@@ -93,8 +92,7 @@
   const renderPopupNotice = (notifications) => {
     const popup = notifications.find((notification) => {
       const scope = normalize(notification.scope || "");
-      const dismissed = localStorage.getItem(`${DISMISS_PREFIX}${notification.id}`);
-      return (scope === "popup" || notification.showAsPopup) && !dismissed;
+      return scope === "popup" || notification.showAsPopup;
     });
 
     if (!popup) return;
@@ -115,7 +113,6 @@
     document.body.appendChild(overlay);
 
     const closePopup = () => {
-      if (popup.dismissible !== false) localStorage.setItem(`${DISMISS_PREFIX}${popup.id}`, "true");
       overlay.remove();
     };
 

@@ -1,300 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Admin Signup | RD Advance Boutique</title>
-
+  <title>Admin Signup Removed | RD Advance Boutique</title>
   <link rel="stylesheet" href="style.css">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-  <section class="admin-login-section">
-
-    <div class="admin-login-container">
-
-      <div class="admin-left">
-
-        <img src="assets/logo.png" alt="RD Logo" class="admin-logo">
-
-        <h1>RD Advance Boutique</h1>
-
-        <p>Request admin dashboard access</p>
-
-      </div>
-
-      <div class="admin-right">
-
-        <div class="admin-form-box">
-
-          <span class="admin-tag">Admin Signup</span>
-
-          <h2>Request Access</h2>
-
-          <p>
-            Create an admin request. Access starts only after
-            rdadvanceboutique@gmail.com approves your request.
-          </p>
-
-          <form id="adminSignupForm">
-
-            <div class="input-group">
-
-              <label>Full Name</label>
-
-              <input
-                id="adminSignupName"
-                name="name"
-                type="text"
-                autocomplete="name"
-                placeholder="Enter your full name"
-              >
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Email Address</label>
-
-              <input
-                id="adminSignupEmail"
-                name="email"
-                type="email"
-                autocomplete="username"
-                placeholder="Enter admin email"
-                required
-              >
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Password</label>
-
-              <input
-                id="adminSignupPassword"
-                name="password"
-                type="password"
-                autocomplete="new-password"
-                placeholder="Create password"
-                minlength="8"
-                required
-              >
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Confirm Password</label>
-
-              <input
-                id="adminSignupConfirmPassword"
-                name="confirmPassword"
-                type="password"
-                autocomplete="new-password"
-                placeholder="Confirm password"
-                minlength="8"
-                required
-              >
-
-            </div>
-            <div class="input-group">
-
-              <label>Security Question</label>
-
-              <input
-                id="adminSignupSecurityQuestion"
-                name="securityQuestion"
-                type="text"
-                autocomplete="off"
-                placeholder="Example: What is your shop code?"
-                required
-              >
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Security Answer</label>
-
-              <input
-                id="adminSignupSecurityAnswer"
-                name="securityAnswer"
-                type="text"
-                autocomplete="off"
-                placeholder="Enter answer for password reset"
-                required
-              >
-
-            </div>
-
-            <p id="adminSignupMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
-
-            <button type="submit" class="primary-btn admin-btn">Send Approval Request</button>
-
-            <a class="secondary-btn admin-secondary-link" href="admin-login.html">Back To Login</a>
-
-          </form>
-
+  <section class="dashboard-section">
+    <div class="dashboard-container">
+      <aside class="dashboard-sidebar">
+        <div class="dashboard-logo">
+          <img src="assets/logo.png" alt="RD Advance Boutique logo">
+          <h2>RD Advance</h2>
+          <p>Static Website</p>
         </div>
-
-      </div>
-
+        <nav class="dashboard-menu" aria-label="Static content management navigation">
+          <a href="admin-dashboard.html" class="menu-item">📋 Guide</a>
+          <a href="admin-products.html" class="menu-item">🛍 Products JSON</a>
+          <a href="admin-gallery.html" class="menu-item">🖼 Gallery JSON</a>
+          <a href="admin-categories.html" class="menu-item">🏷 Categories JSON</a>
+          <a href="admin-settings.html" class="menu-item">⚙ Settings JSON</a>
+          <a href="admin-notifications.html" class="menu-item">🔔 Notifications JSON</a>
+          <a href="index.html" class="menu-item">🏠 View Website</a>
+        </nav>
+      </aside>
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
+          <div>
+            <h1>Admin Signup Removed</h1>
+            <p>This URL is preserved for GitHub Pages, but backend admin authentication and API writes have been removed.</p>
+          </div>
+          <a href="README.md" class="primary-btn">Read Guide</a>
+        </header>
+        <section class="dashboard-box">
+          <h2>How website management works now</h2>
+          <p>RD Advance Boutique is a fully static website. Update content by editing JSON files in the repository and committing the changes.</p>
+          <ul>
+            <li><strong>Products:</strong> edit <code>data/products.json</code> to add, edit, or delete products.</li>
+            <li><strong>Gallery:</strong> edit <code>data/gallery.json</code> to add, edit, or delete designs.</li>
+            <li><strong>Categories:</strong> edit <code>data/categories.json</code>.</li>
+            <li><strong>Settings:</strong> edit <code>data/settings.json</code> for branding, contact, SEO, and social links.</li>
+            <li><strong>Notifications:</strong> edit <code>data/notifications.json</code>.</li>
+          </ul>
+          <p>No login, sessions, server-side storage, Express backend, or JSON write operations are used. Customer product orders, gallery enquiries, custom stitching requests, course enquiries, and contact messages all open WhatsApp Business with prefilled messages.</p>
+          <div class="admin-form-buttons">
+            <a class="primary-btn" href="shop.html">Preview Shop</a>
+            <a class="secondary-btn" href="gallery.html">Preview Gallery</a>
+            <a class="secondary-btn" href="custom.html">Preview Custom Stitching</a>
+            <a class="secondary-btn" href="contact.html">Preview Contact</a>
+          </div>
+        </section>
+      </main>
     </div>
-
   </section>
-
-  <script>
-    const signupForm = document.getElementById("adminSignupForm");
-    const signupMessage = document.getElementById("adminSignupMessage");
-    const signupButton = signupForm.querySelector("button[type='submit']");
-    const signupEndpoint = "/api/v1/admin/auth/signup";
-
-    const setMessage = (message, isError = false) => {
-      signupMessage.textContent = message;
-      signupMessage.classList.toggle("error", isError);
-      signupMessage.classList.toggle("success", !isError && Boolean(message));
-    };
-
-    const getFieldValue = (id) => document.getElementById(id).value.trim();
-
-    const buildSignupPayload = () => ({
-      name: getFieldValue("adminSignupName"),
-      email: getFieldValue("adminSignupEmail").toLowerCase(),
-      password: document.getElementById("adminSignupPassword").value,
-      confirmPassword: document.getElementById("adminSignupConfirmPassword").value,
-      securityQuestion: getFieldValue("adminSignupSecurityQuestion"),
-      securityAnswer: getFieldValue("adminSignupSecurityAnswer"),
-    });
-
-    const validateSignupPayload = (payload) => {
-      const errors = [];
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!payload.name) errors.push("Full name is required.");
-      if (!payload.email) {
-        errors.push("Email address is required.");
-      } else if (!emailPattern.test(payload.email)) {
-        errors.push("Please enter a valid admin email address.");
-      }
-      if (!payload.password) {
-        errors.push("Password is required.");
-      } else if (payload.password.length < 8) {
-        errors.push("Password must be at least 8 characters long.");
-      }
-      if (!payload.confirmPassword) errors.push("Confirm password is required.");
-      if (payload.password && payload.confirmPassword && payload.password !== payload.confirmPassword) {
-        errors.push("Password and confirm password must match.");
-      }
-      if (!payload.securityQuestion) errors.push("Security question is required.");
-      if (!payload.securityAnswer) errors.push("Security answer is required.");
-
-      return errors;
-    };
-
-    const parseResponsePayload = async (response) => {
-      const contentType = response.headers.get("content-type") || "";
-      const responseText = await response.text();
-
-      if (!responseText) return {};
-
-      if (!contentType.includes("application/json")) {
-        console.error("Admin signup API returned a non-JSON response.", {
-          endpoint: signupEndpoint,
-          status: response.status,
-          statusText: response.statusText,
-          contentType,
-          responseText,
-        });
-        return { message: responseText };
-      }
-
-      try {
-        return JSON.parse(responseText);
-      } catch (error) {
-        console.error("Unable to parse admin signup API JSON response.", {
-          endpoint: signupEndpoint,
-          status: response.status,
-          statusText: response.statusText,
-          responseText,
-          error,
-        });
-        throw new Error(`The approval API returned invalid JSON: ${error.message}`);
-      }
-    };
-
-    signupForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      setMessage("");
-
-      const payload = buildSignupPayload();
-      const validationErrors = validateSignupPayload(payload);
-      if (validationErrors.length) {
-        console.error("Admin signup validation failed.", { validationErrors, payload: { ...payload, password: "[hidden]", confirmPassword: "[hidden]", securityAnswer: "[hidden]" } });
-        setMessage(validationErrors.join(" "), true);
-        return;
-      }
-
-      signupButton.disabled = true;
-      setMessage("Sending approval request...");
-      console.debug("Sending admin signup approval request.", {
-        endpoint: signupEndpoint,
-        method: "POST",
-        payload: { ...payload, password: "[hidden]", confirmPassword: "[hidden]", securityAnswer: "[hidden]" },
-      });
-
-      try {
-        const response = await fetch(signupEndpoint, {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const responsePayload = await parseResponsePayload(response);
-        const debugContext = {
-          endpoint: signupEndpoint,
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-          responsePayload,
-        };
-
-        if (!response.ok || responsePayload.success === false) {
-          const backendMessage = responsePayload.message
-            || responsePayload.error
-            || (Array.isArray(responsePayload.details) ? responsePayload.details.join(" ") : responsePayload.details)
-            || `Approval request failed with HTTP ${response.status} ${response.statusText || ""}`.trim();
-          console.error("Admin signup approval request failed.", debugContext);
-          throw new Error(backendMessage);
-        }
-
-        console.debug("Admin signup approval request succeeded.", debugContext);
-        const preview = responsePayload.data?.previewLink ? ` Development approval link: ${responsePayload.data.previewLink}` : "";
-        setMessage(`${responsePayload.message || "Approval request saved successfully."}${preview}`);
-        signupForm.reset();
-      } catch (error) {
-        console.error("Unable to send admin signup approval request.", {
-          endpoint: signupEndpoint,
-          message: error.message,
-          stack: error.stack,
-          error,
-        });
-        setMessage(error.message || "Unable to send approval request. Check the browser console and server logs for details.", true);
-      } finally {
-        signupButton.disabled = false;
-      }
-    });
-  </script>
-
 </body>
 </html>
