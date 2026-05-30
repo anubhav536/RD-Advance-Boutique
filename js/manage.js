@@ -124,7 +124,7 @@
     } catch (err) {
       el("mgLoadingState").hidden = true;
       el("mgErrorState").hidden   = false;
-      el("mgErrorMsg").textContent = "Orders load nahi hue: " + err.message;
+      el("mgErrorMsg").textContent = "Failed to load orders: " + err.message;
     }
   }
 

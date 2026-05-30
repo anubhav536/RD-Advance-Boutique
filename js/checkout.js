@@ -9,7 +9,7 @@
       { id: "color",    type: "chips-or-text", label: "Color",               source: "colors",  required: true  },
       { id: "qty",      type: "quantity",       label: "Quantity",                               required: true  },
       { id: "fallPico", type: "radio",          label: "Fall / Pico Required",
-        staticOptions: ["Yes – zaroor chahiye", "No – nahi chahiye"],                            required: true  },
+        staticOptions: ["Yes – Required", "No – Not Required"],                                  required: true  },
     ],
     blouse: [
       { id: "blouseSize",  type: "chips-or-text", label: "Blouse Size",    source: "sizes",     required: true  },
@@ -42,10 +42,10 @@
     ],
     custom: [
       { id: "measurements", type: "measurements", label: "Body Measurements (inches)",      required: false },
-      { id: "fabricDetails",type: "textarea",     label: "Fabric / Kapde ki Details",
-        placeholder: "Kapde ka rang, type, quality…",                                        required: false },
+      { id: "fabricDetails",type: "textarea",     label: "Fabric Details",
+        placeholder: "Fabric color, type, quality…",                                         required: false },
       { id: "designNotes",  type: "textarea",     label: "Design Notes",
-        placeholder: "Design kaisa chahiye, embroidery, print…",                             required: false },
+        placeholder: "Describe your design, embroidery, print preferences…",                 required: false },
       { id: "refImage",     type: "file",         label: "Reference Image (optional)",       optional: true  },
       { id: "qty",          type: "quantity",     label: "Quantity",                         required: true  },
     ],
@@ -157,7 +157,7 @@
         inner = items.length
           ? renderChips(items, field.id)
           : `<input type="text" id="${field.id}" class="co-dyn-input"
-              placeholder="${field.placeholder || field.label + " likhein…"}" ${reqA}>`;
+              placeholder="${field.placeholder || field.label + "…"}" ${reqA}>`;
         break;
       }
       case "chips":
@@ -168,7 +168,7 @@
         const opts2 = (field.staticOptions || [])
           .map(o => `<option value="${o}">${o}</option>`).join("");
         inner = `<select id="${field.id}" class="co-dyn-input" ${reqA}>
-                   <option value="">— ${field.label} Select Karein —</option>${opts2}
+                   <option value="">— Select ${field.label} —</option>${opts2}
                  </select>`;
         break;
       }
@@ -211,7 +211,7 @@
                    <input type="file" id="${field.id}" accept="image/*" class="co-file-input">
                    <div class="co-upload-ui" id="${field.id}-uploadUi">
                      <span class="co-upload-icon">🖼️</span>
-                     <span>Image select karein</span><small>JPG, PNG, WebP</small>
+                     <span>Select Image</span><small>JPG, PNG, WebP</small>
                    </div>
                    <img id="${field.id}-preview" class="co-upload-preview" src="" alt="" hidden>
                  </div>`;
@@ -402,7 +402,6 @@
       paymentMethod  : selectedPayment === "upi" ? "UPI" : "Cash on Delivery",
       utrNumber      : el("utrNumber")?.value.trim()   || "",
       amountPaid     : el("amountPaid")?.value          || "",
-      screenshotBase64: screenshotData || "",
       notes          : el("coNotes")?.value.trim()     || "",
     };
   }
@@ -445,48 +444,65 @@
   }
 
   /* ─────────────────────────────────────────────
-     SUBMIT TO APPS SCRIPT
+     WHATSAPP MESSAGE
   ───────────────────────────────────────────── */
-  async function submitOrder(order) {
-    const scriptUrl = appConfig.appsScriptUrl || "";
-    if (!scriptUrl || scriptUrl.includes("PASTE_YOUR")) {
-      // Offline mode — save to localStorage only
-      storeLocally(order);
-      return { ok: true, offline: true, status: order.paymentMethod === "UPI" ? "Pending Verification" : "Confirmed – COD" };
-    }
+  function buildWAMessage(order) {
+    const optLines = Object.entries(order.selectedOptions)
+      .map(([k, v]) => `• ${k}: ${v}`).join("\n");
 
-    const payload = { action: "submitOrder", ...order };
-    const res = await fetch(scriptUrl, {
-      method       : "POST",
-      body         : JSON.stringify(payload),
-      headers      : { "Content-Type": "application/json" },
-      redirect     : "follow",
-    });
-    if (!res.ok) throw new Error("Server error " + res.status);
-    return await res.json();
+    const paymentLine = order.paymentMethod === "UPI"
+      ? `Method: UPI${order.utrNumber ? "\nUTR: " + order.utrNumber : ""}${order.amountPaid ? "\nAmount Paid: ₹" + order.amountPaid : ""}\n\n📎 Please also attach your payment screenshot to this message.`
+      : `Method: Cash on Delivery`;
+
+    return `🛍️ *NEW ORDER — RD Advance Boutique*
+
+*Order ID:* ${order.orderId}
+*Date:* ${order.createdAt}
+
+━━━━━━━━━━━━━━━━━
+*PRODUCT*
+━━━━━━━━━━━━━━━━━
+${order.productName}
+Price: ${order.productPrice}
+
+━━━━━━━━━━━━━━━━━
+*SELECTED OPTIONS*
+━━━━━━━━━━━━━━━━━
+${optLines || "—"}
+
+━━━━━━━━━━━━━━━━━
+*CUSTOMER DETAILS*
+━━━━━━━━━━━━━━━━━
+Name: ${order.customerName}
+Mobile: ${order.phone}
+Address: ${order.address}, ${order.city}, ${order.state} - ${order.pincode}${order.notes ? "\nNotes: " + order.notes : ""}
+
+━━━━━━━━━━━━━━━━━
+*PAYMENT*
+━━━━━━━━━━━━━━━━━
+${paymentLine}
+
+Please confirm this order. 🙏`;
   }
 
   /* ─────────────────────────────────────────────
      SUCCESS SCREEN
   ───────────────────────────────────────────── */
-  function showSuccess(order, serverStatus) {
+  function showSuccess(order) {
     el("coReview").hidden  = true;
     el("coSuccess").hidden = false;
     setStep(5);
 
     el("successOrderId").textContent = order.orderId;
 
-    const status = serverStatus || (order.paymentMethod === "UPI" ? "Pending Verification" : "Confirmed – COD");
-    const statusConf = {
-      "Pending Verification": { cls: "badge--warn",  text: "⏳ Pending Verification — UTR check baaki hai" },
-      "Confirmed – COD"     : { cls: "badge--green", text: "✅ Order Confirmed — COD" },
-    };
-    const sc = statusConf[status] || { cls: "badge--blue", text: status };
-    el("successStatusBadge").innerHTML  = `<span class="co-badge ${sc.cls}">${sc.text}</span>`;
+    const isUpi = order.paymentMethod === "UPI";
+    el("successStatusBadge").innerHTML = isUpi
+      ? `<span class="co-badge badge--warn">⏳ Pending Verification</span>`
+      : `<span class="co-badge badge--green">✅ Order Confirmed — COD</span>`;
 
-    el("successMsg").textContent = status === "Pending Verification"
-      ? "Aapka order mila! Hum UTR verify karke aapko confirm karenge. WhatsApp par bhi message kar sakte hain."
-      : "Aapka order confirm ho gaya! Delivery ke samay payment karein. Hum aapko call karenge.";
+    el("successMsg").textContent = isUpi
+      ? "Your order has been sent to us on WhatsApp! Please also attach your payment screenshot to the message. We will confirm once verified."
+      : "Your order has been sent to us on WhatsApp! We will call you to confirm and arrange delivery.";
 
     const rows = [
       `<div class="co-sum-row"><span>Order ID</span><strong>${order.orderId}</strong></div>`,
@@ -502,68 +518,22 @@
     rows.push(`<div class="co-sum-row"><span>Address</span><strong>${[order.address, order.city, order.state, order.pincode].filter(Boolean).join(", ")}</strong></div>`);
     rows.push(`<div class="co-sum-divider"></div>`);
     rows.push(`<div class="co-sum-row"><span>Payment</span><strong>${order.paymentMethod}</strong></div>`);
-    if (order.paymentMethod === "UPI") {
+    if (isUpi) {
       rows.push(`<div class="co-sum-row"><span>UTR</span><strong>${order.utrNumber}</strong></div>`);
       rows.push(`<div class="co-sum-row"><span>Amount Paid</span><strong>₹${order.amountPaid}</strong></div>`);
     }
     el("coSuccessSummary").innerHTML = rows.join("");
 
-    el("coWhatsappBtn").onclick = () => {
-      const url = "https://wa.me/" + (appConfig.ownerPhone || "917693849472") +
-                  "?text=" + encodeURIComponent(buildWAMessage(order, status));
-      window.open(url, "_blank", "noopener");
-    };
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   /* ─────────────────────────────────────────────
-     WHATSAPP MESSAGE
-  ───────────────────────────────────────────── */
-  function buildWAMessage(order, status) {
-    const optLines = Object.entries(order.selectedOptions)
-      .map(([k, v]) => `• ${k}: ${v}`).join("\n");
-
-    return `🛍️ *NEW ORDER — RD Advance Boutique*
-
-*Order ID:* ${order.orderId}
-*Date:* ${order.createdAt}
-*Status:* ${status}
-
-━━━━━━━━━━━━━━━━━
-*PRODUCT*
-━━━━━━━━━━━━━━━━━
-${order.productName}
-Price: ${order.productPrice}
-URL: ${order.productUrl}
-
-━━━━━━━━━━━━━━━━━
-*SELECTED OPTIONS*
-━━━━━━━━━━━━━━━━━
-${optLines || "—"}
-
-━━━━━━━━━━━━━━━━━
-*CUSTOMER DETAILS*
-━━━━━━━━━━━━━━━━━
-Name: ${order.customerName}
-Mobile: ${order.phone}
-Address: ${order.address}, ${order.city}, ${order.state} - ${order.pincode}
-
-━━━━━━━━━━━━━━━━━
-*PAYMENT*
-━━━━━━━━━━━━━━━━━
-Method: ${order.paymentMethod}${order.utrNumber ? "\nUTR: " + order.utrNumber : ""}${order.amountPaid ? "\nAmount: ₹" + order.amountPaid : ""}${screenshotData ? "\nScreenshot: Uploaded ✅" : ""}${order.notes ? "\n\nNotes: " + order.notes : ""}
-
-Please confirm this order. 🙏`;
-  }
-
-  /* ─────────────────────────────────────────────
-     LOCAL STORAGE (fallback)
+     LOCAL STORAGE (record keeping)
   ───────────────────────────────────────────── */
   function storeLocally(order) {
     try {
       const stored = JSON.parse(localStorage.getItem("rdOrders") || "[]");
-      stored.unshift({ ...order, screenshotBase64: undefined });
+      stored.unshift({ ...order });
       localStorage.setItem("rdOrders", JSON.stringify(stored.slice(0, 200)));
     } catch (_) {}
   }
@@ -592,24 +562,23 @@ Please confirm this order. 🙏`;
   /* ─────────────────────────────────────────────
      EVENT HANDLERS
   ───────────────────────────────────────────── */
-  async function handleConfirm() {
+  function handleConfirm() {
     if (!pendingOrder) return;
     const btn = el("coConfirmBtn");
     btn.disabled    = true;
-    btn.textContent = "Submitting…";
+    btn.textContent = "Opening WhatsApp…";
 
     try {
-      const result = await submitOrder(pendingOrder);
-      if (result.ok || result.offline) {
-        storeLocally(pendingOrder);
-        showSuccess(pendingOrder, result.status);
-      } else {
-        throw new Error(result.error || "Order submit failed");
-      }
+      storeLocally(pendingOrder);
+      const waMessage = buildWAMessage(pendingOrder);
+      const waUrl = "https://wa.me/" + (appConfig.ownerPhone || "917693849472") +
+                    "?text=" + encodeURIComponent(waMessage);
+      window.open(waUrl, "_blank", "noopener");
+      showSuccess(pendingOrder);
     } catch (err) {
       btn.disabled    = false;
-      btn.textContent = "✅ Order Confirm Karein";
-      showError("Order submit karne mein problem aayi. Screenshot le kar WhatsApp par bhejein, ya dubara try karein. (" + err.message + ")");
+      btn.textContent = "✅ Confirm Order";
+      showError("Something went wrong. Please try again or contact us on WhatsApp. (" + err.message + ")");
     }
   }
 
@@ -645,7 +614,7 @@ Please confirm this order. 🙏`;
 
     function loadFile(file) {
       if (!file || !file.type.startsWith("image/")) return;
-      if (file.size > 5 * 1024 * 1024) { showError("Screenshot 5 MB se bada hai. Chhoti image choose karein."); return; }
+      if (file.size > 5 * 1024 * 1024) { showError("Screenshot exceeds 5 MB. Please choose a smaller image."); return; }
       const reader = new FileReader();
       reader.onload = ev => {
         screenshotData = ev.target.result;
@@ -695,7 +664,6 @@ Please confirm this order. 🙏`;
     try {
       const res = await fetch("data/config.json", { cache: "no-store" });
       appConfig = await res.json();
-      // Update UPI display from config
       if (appConfig.upiId) {
         const upiEl = el("cfgUpiId");
         if (upiEl) { upiEl.textContent = appConfig.upiId; upiEl.closest(".co-upi-row")?.querySelector(".co-copy-btn")?.setAttribute("data-copy", appConfig.upiId); }
@@ -721,7 +689,7 @@ Please confirm this order. 🙏`;
       ) || products[0];
 
       if (!found) {
-        el("productOptionsContainer").innerHTML = "<p>Product nahi mila. <a href='shop.html'>Shop par jaayein.</a></p>";
+        el("productOptionsContainer").innerHTML = "<p>Product not found. <a href='shop.html'>Go to Shop</a></p>";
         return;
       }
 
@@ -738,7 +706,7 @@ Please confirm this order. 🙏`;
       buildDynamicForm(found);
     } catch (err) {
       console.error(err);
-      el("productOptionsContainer").innerHTML = "<p>Product load nahi hua. Reload karein.</p>";
+      el("productOptionsContainer").innerHTML = "<p>Failed to load product. Please reload the page.</p>";
     }
   }
 
