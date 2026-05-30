@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static Content Manager | RD Advance Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff7f2;
+      --panel: #ffffff;
+      --ink: #2d1f1b;
+      --muted: rgba(45,31,27,0.68);
+      --line: rgba(190,107,114,0.22);
+      --brand: #be6b72;
+      --brand-dark: #8f4049;
+      --gold: #c9a45c;
+      --shadow: 0 22px 60px rgba(64, 32, 28, 0.12);
+      --radius: 24px;
+      --font-heading: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Montserrat', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(248,225,220,0.85), transparent 32rem),
+        linear-gradient(135deg, #fffaf6 0%, var(--bg) 52%, #f8e1dc 100%);
+      color: var(--ink);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    button, input, textarea, select { font: inherit; }
+
+    a { color: inherit; }
+
+    .manager-shell {
+      display: grid;
+      grid-template-columns: 18rem minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #170f0d;
+      color: #fff8f4;
+      padding: 1.3rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar__brand {
+      display: flex;
+      gap: 0.9rem;
+      align-items: center;
+      margin-bottom: 1.4rem;
+    }
+
+    .sidebar__brand img {
+      width: 3.4rem;
+      height: 3.4rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(201,164,92,0.58);
+    }
+
+    .sidebar h1,
+    .hero-panel h2,
+    .section-card h2,
+    .preview-card h3 {
+      font-family: var(--font-heading);
+    }
+
+    .sidebar h1 {
+      font-size: 1.45rem;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .sidebar p {
+      color: rgba(255,248,244,0.72);
+      font-size: 0.84rem;
+      line-height: 1.55;
+      margin: 0.35rem 0 1rem;
+    }
+
+    .tab-list {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .tab-button,
+    .action-button,
+    .ghost-button,
+    .danger-button {
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 2.85rem;
+      padding: 0.78rem 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .tab-button {
+      background: rgba(255,255,255,0.08);
+      color: #fff8f4;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .tab-button[aria-selected="true"] {
+      background: linear-gradient(135deg, var(--brand), var(--gold));
+      color: #160e0c;
+      box-shadow: 0 14px 30px rgba(190,107,114,0.25);
+    }
+
+    .main {
+      padding: clamp(1rem, 3vw, 2.4rem);
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .hero-panel,
+    .section-card {
+      background: rgba(255,255,255,0.86);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel {
+      padding: clamp(1.1rem, 3vw, 2rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.8fr);
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: var(--brand-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      margin: 0 0 0.45rem;
+      text-transform: uppercase;
+    }
+
+    .hero-panel h2 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.95;
+      margin: 0;
+    }
+
+    .hero-panel p,
+    .section-card p,
+    .help-text {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .hero-actions,
+    .form-actions,
+    .export-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    .action-button { background: var(--brand); color: #fff; }
+    .ghost-button { background: #fff8f4; color: var(--ink); border: 1px solid var(--line); }
+    .danger-button { background: #8b1e2d; color: #fff; }
+    .action-button:hover, .ghost-button:hover, .danger-button:hover, .tab-button:hover { transform: translateY(-1px); }
+
+    .status-box {
+      background: #fff8f4;
+      border: 1px dashed rgba(190,107,114,0.35);
+      border-radius: 18px;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(18rem, 0.85fr) minmax(20rem, 1fr) minmax(17rem, 0.7fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .section-card {
+      padding: 1rem;
+      min-width: 0;
+    }
+
+    .section-card h2 {
+      font-size: 1.85rem;
+      margin: 0 0 0.65rem;
+    }
+
+    .item-list {
+      display: grid;
+      gap: 0.5rem;
+      max-height: 48rem;
+      overflow: auto;
+      padding-right: 0.2rem;
+    }
+
+    .item-button {
+      background: #fffaf6;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 3.4rem minmax(0, 1fr);
+      gap: 0.7rem;
+      padding: 0.55rem;
+      text-align: left;
+      width: 100%;
+    }
+
+    .item-button[aria-current="true"] { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(190,107,114,0.14); }
+
+    .item-button img {
+      width: 3.4rem;
+      height: 3.4rem;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f8e1dc;
+    }
+
+    .item-button strong,
+    .item-button span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .item-button span { color: var(--muted); font-size: 0.82rem; margin-top: 0.2rem; }
+
+    .manager-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .field { display: grid; gap: 0.35rem; }
+    .field--full { grid-column: 1 / -1; }
+
+    label { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    input, textarea, select {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffaf6;
+      color: var(--ink);
+      outline: none;
+      padding: 0.8rem 0.9rem;
+      width: 100%;
+    }
+
+    textarea { min-height: 8rem; resize: vertical; }
+    .long-editor { min-height: 14rem; }
+    .json-output { min-height: 22rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; }
+
+    input:focus, textarea:focus, select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(190,107,114,0.12); }
+
+    .checkbox-row {
+      align-items: center;
+      display: flex;
+      gap: 0.55rem;
+      min-height: 2.8rem;
+    }
+
+    .checkbox-row input { width: auto; }
+
+    .preview-card {
+      background: #fffaf6;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .preview-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: block;
+      object-fit: cover;
+      background: #f8e1dc;
+    }
+
+    .preview-card__content { padding: 1rem; }
+    .preview-card h3 { font-size: 1.7rem; margin: 0 0 0.35rem; }
+    .preview-card p { margin: 0.4rem 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.75rem; }
+    .chip { border: 1px solid rgba(201,164,92,0.45); border-radius: 999px; padding: 0.35rem 0.6rem; font-size: 0.75rem; font-weight: 700; }
+
+    .import-row {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    .notice {
+      background: rgba(201,164,92,0.13);
+      border: 1px solid rgba(201,164,92,0.28);
+      border-radius: 16px;
+      color: #5b3d14;
+      line-height: 1.55;
+      padding: 0.85rem;
+    }
+
+    .toast {
+      background: #160f0d;
+      border-radius: 999px;
+      bottom: 1rem;
+      box-shadow: var(--shadow);
+      color: #fff8f4;
+      left: 50%;
+      opacity: 0;
+      padding: 0.75rem 1rem;
+      pointer-events: none;
+      position: fixed;
+      transform: translate(-50%, 1rem);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 10;
+    }
+
+    .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1fr); }
+      .workspace .section-card:last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 860px) {
+      .manager-shell { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: static; }
+      .tab-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-panel, .workspace { grid-template-columns: 1fr; }
+      .manager-form { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .tab-list { grid-template-columns: 1fr; }
+      .hero-actions, .form-actions, .export-actions { display: grid; }
+      .action-button, .ghost-button, .danger-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="manager-shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <img src="assets/logo.png" alt="RD Advance Boutique logo">
+        <div>
+          <h1>Content Manager</h1>
+          <p>Static JSON panel</p>
+        </div>
+      </div>
+      <p>Manage content in your browser, preview it, then export JSON files and commit them to the <code>data/</code> folder.</p>
+      <nav class="tab-list" aria-label="Content sections">
+        <button class="tab-button" type="button" data-section="products" aria-selected="true">🛍 Products Manager</button>
+        <button class="tab-button" type="button" data-section="gallery">🖼 Gallery Manager</button>
+        <button class="tab-button" type="button" data-section="categories">🏷 Categories Manager</button>
+        <button class="tab-button" type="button" data-section="notifications">🔔 Notifications Manager</button>
+        <button class="tab-button" type="button" data-section="settings">⚙ Settings Manager</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="hero-panel">
+        <div>
+          <p class="eyebrow">GitHub Pages compatible · no backend</p>
+          <h2>Manage website JSON without editing code.</h2>
+          <p>Use add, edit, delete, image path, long description, preview, import, and export tools. The panel stores draft work locally in this browser only.</p>
+          <div class="hero-actions">
+            <button class="action-button" type="button" id="saveDraftButton">Save Draft</button>
+            <button class="ghost-button" type="button" id="resetDraftButton">Reload Website JSON</button>
+            <a class="ghost-button" href="index.html">View Website</a>
+          </div>
+        </div>
+        <div class="status-box" id="statusBox">Loading existing JSON files from the data folder…</div>
+      </section>
+
+      <section class="workspace" aria-live="polite">
+        <article class="section-card">
+          <p class="eyebrow" id="listEyebrow">Products Manager</p>
+          <h2>Items</h2>
+          <div class="hero-actions">
+            <button class="action-button" type="button" id="newItemButton">Add New Item</button>
+          </div>
+          <div class="item-list" id="itemList"></div>
+        </article>
+
+        <article class="section-card">
+          <p class="eyebrow" id="formEyebrow">Add item form</p>
+          <h2 id="formTitle">Product Details</h2>
+          <form class="manager-form" id="managerForm"></form>
+        </article>
+
+        <article class="section-card">
+          <p class="eyebrow">Preview card</p>
+          <h2>Live Preview</h2>
+          <div id="previewCard"></div>
+          <div class="import-row">
+            <label for="jsonOutput">Generated JSON</label>
+            <textarea id="jsonOutput" class="json-output" spellcheck="false" aria-label="Generated JSON output"></textarea>
+            <div class="export-actions">
+              <button class="action-button" type="button" id="applyJsonButton">Apply JSON Text</button>
+              <button class="ghost-button" type="button" id="copyJsonButton">Copy JSON</button>
+              <button class="ghost-button" type="button" id="exportSectionButton">Export This JSON File</button>
+              <button class="ghost-button" type="button" id="exportAllButton">Export All JSON</button>
+            </div>
+            <label for="importFile">Import existing JSON file</label>
+            <input type="file" id="importFile" accept="application/json,.json">
+            <p class="notice">Static websites cannot write files automatically. After export, replace the matching file in <code>data/</code> and commit it to publish changes.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <datalist id="imagePathOptions"></datalist>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'rd-static-manager-draft-v1';
+      const nowIso = () => new Date().toISOString();
+      const sections = ['products', 'gallery', 'categories', 'notifications', 'settings'];
+      const dataFiles = {
+        products: 'data/products.json',
+        gallery: 'data/gallery.json',
+        categories: 'data/categories.json',
+        notifications: 'data/notifications.json',
+        settings: 'data/settings.json'
+      };
+      const assetPaths = [
+        'assets/logo.png', 'assets/hero-bg.jpg', 'assets/design1.jpg', 'assets/design2.jpg',
+        'assets/design3.jpg', 'assets/design4.jpg', 'assets/design5.jpg', 'assets/design6.png',
+        'assets/course.jpg', 'assets/coursedesign1.jpg', 'assets/coursedesign2.jpg', 'assets/coursedesign3.jpg'
+      ];
+      const defaultState = {
+        products: [],
+        gallery: [],
+        categories: [],
+        notifications: [],
+        settings: {}
+      };
+
+      const sectionConfig = {
+        products: {
+          label: 'Products Manager',
+          title: 'Product Details',
+          filename: 'products.json',
+          defaults: () => ({
+            id: '', title: '', name: '', category: '', productType: 'boutique', type: 'boutique', price: 0,
+            discountPrice: 0, oldPrice: 0, image: 'assets/design1.jpg', images: [], shortDescription: '',
+            description: '', longDescription: '', details: '', features: [], tags: [], sizes: [], colors: [],
+            stockQuantity: 1, stock: 1, featured: false, status: 'active', link: '', affiliateUrl: '',
+            whatsappMessage: '', createdAt: nowIso(), updatedAt: nowIso()
+          }),
+          fields: [
+            ['id', 'ID / slug', 'text'], ['title', 'Title', 'text'], ['category', 'Category', 'text'], ['status', 'Status', 'select:active,draft,inactive'],
+            ['price', 'Price', 'number'], ['discountPrice', 'Discount price', 'number'], ['oldPrice', 'Old price', 'number'], ['stockQuantity', 'Stock quantity', 'number'],
+            ['image', 'Image path selector', 'image'], ['featured', 'Featured', 'checkbox'],
+            ['shortDescription', 'Short description', 'textarea'], ['longDescription', 'Long description editor', 'longtext'],
+            ['features', 'Features (one per line)', 'list'], ['tags', 'Tags (one per line)', 'list'], ['sizes', 'Sizes (one per line)', 'list'], ['colors', 'Colors (one per line)', 'list'],
+            ['link', 'Order / WhatsApp link', 'url'], ['whatsappMessage', 'WhatsApp message', 'textarea']
+          ]
+        },
+        gallery: {
+          label: 'Gallery Manager', title: 'Gallery Details', filename: 'gallery.json',
+          defaults: () => ({ id: '', title: '', category: '', image: 'assets/design1.jpg', alt: '', layout: 'standard', featured: false, shortDescription: '', longDescription: '', tags: [], features: [], whatsappMessage: '' }),
+          fields: [
+            ['id', 'ID / slug', 'text'], ['title', 'Title', 'text'], ['category', 'Category', 'text'], ['layout', 'Layout', 'select:standard,tall,wide'],
+            ['image', 'Image path selector', 'image'], ['featured', 'Featured', 'checkbox'], ['alt', 'Image alt text', 'text'],
+            ['shortDescription', 'Short description', 'textarea'], ['longDescription', 'Long description editor', 'longtext'],
+            ['features', 'Features (one per line)', 'list'], ['tags', 'Tags (one per line)', 'list'], ['whatsappMessage', 'WhatsApp message', 'textarea']
+          ]
+        },
+        categories: {
+          label: 'Categories Manager', title: 'Category Details', filename: 'categories.json',
+          defaults: () => ({ id: '', name: '', slug: '', description: '', status: 'active', image: '' }),
+          fields: [
+            ['id', 'ID / slug', 'text'], ['name', 'Name', 'text'], ['slug', 'URL slug', 'text'], ['status', 'Status', 'select:active,draft,inactive'],
+            ['image', 'Optional image path selector', 'image'], ['description', 'Long description editor', 'longtext']
+          ]
+        },
+        notifications: {
+          label: 'Notifications Manager', title: 'Notification Details', filename: 'notifications.json',
+          defaults: () => ({ id: '', title: '', scope: 'homepage', category: 'General Update', audience: 'All Users', deliveryMethod: 'Website Notification', priority: 'normal', status: 'active', message: '', image: 'assets/logo.png', ctaLabel: '', ctaUrl: '', startAt: '', endAt: '', showAsPopup: false, dismissible: true, createdAt: nowIso(), updatedAt: nowIso() }),
+          fields: [
+            ['id', 'ID / slug', 'text'], ['title', 'Title', 'text'], ['scope', 'Scope', 'select:homepage,popup,product,gallery,course,admin'], ['category', 'Category', 'text'],
+            ['audience', 'Audience', 'select:All Users,Customers Only,Students Only,Admins Only'], ['priority', 'Priority', 'select:normal,important,urgent'], ['status', 'Status', 'select:active,draft,inactive'],
+            ['image', 'Image path selector', 'image'], ['message', 'Long description editor', 'longtext'], ['ctaLabel', 'CTA label', 'text'], ['ctaUrl', 'CTA URL', 'url'],
+            ['startAt', 'Start date/time', 'text'], ['endAt', 'End date/time', 'text'], ['showAsPopup', 'Show as popup', 'checkbox'], ['dismissible', 'Dismissible', 'checkbox']
+          ]
+        },
+        settings: {
+          label: 'Settings Manager', title: 'Website Settings', filename: 'settings.json',
+          defaults: () => ({ siteName: '', tagline: '', description: '', logo: 'assets/logo.png', favicon: 'assets/logo.png', currency: 'INR', footerText: '', maintenanceMode: false, theme: { primaryColor: '#be6b72', secondaryColor: '#100d0b' }, contact: { phone: '', phoneHref: '', email: '', address: '', hours: '', whatsappNumber: '', whatsappUrl: '' }, homepageBanner: { eyebrow: '', title: '', description: '', image: 'assets/hero-bg.jpg', primaryButtonText: '', primaryButtonUrl: '', secondaryButtonText: '', secondaryButtonUrl: '', highlightLabel: '', highlightText: '' }, updatedAt: nowIso() }),
+          fields: [
+            ['siteName', 'Site name', 'text'], ['tagline', 'Tagline', 'text'], ['currency', 'Currency', 'text'], ['maintenanceMode', 'Maintenance mode', 'checkbox'],
+            ['logo', 'Logo image path selector', 'image'], ['favicon', 'Favicon image path selector', 'image'], ['description', 'Long description editor', 'longtext'], ['footerText', 'Footer text', 'text'],
+            ['theme.primaryColor', 'Primary color', 'color'], ['theme.secondaryColor', 'Secondary color', 'color'],
+            ['contact.phone', 'Contact phone', 'text'], ['contact.phoneHref', 'Phone href number', 'text'], ['contact.email', 'Email', 'email'], ['contact.address', 'Address', 'textarea'], ['contact.hours', 'Hours', 'text'], ['contact.whatsappUrl', 'WhatsApp URL', 'url'],
+            ['homepageBanner.eyebrow', 'Banner eyebrow', 'text'], ['homepageBanner.title', 'Banner title', 'text'], ['homepageBanner.image', 'Banner image path selector', 'image'], ['homepageBanner.description', 'Banner long description editor', 'longtext']
+          ]
+        }
+      };
+
+      let state = structuredClone(defaultState);
+      let currentSection = 'products';
+      let selectedIndex = 0;
+
+      const $ = selector => document.querySelector(selector);
+      const itemList = $('#itemList');
+      const form = $('#managerForm');
+      const preview = $('#previewCard');
+      const output = $('#jsonOutput');
+      const toast = $('#toast');
+      const imagePathOptions = $('#imagePathOptions');
+
+      const slugify = value => String(value || '')
+        .trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `item-${Date.now()}`;
+
+      const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+
+      const getPath = (object, path) => path.split('.').reduce((target, key) => target?.[key], object);
+      const setPath = (object, path, value) => {
+        const keys = path.split('.');
+        const last = keys.pop();
+        const target = keys.reduce((acc, key) => {
+          if (!acc[key] || typeof acc[key] !== 'object') acc[key] = {};
+          return acc[key];
+        }, object);
+        target[last] = value;
+      };
+
+      const getCollection = () => currentSection === 'settings' ? [state.settings] : state[currentSection];
+      const setCollection = value => {
+        if (currentSection === 'settings') state.settings = value && !Array.isArray(value) ? value : {};
+        else state[currentSection] = Array.isArray(value) ? value : [];
+      };
+
+      const selectedItem = () => getCollection()[selectedIndex] || sectionConfig[currentSection].defaults();
+
+      const showToast = message => {
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(() => toast.classList.remove('is-visible'), 2600);
+      };
+
+      const updateStatus = () => {
+        const counts = sections.map(section => `${section}: ${section === 'settings' ? '1 object' : `${state[section].length} items`}`).join(' · ');
+        $('#statusBox').textContent = `Draft ready. ${counts}. Export JSON files after editing.`;
+      };
+
+      const refreshImageOptions = () => {
+        const fromData = sections.flatMap(section => {
+          const data = section === 'settings' ? [state.settings] : state[section];
+          return JSON.stringify(data).match(/assets\/[A-Za-z0-9._/-]+/g) || [];
+        });
+        imagePathOptions.innerHTML = [...new Set([...assetPaths, ...fromData])].sort().map(path => `<option value="${escapeHtml(path)}"></option>`).join('');
+      };
+
+      const normalizeItem = item => {
+        const copy = structuredClone(item);
+        if (!copy.id && (copy.title || copy.name || copy.siteName)) copy.id = slugify(copy.title || copy.name || copy.siteName);
+        if (currentSection === 'products') {
+          copy.name = copy.name || copy.title;
+          copy.title = copy.title || copy.name;
+          copy.description = copy.shortDescription || copy.description || '';
+          copy.details = copy.longDescription || copy.details || '';
+          copy.images = copy.image ? [copy.image] : [];
+          copy.stock = Number(copy.stockQuantity || copy.stock || 0);
+          copy.updatedAt = nowIso();
+        }
+        if (currentSection === 'categories') copy.slug = copy.slug || slugify(copy.name || copy.id);
+        if (currentSection === 'notifications') copy.updatedAt = nowIso();
+        if (currentSection === 'settings') copy.updatedAt = nowIso();
+        return copy;
+      };
+
+      const parseValue = (element, type) => {
+        if (type === 'checkbox') return element.checked;
+        if (type === 'number') return Number(element.value || 0);
+        if (type === 'list') return element.value.split('\n').map(item => item.trim()).filter(Boolean);
+        return element.value.trim();
+      };
+
+      const fieldInput = ([path, label, type], item) => {
+        const id = `field-${path.replace(/\./g, '-')}`;
+        const value = getPath(item, path);
+        const full = ['textarea', 'longtext', 'list'].includes(type) || path.includes('description') || path.includes('message');
+        const fieldClass = full ? 'field field--full' : 'field';
+        if (type.startsWith('select:')) {
+          const options = type.replace('select:', '').split(',');
+          return `<div class="${fieldClass}"><label for="${id}">${label}</label><select id="${id}" name="${path}" data-type="select">${options.map(option => `<option value="${escapeHtml(option)}" ${option === value ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}</select></div>`;
+        }
+        if (type === 'checkbox') {
+          return `<div class="${fieldClass} checkbox-row"><input id="${id}" name="${path}" data-type="checkbox" type="checkbox" ${value ? 'checked' : ''}><label for="${id}">${label}</label></div>`;
+        }
+        if (type === 'textarea' || type === 'longtext' || type === 'list') {
+          const textValue = Array.isArray(value) ? value.join('\n') : (value || '');
+          return `<div class="${fieldClass}"><label for="${id}">${label}</label><textarea id="${id}" name="${path}" data-type="${type}" class="${type === 'longtext' ? 'long-editor' : ''}">${escapeHtml(textValue)}</textarea></div>`;
+        }
+        if (type === 'image') {
+          return `<div class="${fieldClass}"><label for="${id}">${label}</label><input id="${id}" name="${path}" data-type="image" type="text" list="imagePathOptions" value="${escapeHtml(value || '')}" placeholder="assets/design1.jpg"></div>`;
+        }
+        return `<div class="${fieldClass}"><label for="${id}">${label}</label><input id="${id}" name="${path}" data-type="${type}" type="${type}" value="${escapeHtml(value || '')}"></div>`;
+      };
+
+      const labelFor = item => item.title || item.name || item.siteName || item.id || 'Untitled item';
+      const imageFor = item => item.image || item.logo || getPath(item, 'homepageBanner.image') || 'assets/logo.png';
+      const descriptionFor = item => item.shortDescription || item.description || item.longDescription || item.message || item.tagline || '';
+
+      const renderList = () => {
+        const collection = getCollection();
+        itemList.innerHTML = collection.map((item, index) => `
+          <button class="item-button" type="button" data-index="${index}" aria-current="${index === selectedIndex}">
+            <img src="${escapeHtml(imageFor(item))}" alt="" onerror="this.src='assets/logo.png'">
+            <span><strong>${escapeHtml(labelFor(item))}</strong><span>${escapeHtml(item.category || item.scope || item.status || item.currency || 'Static item')}</span></span>
+          </button>
+        `).join('') || '<p class="help-text">No items yet. Use Add New Item to begin.</p>';
+      };
+
+      const renderForm = () => {
+        const config = sectionConfig[currentSection];
+        const item = selectedItem();
+        $('#listEyebrow').textContent = config.label;
+        $('#formEyebrow').textContent = currentSection === 'settings' ? 'Edit item form' : (getCollection()[selectedIndex] ? 'Edit item form' : 'Add item form');
+        $('#formTitle').textContent = config.title;
+        form.innerHTML = config.fields.map(field => fieldInput(field, item)).join('') + `
+          <div class="field field--full form-actions">
+            <button class="action-button" type="submit">Save Item</button>
+            <button class="ghost-button" type="button" id="duplicateButton">Duplicate Item</button>
+            <button class="danger-button" type="button" id="deleteButton">Delete Item</button>
+          </div>`;
+        $('#deleteButton').disabled = currentSection === 'settings';
+        $('#duplicateButton').disabled = currentSection === 'settings';
+      };
+
+      const renderPreview = () => {
+        const item = selectedItem();
+        const tags = [item.category, item.status, item.priority, item.currency, ...(Array.isArray(item.tags) ? item.tags.slice(0, 3) : [])].filter(Boolean);
+        preview.innerHTML = `
+          <div class="preview-card">
+            <img src="${escapeHtml(imageFor(item))}" alt="" onerror="this.src='assets/logo.png'">
+            <div class="preview-card__content">
+              <h3>${escapeHtml(labelFor(item))}</h3>
+              <p>${escapeHtml(descriptionFor(item) || 'Add a description to preview customer-facing content.')}</p>
+              ${item.price ? `<p><strong>${escapeHtml(state.settings.currency || 'INR')} ${escapeHtml(item.discountPrice || item.price)}</strong></p>` : ''}
+              <div class="chips">${tags.map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div>
+            </div>
+          </div>`;
+      };
+
+      const updateJsonOutput = () => {
+        const data = currentSection === 'settings' ? state.settings : state[currentSection];
+        output.value = JSON.stringify(data, null, 2);
+      };
+
+      const render = () => {
+        refreshImageOptions();
+        renderList();
+        renderForm();
+        renderPreview();
+        updateJsonOutput();
+        updateStatus();
+      };
+
+      const readForm = () => {
+        const base = structuredClone(selectedItem());
+        sectionConfig[currentSection].fields.forEach(([path, , type]) => {
+          const element = form.elements[path];
+          if (!element) return;
+          setPath(base, path, parseValue(element, type));
+        });
+        return normalizeItem(base);
+      };
+
+      const saveCurrentForm = () => {
+        const item = readForm();
+        if (currentSection === 'settings') state.settings = item;
+        else {
+          const collection = state[currentSection];
+          if (selectedIndex >= 0 && collection[selectedIndex]) collection[selectedIndex] = item;
+          else {
+            collection.push(item);
+            selectedIndex = collection.length - 1;
+          }
+        }
+        persistDraft(false);
+        render();
+        showToast('Item saved and JSON regenerated.');
+      };
+
+      const persistDraft = notify => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (notify) showToast('Draft saved in this browser.');
+      };
+
+      const switchSection = section => {
+        currentSection = section;
+        selectedIndex = 0;
+        document.querySelectorAll('.tab-button').forEach(button => button.setAttribute('aria-selected', String(button.dataset.section === section)));
+        render();
+      };
+
+      const loadWebsiteJson = async () => {
+        const loaded = structuredClone(defaultState);
+        await Promise.all(sections.map(async section => {
+          try {
+            const response = await fetch(dataFiles[section], { cache: 'no-store' });
+            if (response.ok) loaded[section] = await response.json();
+          } catch (error) {
+            console.warn(`Could not load ${dataFiles[section]}`, error);
+          }
+        }));
+        state = loaded;
+        persistDraft(false);
+        selectedIndex = 0;
+        render();
+        showToast('Website JSON loaded.');
+      };
+
+      const loadInitialData = async () => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            state = { ...structuredClone(defaultState), ...JSON.parse(saved) };
+            render();
+            showToast('Browser draft restored.');
+            return;
+          } catch (error) {
+            console.warn('Draft was not readable.', error);
+          }
+        }
+        await loadWebsiteJson();
+      };
+
+      const downloadFile = (filename, content) => {
+        const blob = new Blob([content], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      };
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        saveCurrentForm();
+      });
+
+      form.addEventListener('input', () => {
+        const item = readForm();
+        if (currentSection === 'settings') state.settings = item;
+        else if (state[currentSection][selectedIndex]) state[currentSection][selectedIndex] = item;
+        renderPreview();
+        updateJsonOutput();
+      });
+
+      itemList.addEventListener('click', event => {
+        const button = event.target.closest('.item-button');
+        if (!button) return;
+        selectedIndex = Number(button.dataset.index);
+        render();
+      });
+
+      document.querySelectorAll('.tab-button').forEach(button => button.addEventListener('click', () => switchSection(button.dataset.section)));
+
+      $('#newItemButton').addEventListener('click', () => {
+        if (currentSection === 'settings') {
+          selectedIndex = 0;
+        } else {
+          const collection = state[currentSection];
+          const item = sectionConfig[currentSection].defaults();
+          item.id = slugify(`${currentSection}-${collection.length + 1}`);
+          if (item.title !== undefined) item.title = `New ${currentSection.slice(0, -1)} ${collection.length + 1}`;
+          if (item.name !== undefined) item.name = item.title || `New ${currentSection.slice(0, -1)} ${collection.length + 1}`;
+          collection.push(item);
+          selectedIndex = collection.length - 1;
+        }
+        render();
+        showToast('New item ready. Fill the form and save.');
+      });
+
+      document.addEventListener('click', event => {
+        if (event.target.id === 'deleteButton') {
+          if (currentSection === 'settings') return;
+          state[currentSection].splice(selectedIndex, 1);
+          selectedIndex = Math.max(0, selectedIndex - 1);
+          persistDraft(false);
+          render();
+          showToast('Item deleted and JSON regenerated.');
+        }
+        if (event.target.id === 'duplicateButton') {
+          if (currentSection === 'settings') return;
+          const copy = structuredClone(selectedItem());
+          copy.id = slugify(`${copy.id || labelFor(copy)} copy`);
+          if (copy.title) copy.title = `${copy.title} Copy`;
+          if (copy.name) copy.name = `${copy.name} Copy`;
+          state[currentSection].push(normalizeItem(copy));
+          selectedIndex = state[currentSection].length - 1;
+          persistDraft(false);
+          render();
+          showToast('Item duplicated.');
+        }
+      });
+
+      $('#saveDraftButton').addEventListener('click', () => persistDraft(true));
+      $('#resetDraftButton').addEventListener('click', loadWebsiteJson);
+      $('#copyJsonButton').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(output.value);
+        showToast('JSON copied.');
+      });
+      $('#exportSectionButton').addEventListener('click', () => downloadFile(sectionConfig[currentSection].filename, output.value));
+      $('#exportAllButton').addEventListener('click', () => downloadFile('rd-advance-boutique-content.json', JSON.stringify(state, null, 2)));
+      $('#applyJsonButton').addEventListener('click', () => {
+        try {
+          const parsed = JSON.parse(output.value);
+          setCollection(parsed);
+          selectedIndex = 0;
+          persistDraft(false);
+          render();
+          showToast('JSON text applied.');
+        } catch (error) {
+          showToast('JSON is invalid. Please check commas and brackets.');
+        }
+      });
+
+      $('#importFile').addEventListener('change', event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            const fileSection = sections.find(section => file.name.toLowerCase() === `${section}.json`);
+            if (parsed.products || parsed.gallery || parsed.settings) {
+              state = { ...structuredClone(defaultState), ...parsed };
+            } else if (fileSection) {
+              if (fileSection === 'settings') state.settings = Array.isArray(parsed) ? parsed[0] || {} : parsed;
+              else state[fileSection] = Array.isArray(parsed) ? parsed : [];
+              currentSection = fileSection;
+              document.querySelectorAll('.tab-button').forEach(button => button.setAttribute('aria-selected', String(button.dataset.section === currentSection)));
+            } else {
+              setCollection(parsed);
+            }
+            selectedIndex = 0;
+            persistDraft(false);
+            render();
+            showToast(`${file.name} imported.`);
+          } catch (error) {
+            showToast('Import failed: invalid JSON file.');
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      loadInitialData();
+    })();
+  </script>
+</body>
+</html>
