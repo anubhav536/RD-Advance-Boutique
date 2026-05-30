@@ -417,6 +417,10 @@
     document.getElementById("productLongDescription").textContent = product.longDescription || product.details || product.shortDescription || product.description || "Premium boutique fashion with personalized RD Advance Boutique guidance.";
     renderList(document.getElementById("productSizes"), product.sizes || ["Custom measurements"], "detail-chip");
     renderList(document.getElementById("productColors"), product.colors || ["As per fabric"], "detail-chip detail-chip--soft");
+    const buyNowBtn = document.getElementById("productBuyNow");
+    if (buyNowBtn) {
+      buyNowBtn.href = getCurrentPageUrlForPath("checkout.html", { id: product.id || normalize(title) });
+    }
     const orderButton = document.getElementById("productWhatsapp");
     orderButton.href = getWhatsappUrl(createProductOrderMessage(product));
     const shareButton = document.getElementById("productShare");
