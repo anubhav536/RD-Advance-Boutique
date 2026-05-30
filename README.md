@@ -44,7 +44,7 @@ Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: 
 
 Change both the password hash, `sessionSecret`, and `ADMIN_SHORTCUT_PATH` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
 
-Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Email reset links have been removed; the page now loads the admin user's security question and allows a new password only after the security answer is verified. Existing legacy users without a saved security answer can use the registered admin email as the initial answer, then update credentials from the admin settings page.
+Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Email reset links have been removed; the page now loads the admin user's security question and allows a new password only after the configured security answer is verified. Accounts without a saved security answer cannot use password reset until an authenticated admin sets one from the admin settings page.
 
 Admin auth endpoints:
 
