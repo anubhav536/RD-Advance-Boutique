@@ -479,6 +479,18 @@
       }
 
       const price = Number(product.discountPrice || product.price || 0);
+      const wantsUpi = window.confirm("Choose OK for manual UPI, or Cancel for Cash on Delivery / pay at boutique.");
+      const upiTransactionId = wantsUpi ? window.prompt("Enter UPI transaction ID (leave blank to submit later):", "") : "";
+      const paymentProofPath = wantsUpi && upiTransactionId ? window.prompt("Enter payment proof path/reference (optional):", "") : "";
+      const payment = wantsUpi
+        ? {
+          method: "manual-upi",
+          status: upiTransactionId && paymentProofPath ? "pending-verification" : "not-submitted",
+          amount: price * quantity,
+          upiTransactionId,
+          proofPath: paymentProofPath
+        }
+        : { method: "cod", status: "not-submitted", amount: price * quantity };
       const order = await request("/api/v1/orders/ready-made", {
         method: "POST",
         body: JSON.stringify({
@@ -487,10 +499,10 @@
           productName: product.title || product.name,
           items: [{ productId: product.id, name: product.title || product.name, quantity, price }],
           totalAmount: price * quantity,
-          payment: { method: "manual-upi", status: "not-submitted", amount: price * quantity }
+          payment
         })
       });
-      alert(`Order saved! Your order ID is ${order.orderNumber || order.id}. Please share UPI payment proof with the boutique team.`);
+      alert(`Order saved! Your order ID is ${order.orderNumber || order.id}. Payment method: ${wantsUpi ? "Manual UPI" : "COD / Pay at boutique"}.`);
       products = await request("/api/v1/products?type=ready-made");
       renderProducts();
     };
@@ -546,37 +558,14 @@
       return;
     }
 
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      resolve({
-        fileName: file.name,
-        fileType: file.type || "application/octet-stream",
-        fileSize: file.size,
-        dataUrl: reader.result
-      });
+    const safeName = file.name.replace(/[^a-z0-9._-]/gi, "-");
+    resolve({
+      fileName: safeName,
+      fileType: file.type || "application/octet-stream",
+      fileSize: file.size,
+      path: `customer-uploads/${safeName}`
     });
-    reader.addEventListener("error", () => reject(new Error(`Unable to read the ${label.toLowerCase()} file.`)));
-    reader.readAsDataURL(file);
   });
-
-  const formatStatus = status => String(status || "pending")
-    .split("-")
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-
-  const escapeHtml = value => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-
-  const formatTimelineDate = value => {
-    if (!value) return "";
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return "";
-    return parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-  };
 
   const getPublicOrderTrackingUrl = orderId => `/api/v1/orders/public/track/${encodeURIComponent(orderId)}`;
 
@@ -644,7 +633,7 @@
           const paymentScreenshot = await readUploadFile(formData.get("payment_screenshot"), {
             label: "Payment screenshot",
             maxFileSize: 2 * 1024 * 1024,
-            required: true
+            required: false
           });
           const payload = {
             orderType: "custom-stitching",
@@ -683,6 +672,7 @@
               status: "pending-verification",
               upiTransactionId: formData.get("upi_transaction_id"),
               amount: formData.get("payment_amount"),
+              proofPath: formData.get("payment_proof_path") || paymentScreenshot.path || "",
               screenshot: paymentScreenshot
             },
             notes: formData.get("design_instructions")

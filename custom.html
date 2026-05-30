@@ -217,18 +217,22 @@
             <div class="form-grid form-grid--two">
               <label class="field">
                 <span>UPI Transaction ID</span>
-                <input type="text" name="upi_transaction_id" placeholder="Example: 412345678901" required>
+                <input type="text" name="upi_transaction_id" placeholder="Example: 412345678901">
               </label>
               <label class="field">
                 <span>Payment Amount (₹)</span>
                 <input type="number" name="payment_amount" min="0" step="1" placeholder="Amount paid">
               </label>
+              <label class="field">
+                <span>Payment Proof Path / Note</span>
+                <input type="text" name="payment_proof_path" placeholder="Example: UPI app ref note or local receipt path">
+              </label>
             </div>
             <label class="upload-box">
-              <input type="file" name="payment_screenshot" accept="image/*" required>
+              <input type="file" name="payment_screenshot" accept="image/*">
               <span class="upload-icon">₹</span>
               <strong>Upload UPI payment screenshot</strong>
-              <small>Admin will approve or reject payment after matching this screenshot with your UPI transaction ID.</small>
+              <small>Optional: share a screenshot filename/reference. The website stores only the local reference path, not the binary file.</small>
             </label>
           </fieldset>
 
