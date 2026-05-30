@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders Manager | RD Advance Boutique</title>
+  <title>Admin Panel | RD Advance Boutique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/manage.css">
+  <link rel="icon" type="image/png" href="assets/logo.png">
 </head>
 <body class="manage-page">
 
-  <!-- ─── LOGIN SCREEN ─── -->
+  <!-- ─── LOGIN ─── -->
   <div class="mg-login-screen" id="mgLoginScreen">
     <div class="mg-login-card">
       <img src="assets/logo.png" alt="Logo" class="mg-login-logo">
-      <h1 class="mg-login-title">Orders Manager</h1>
+      <h1 class="mg-login-title">Admin Panel</h1>
       <p class="mg-login-sub">RD Advance Boutique</p>
       <form class="mg-login-form" id="mgLoginForm" novalidate>
         <label for="mgPin">Manager PIN</label>
@@ -27,164 +27,264 @@
     </div>
   </div>
 
-  <!-- ─── MANAGER APP (shown after login) ─── -->
-  <div class="mg-app" id="mgApp" hidden>
+  <!-- ─── ADMIN APP ─── -->
+  <div class="adm-app" id="mgApp" hidden>
 
-    <header class="mg-header">
-      <div class="mg-header-brand">
-        <img src="assets/logo.png" alt="Logo" class="mg-header-logo">
+    <!-- SIDEBAR -->
+    <aside class="adm-sidebar" id="admSidebar">
+      <div class="adm-sidebar-brand">
+        <img src="assets/logo.png" alt="Logo">
         <div>
-          <strong>RD Advance Boutique</strong>
-          <span>Orders Manager</span>
+          <strong>RD Advance</strong>
+          <span>Admin Panel</span>
         </div>
       </div>
-      <div class="mg-header-actions">
-        <button class="mg-refresh-btn" id="mgRefreshBtn">↻ Refresh</button>
-        <a href="index.html" class="mg-home-link">← Site</a>
-      </div>
-    </header>
 
-    <!-- Setup warning -->
-    <div class="mg-setup-banner" id="mgSetupBanner" hidden>
-      <strong>⚙️ Setup Required:</strong> Google Apps Script URL is not configured.
-      <button class="mg-setup-banner-btn" id="mgSetupBannerBtn">View Setup Guide →</button>
+      <nav class="adm-nav">
+        <button class="adm-nav-item active" data-section="dashboard">
+          <span class="adm-nav-icon">📊</span><span>Dashboard</span>
+        </button>
+        <button class="adm-nav-item" data-section="orders">
+          <span class="adm-nav-icon">📦</span><span>Orders</span>
+          <span class="adm-nav-badge" id="navOrderBadge" hidden></span>
+        </button>
+        <button class="adm-nav-item" data-section="products">
+          <span class="adm-nav-icon">🛍️</span><span>Products</span>
+        </button>
+        <button class="adm-nav-item" data-section="categories">
+          <span class="adm-nav-icon">📁</span><span>Categories</span>
+        </button>
+        <button class="adm-nav-item" data-section="gallery">
+          <span class="adm-nav-icon">🖼️</span><span>Gallery</span>
+        </button>
+        <button class="adm-nav-item" data-section="notifications">
+          <span class="adm-nav-icon">🔔</span><span>Notifications</span>
+        </button>
+        <button class="adm-nav-item" data-section="website">
+          <span class="adm-nav-icon">🌐</span><span>Website</span>
+        </button>
+        <button class="adm-nav-item" data-section="theme">
+          <span class="adm-nav-icon">🎨</span><span>Theme &amp; SEO</span>
+        </button>
+        <button class="adm-nav-item" data-section="config">
+          <span class="adm-nav-icon">⚙️</span><span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="adm-sidebar-footer">
+        <a href="index.html" class="adm-site-link" target="_blank">← View Site</a>
+        <button class="adm-logout-btn" id="admLogout">Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="adm-main">
+
+      <!-- Mobile topbar -->
+      <div class="adm-topbar">
+        <button class="adm-menu-toggle" id="admMenuToggle">☰</button>
+        <span class="adm-topbar-title" id="admCurrentSection">Dashboard</span>
+        <a href="index.html" class="adm-topbar-site" target="_blank">← Site</a>
+      </div>
+
+      <main class="adm-content">
+
+        <!-- ── DASHBOARD ── -->
+        <div class="adm-section" id="section-dashboard">
+          <div class="adm-page-header">
+            <h1>Dashboard</h1>
+            <p>Your boutique at a glance</p>
+          </div>
+          <div class="adm-dash-grid">
+            <div class="adm-dash-card adm-dash-card--orders" data-goto="orders">
+              <div class="adm-dash-icon">📦</div>
+              <div class="adm-dash-num" id="dashOrders">—</div>
+              <div class="adm-dash-label">Total Orders</div>
+            </div>
+            <div class="adm-dash-card adm-dash-card--pending" data-goto="orders">
+              <div class="adm-dash-icon">⏳</div>
+              <div class="adm-dash-num" id="dashPending">—</div>
+              <div class="adm-dash-label">Pending (UPI)</div>
+            </div>
+            <div class="adm-dash-card" data-goto="products">
+              <div class="adm-dash-icon">🛍️</div>
+              <div class="adm-dash-num" id="dashProducts">—</div>
+              <div class="adm-dash-label">Products</div>
+            </div>
+            <div class="adm-dash-card" data-goto="categories">
+              <div class="adm-dash-icon">📁</div>
+              <div class="adm-dash-num" id="dashCategories">—</div>
+              <div class="adm-dash-label">Categories</div>
+            </div>
+            <div class="adm-dash-card" data-goto="gallery">
+              <div class="adm-dash-icon">🖼️</div>
+              <div class="adm-dash-num" id="dashGallery">—</div>
+              <div class="adm-dash-label">Gallery Items</div>
+            </div>
+            <div class="adm-dash-card" data-goto="notifications">
+              <div class="adm-dash-icon">🔔</div>
+              <div class="adm-dash-num" id="dashNotifications">—</div>
+              <div class="adm-dash-label">Notifications</div>
+            </div>
+          </div>
+          <div class="adm-dash-info">
+            <div class="adm-info-box">
+              <h3>📋 How the admin panel works</h3>
+              <p>This panel controls your entire website. Make changes in any section, then click <strong>"Generate Code"</strong> to get the updated file content. Copy it and paste it into the matching file in your GitHub repository — changes go live automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ORDERS ── -->
+        <div class="adm-section" id="section-orders" hidden>
+          <div class="adm-page-header">
+            <h1>Orders</h1>
+            <p>All orders received via WhatsApp checkout</p>
+          </div>
+          <div class="mg-stats-bar">
+            <div class="mg-stat" data-filter="all"><span class="mg-stat-num" id="statAll">—</span><span class="mg-stat-label">Total</span></div>
+            <div class="mg-stat mg-stat--warn" data-filter="Pending Verification"><span class="mg-stat-num" id="statPending">—</span><span class="mg-stat-label">Pending</span></div>
+            <div class="mg-stat mg-stat--teal" data-filter="Confirmed – COD"><span class="mg-stat-num" id="statCod">—</span><span class="mg-stat-label">COD</span></div>
+            <div class="mg-stat mg-stat--blue" data-filter="Verified"><span class="mg-stat-num" id="statVerified">—</span><span class="mg-stat-label">Verified</span></div>
+            <div class="mg-stat mg-stat--green" data-filter="Completed"><span class="mg-stat-num" id="statCompleted">—</span><span class="mg-stat-label">Completed</span></div>
+            <div class="mg-stat mg-stat--red" data-filter="Cancelled"><span class="mg-stat-num" id="statCancelled">—</span><span class="mg-stat-label">Cancelled</span></div>
+          </div>
+          <div class="mg-tabs" id="mgTabs">
+            <button class="mg-tab active" data-filter="all">All</button>
+            <button class="mg-tab mg-tab--warn" data-filter="Pending Verification">⏳ Pending</button>
+            <button class="mg-tab mg-tab--teal" data-filter="Confirmed – COD">🏠 COD</button>
+            <button class="mg-tab mg-tab--blue" data-filter="Verified">✅ Verified</button>
+            <button class="mg-tab mg-tab--green" data-filter="Completed">📦 Completed</button>
+            <button class="mg-tab mg-tab--red" data-filter="Cancelled">❌ Cancelled</button>
+            <button class="mg-tab mg-tab--red" data-filter="Rejected">🚫 Rejected</button>
+          </div>
+          <div class="adm-orders-toolbar">
+            <button class="adm-btn-secondary" id="mgRefreshBtn">↻ Refresh Orders</button>
+          </div>
+          <div class="mg-loading-state" id="mgLoadingState"><div class="mg-spinner"></div><span>Loading orders…</span></div>
+          <div class="mg-empty-state" id="mgEmptyState" hidden><span class="mg-empty-icon">📭</span><p>No orders in this category yet.</p></div>
+          <div class="mg-error-state" id="mgErrorState" hidden><span>⚠️</span><p id="mgErrorMsg">Could not load orders.</p><button class="btn btn--ghost" id="mgRetryBtn">Retry</button></div>
+          <div class="mg-orders-list" id="mgOrdersList"></div>
+        </div>
+
+        <!-- ── PRODUCTS ── -->
+        <div class="adm-section" id="section-products" hidden>
+          <div class="adm-page-header">
+            <h1>Products</h1>
+            <p>Add, edit or remove products shown in your shop</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnAddProduct">+ Add Product</button>
+            <button class="adm-btn-code" id="btnGenProducts">📋 Generate Code</button>
+          </div>
+          <div id="admProductsList"></div>
+        </div>
+
+        <!-- ── CATEGORIES ── -->
+        <div class="adm-section" id="section-categories" hidden>
+          <div class="adm-page-header">
+            <h1>Categories</h1>
+            <p>Manage product categories used across the shop</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnAddCategory">+ Add Category</button>
+            <button class="adm-btn-code" id="btnGenCategories">📋 Generate Code</button>
+          </div>
+          <div id="admCategoriesList"></div>
+        </div>
+
+        <!-- ── GALLERY ── -->
+        <div class="adm-section" id="section-gallery" hidden>
+          <div class="adm-page-header">
+            <h1>Gallery</h1>
+            <p>Manage design portfolio and inspiration images</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnAddGallery">+ Add Item</button>
+            <button class="adm-btn-code" id="btnGenGallery">📋 Generate Code</button>
+          </div>
+          <div id="admGalleryList"></div>
+        </div>
+
+        <!-- ── NOTIFICATIONS ── -->
+        <div class="adm-section" id="section-notifications" hidden>
+          <div class="adm-page-header">
+            <h1>Notifications</h1>
+            <p>Manage banners and popups shown across the website</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnAddNotification">+ Add Notification</button>
+            <button class="adm-btn-code" id="btnGenNotifications">📋 Generate Code</button>
+          </div>
+          <div id="admNotificationsList"></div>
+        </div>
+
+        <!-- ── WEBSITE SETTINGS ── -->
+        <div class="adm-section" id="section-website" hidden>
+          <div class="adm-page-header">
+            <h1>Website Settings</h1>
+            <p>Control store info, contact details, payment, homepage banner, and social links</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnSaveWebsite">💾 Save Changes</button>
+            <button class="adm-btn-code" id="btnGenSettings">📋 Generate Code</button>
+          </div>
+          <form id="admWebsiteForm" class="adm-settings-form" novalidate></form>
+        </div>
+
+        <!-- ── THEME & SEO ── -->
+        <div class="adm-section" id="section-theme" hidden>
+          <div class="adm-page-header">
+            <h1>Theme &amp; SEO</h1>
+            <p>Customize brand colors and search engine settings</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnSaveTheme">💾 Save Changes</button>
+            <button class="adm-btn-code" id="btnGenTheme">📋 Generate Code</button>
+          </div>
+          <form id="admThemeForm" class="adm-settings-form" novalidate></form>
+        </div>
+
+        <!-- ── CONFIG / SETTINGS ── -->
+        <div class="adm-section" id="section-config" hidden>
+          <div class="adm-page-header">
+            <h1>Settings</h1>
+            <p>Admin PIN and general configuration</p>
+          </div>
+          <div class="adm-section-toolbar">
+            <button class="adm-btn-primary" id="btnSaveConfig">💾 Save Changes</button>
+            <button class="adm-btn-code" id="btnGenConfig">📋 Generate Code</button>
+          </div>
+          <form id="admConfigForm" class="adm-settings-form" novalidate></form>
+        </div>
+
+      </main>
     </div>
-
-    <!-- Stats bar -->
-    <div class="mg-stats-bar">
-      <div class="mg-stat" data-filter="all">
-        <span class="mg-stat-num" id="statAll">—</span>
-        <span class="mg-stat-label">Total</span>
-      </div>
-      <div class="mg-stat mg-stat--warn" data-filter="Pending Verification">
-        <span class="mg-stat-num" id="statPending">—</span>
-        <span class="mg-stat-label">Pending</span>
-      </div>
-      <div class="mg-stat mg-stat--teal" data-filter="Confirmed – COD">
-        <span class="mg-stat-num" id="statCod">—</span>
-        <span class="mg-stat-label">COD</span>
-      </div>
-      <div class="mg-stat mg-stat--blue" data-filter="Verified">
-        <span class="mg-stat-num" id="statVerified">—</span>
-        <span class="mg-stat-label">Verified</span>
-      </div>
-      <div class="mg-stat mg-stat--green" data-filter="Completed">
-        <span class="mg-stat-num" id="statCompleted">—</span>
-        <span class="mg-stat-label">Completed</span>
-      </div>
-      <div class="mg-stat mg-stat--red" data-filter="Cancelled">
-        <span class="mg-stat-num" id="statCancelled">—</span>
-        <span class="mg-stat-label">Cancelled</span>
-      </div>
-    </div>
-
-    <!-- Filter tabs -->
-    <div class="mg-tabs" id="mgTabs">
-      <button class="mg-tab active"          data-filter="all">All</button>
-      <button class="mg-tab mg-tab--warn"    data-filter="Pending Verification">⏳ Pending</button>
-      <button class="mg-tab mg-tab--teal"    data-filter="Confirmed – COD">🏠 COD</button>
-      <button class="mg-tab mg-tab--blue"    data-filter="Verified">✅ Verified</button>
-      <button class="mg-tab mg-tab--green"   data-filter="Completed">📦 Completed</button>
-      <button class="mg-tab mg-tab--red"     data-filter="Cancelled">❌ Cancelled</button>
-      <button class="mg-tab mg-tab--red"     data-filter="Rejected">🚫 Rejected</button>
-    </div>
-
-    <!-- Orders list -->
-    <div class="mg-orders-wrap">
-      <div class="mg-loading-state" id="mgLoadingState">
-        <div class="mg-spinner"></div>
-        <span>Loading orders…</span>
-      </div>
-      <div class="mg-empty-state" id="mgEmptyState" hidden>
-        <span class="mg-empty-icon">📭</span>
-        <p>No orders in this category yet.</p>
-      </div>
-      <div class="mg-error-state" id="mgErrorState" hidden>
-        <span>⚠️</span>
-        <p id="mgErrorMsg">Could not load orders.</p>
-        <button class="btn btn--ghost" id="mgRetryBtn">Retry</button>
-      </div>
-      <div class="mg-orders-list" id="mgOrdersList"></div>
-    </div>
-
   </div>
 
-  <!-- ─── SETUP MODAL ─── -->
-  <div class="mg-modal-overlay" id="mgSetupModal" hidden>
-    <div class="mg-modal">
-      <div class="mg-modal-header">
-        <h2>⚙️ Google Sheets Setup Guide</h2>
-        <button class="mg-modal-close" id="mgSetupClose">✕</button>
+  <!-- ── EDIT / ADD MODAL ── -->
+  <div class="adm-modal-overlay" id="admEditModal" hidden>
+    <div class="adm-modal-box">
+      <div class="adm-modal-hd">
+        <h2 id="admModalTitle">Add Item</h2>
+        <button class="adm-modal-x" id="admModalClose">✕</button>
       </div>
-      <div class="mg-modal-body">
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">1</span>
-          <div>
-            <strong>Create a Google Sheet</strong>
-            <p>Go to <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> → New Sheet → name it <em>RD Boutique Orders</em></p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">2</span>
-          <div>
-            <strong>Open Apps Script Editor</strong>
-            <p>In the sheet menu: <strong>Extensions → Apps Script</strong> → Delete the default code</p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">3</span>
-          <div>
-            <strong>Paste the Script</strong>
-            <p>Copy the entire file <code>apps-script/Code.gs</code> from your project → Paste it into Apps Script</p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">4</span>
-          <div>
-            <strong>Fill in CONFIG at the top</strong>
-            <p>Edit these values in <code>Code.gs</code>:<br>
-            • <code>SHEET_ID</code> — from your sheet URL: <code>/d/<strong>THIS_PART</strong>/edit</code><br>
-            • <code>OWNER_EMAIL</code> — your email for notifications<br>
-            • <code>MANAGER_PIN</code> — same as in <code>data/config.json</code></p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">5</span>
-          <div>
-            <strong>Deploy as Web App</strong>
-            <p><strong>Deploy → New Deployment → Web App</strong><br>
-            Execute as: <strong>Me</strong><br>
-            Who has access: <strong>Anyone</strong><br>
-            → Click Deploy → Authorize → Copy the URL</p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">6</span>
-          <div>
-            <strong>Paste URL into config.json</strong>
-            <p>Open <code>data/config.json</code> → set <code>appsScriptUrl</code> to the URL ending in <code>/exec</code></p>
-          </div>
-        </div>
-
-        <div class="mg-setup-step">
-          <span class="mg-setup-num">7</span>
-          <div>
-            <strong>Set Manager PIN</strong>
-            <p>In <code>data/config.json</code> set <code>managerPin</code> to your PIN.<br>
-            Also update <code>MANAGER_PIN</code> inside <code>Code.gs</code> to match.</p>
-          </div>
-        </div>
-
-        <div class="mg-setup-tip">
-          ✅ After saving <code>config.json</code> and pushing to GitHub, refresh this page — orders will load automatically.
-        </div>
+      <div class="adm-modal-bd" id="admModalBody"></div>
+      <div class="adm-modal-ft">
+        <button class="adm-btn-primary" id="admModalSave">Save</button>
+        <button class="adm-btn-ghost" id="admModalCancel">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── CODE OUTPUT MODAL ── -->
+  <div class="adm-modal-overlay" id="admCodeModal" hidden>
+    <div class="adm-modal-box adm-modal-box--code">
+      <div class="adm-modal-hd">
+        <h2>📋 Generated Code</h2>
+        <button class="adm-modal-x" id="admCodeClose">✕</button>
+      </div>
+      <div class="adm-modal-bd" id="admCodeBody"></div>
     </div>
   </div>
 
