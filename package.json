@@ -4,6 +4,7 @@
   "description": "GitHub Pages compatible static website for RD Advance Boutique.",
   "main": "index.html",
   "scripts": {
+    "start": "serve . -l 5000",
     "check": "find . -path './node_modules' -prune -o -path './.git' -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check"
   },
   "keywords": [
@@ -15,5 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
 }
