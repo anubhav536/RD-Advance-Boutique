@@ -241,6 +241,8 @@
 
               <input
                 type="text"
+                name="name"
+                id="categoryName"
                 placeholder="Enter category name"
                 required
               >
@@ -265,6 +267,8 @@
 
               <input
                 type="text"
+                name="slug"
+                id="categorySlug"
                 placeholder="designer-blouse"
               >
 
@@ -288,6 +292,8 @@
 
               <textarea
                 rows="5"
+                name="description"
+                id="categoryDescription"
                 placeholder="Write category description"
               ></textarea>
 
@@ -360,9 +366,9 @@
 
 
 
-              <select>
+              <select name="featured" id="categoryFeatured">
 
-                <option>
+                <option value="false">
 
                   No
 
@@ -370,7 +376,7 @@
 
 
 
-                <option>
+                <option value="true">
 
                   Yes
 
@@ -396,9 +402,9 @@
 
 
 
-              <select>
+              <select name="status" id="categoryStatus">
 
-                <option>
+                <option value="active">
 
                   Active
 
@@ -406,7 +412,7 @@
 
 
 
-                <option>
+                <option value="hidden">
 
                   Hidden
 
@@ -565,153 +571,7 @@
   <!-- SCRIPT -->
   <!-- ========================= -->
 
-  <script>
-
-    // IMAGE PREVIEW
-
-    const imageInput = document.getElementById(
-
-      "categoryImage"
-
-    );
-
-
-
-
-
-    const previewContainer = document.getElementById(
-
-      "imagePreviewContainer"
-
-    );
-
-
-
-
-
-    imageInput.addEventListener("change", function(){
-
-      previewContainer.innerHTML = "";
-
-
-
-
-
-      const file = this.files[0];
-
-
-
-
-
-      if(file){
-
-        const reader = new FileReader();
-
-
-
-
-
-        reader.onload = function(e){
-
-          const imageBox = document.createElement(
-
-            "div"
-
-          );
-
-
-
-
-
-          imageBox.classList.add(
-
-            "preview-image-box"
-
-          );
-
-
-
-
-
-          imageBox.innerHTML = `
-
-            <img src="${e.target.result}" alt="Preview">
-
-          `;
-
-
-
-
-
-          previewContainer.appendChild(
-
-            imageBox
-
-          );
-
-        };
-
-
-
-
-
-        reader.readAsDataURL(file);
-
-      }
-
-    });
-
-
-
-
-
-    // FORM SUBMIT
-
-    const categoryForm = document.getElementById(
-
-      "categoryForm"
-
-    );
-
-
-
-
-
-    categoryForm.addEventListener("submit", function(e){
-
-      e.preventDefault();
-
-
-
-
-
-      alert(
-
-        "Category Created Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Save category in database
-
-    });
-
-
-
-
-
-    console.log(
-
-      "Add Category Panel Loaded ✨"
-
-    );
-
-  </script>
-
+  <script src="js/admin-categories.js"></script>
   <script src="js/admin-auth.js"></script>
 </body>
 </html>

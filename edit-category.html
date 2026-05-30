@@ -262,7 +262,7 @@
 
 
 
-          <div class="overview-content">
+          <div class="overview-content" id="editCategoryList">
 
 
 
@@ -453,7 +453,10 @@
 
               <input
                 type="text"
+                name="name"
+                id="editCategoryName"
                 placeholder="Update category name"
+                required
               >
 
             </div>
@@ -476,6 +479,8 @@
 
               <input
                 type="text"
+                name="slug"
+                id="editCategorySlug"
                 placeholder="update-category-slug"
               >
 
@@ -499,6 +504,8 @@
 
               <textarea
                 rows="5"
+                name="description"
+                id="editCategoryDescription"
                 placeholder="Update category description"
               ></textarea>
 
@@ -571,9 +578,9 @@
 
 
 
-              <select>
+              <select name="featured" id="editCategoryFeatured">
 
-                <option>
+                <option value="false">
 
                   No
 
@@ -581,7 +588,7 @@
 
 
 
-                <option>
+                <option value="true">
 
                   Yes
 
@@ -607,9 +614,9 @@
 
 
 
-              <select>
+              <select name="status" id="editCategoryStatus">
 
-                <option>
+                <option value="active">
 
                   Active
 
@@ -617,7 +624,7 @@
 
 
 
-                <option>
+                <option value="hidden">
 
                   Hidden
 
@@ -776,197 +783,7 @@
   <!-- SCRIPT -->
   <!-- ========================= -->
 
-  <script>
-
-    // IMAGE PREVIEW
-
-    const imageInput = document.getElementById(
-
-      "editCategoryImage"
-
-    );
-
-
-
-
-
-    const previewContainer = document.getElementById(
-
-      "editPreviewContainer"
-
-    );
-
-
-
-
-
-    imageInput.addEventListener("change", function(){
-
-      previewContainer.innerHTML = "";
-
-
-
-
-
-      const file = this.files[0];
-
-
-
-
-
-      if(file){
-
-        const reader = new FileReader();
-
-
-
-
-
-        reader.onload = function(e){
-
-          const imageBox = document.createElement(
-
-            "div"
-
-          );
-
-
-
-
-
-          imageBox.classList.add(
-
-            "preview-image-box"
-
-          );
-
-
-
-
-
-          imageBox.innerHTML = `
-
-            <img src="${e.target.result}" alt="Preview">
-
-          `;
-
-
-
-
-
-          previewContainer.appendChild(
-
-            imageBox
-
-          );
-
-        };
-
-
-
-
-
-        reader.readAsDataURL(file);
-
-      }
-
-    });
-
-
-
-
-
-    // DELETE BUTTON
-
-    const deleteButtons = document.querySelectorAll(
-
-      ".delete-btn"
-
-    );
-
-
-
-
-
-    deleteButtons.forEach(button => {
-
-      button.addEventListener("click", () => {
-
-        const confirmDelete = confirm(
-
-          "Are you sure you want to delete this category?"
-
-        );
-
-
-
-
-
-        if(confirmDelete){
-
-          alert(
-
-            "Category Deleted Successfully ✨"
-
-          );
-
-        }
-
-      });
-
-    });
-
-
-
-
-
-    // FORM SUBMIT
-
-    const editCategoryForm = document.getElementById(
-
-      "editCategoryForm"
-
-    );
-
-
-
-
-
-    editCategoryForm.addEventListener("submit", function(e){
-
-      e.preventDefault();
-
-
-
-
-
-      alert(
-
-        "Category Updated Successfully ✨"
-
-      );
-
-
-
-
-
-      // FUTURE:
-      // Update category in database
-
-    });
-
-
-
-
-
-    console.log(
-
-      "Edit Category Panel Loaded ✨"
-
-    );
-
-  </script>
-
+  <script src="js/admin-categories.js"></script>
   <script src="js/admin-auth.js"></script>
 </body>
 </html>
