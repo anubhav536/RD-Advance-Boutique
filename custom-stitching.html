@@ -3,276 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Stitching | RD Advance Boutique</title>
+  <title>Custom Stitching Replaced | RD Advance Boutique</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <section class="dashboard-section">
     <div class="dashboard-container">
-      <div class="dashboard-sidebar">
+      <aside class="dashboard-sidebar">
         <div class="dashboard-logo">
-          <img src="assets/logo.png" alt="Logo">
+          <img src="assets/logo.png" alt="RD Advance Boutique logo">
           <h2>RD Advance</h2>
-          <p>Admin Panel</p>
+          <p>Static Website</p>
         </div>
-        <div class="dashboard-menu">
-          <a href="admin-dashboard.html" class="menu-item">📊 Dashboard</a>
-          <a href="admin-products.html" class="menu-item">🛍 Products</a>
-          <a href="admin-gallery.html" class="menu-item">🖼 Gallery</a>
-          <a href="admin.orders.html" class="menu-item active">📦 Orders</a>
-          <a href="admin-course.html" class="menu-item">✂️ Course</a>
-          <a href="admin-settings.html" class="menu-item">⚙ Settings</a>
-        </div>
-      </div>
-
-      <div class="dashboard-main">
-        <div class="dashboard-topbar">
+        <nav class="dashboard-menu" aria-label="Static content management navigation">
+          <a href="admin-dashboard.html" class="menu-item">📋 Guide</a>
+          <a href="admin-products.html" class="menu-item">🛍 Products JSON</a>
+          <a href="admin-gallery.html" class="menu-item">🖼 Gallery JSON</a>
+          <a href="admin-categories.html" class="menu-item">🏷 Categories JSON</a>
+          <a href="admin-settings.html" class="menu-item">⚙ Settings JSON</a>
+          <a href="admin-notifications.html" class="menu-item">🔔 Notifications JSON</a>
+          <a href="index.html" class="menu-item">🏠 View Website</a>
+        </nav>
+      </aside>
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
           <div>
-            <h1>Custom Stitching</h1>
-            <p>Manage tailoring requests with measurements, reference uploads, fabrics, appointments, and status tracking ✨</p>
+            <h1>Custom Stitching Replaced</h1>
+            <p>This URL is preserved for GitHub Pages, but backend admin authentication and API writes have been removed.</p>
           </div>
-          <a href="admin.orders.html" class="primary-btn">Back</a>
-        </div>
-
-        <div class="dashboard-box stitching-request-panel">
-          <div class="box-header">
-            <h2>Stitching Filters</h2>
+          <a href="README.md" class="primary-btn">Read Guide</a>
+        </header>
+        <section class="dashboard-box">
+          <h2>How website management works now</h2>
+          <p>RD Advance Boutique is a fully static website. Update content by editing JSON files in the repository and committing the changes.</p>
+          <ul>
+            <li><strong>Products:</strong> edit <code>data/products.json</code> to add, edit, or delete products.</li>
+            <li><strong>Gallery:</strong> edit <code>data/gallery.json</code> to add, edit, or delete designs.</li>
+            <li><strong>Categories:</strong> edit <code>data/categories.json</code>.</li>
+            <li><strong>Settings:</strong> edit <code>data/settings.json</code> for branding, contact, SEO, and social links.</li>
+            <li><strong>Notifications:</strong> edit <code>data/notifications.json</code>.</li>
+          </ul>
+          <p>No login, sessions, server-side storage, Express backend, or JSON write operations are used. Customer product orders, gallery enquiries, custom stitching requests, course enquiries, and contact messages all open WhatsApp Business with prefilled messages.</p>
+          <div class="admin-form-buttons">
+            <a class="primary-btn" href="shop.html">Preview Shop</a>
+            <a class="secondary-btn" href="gallery.html">Preview Gallery</a>
+            <a class="secondary-btn" href="custom.html">Preview Custom Stitching</a>
+            <a class="secondary-btn" href="contact.html">Preview Contact</a>
           </div>
-          <div class="all-products-filters">
-            <input type="text" id="stitching-search" placeholder="Search name, phone, order number, fabric..." class="product-search">
-            <select id="stitching-outfit-filter" class="product-filter-select">
-              <option value="">All Outfit Types</option>
-              <option value="Designer Blouse">Designer Blouse</option>
-              <option value="Lehenga">Lehenga</option>
-              <option value="Kurti">Kurti</option>
-              <option value="Salwar Suit">Salwar Suit</option>
-              <option value="Kids Wear">Kids Wear</option>
-              <option value="Custom Design">Custom Design</option>
-            </select>
-            <select id="stitching-status-filter" class="product-filter-select">
-              <option value="">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="ready">Ready</option>
-              <option value="completed">Completed</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2>Custom Stitching Requests</h2>
-          </div>
-          <div class="products-table-wrapper">
-            <table class="products-table stitching-table">
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Design & Fabric</th>
-                  <th>Measurements</th>
-                  <th>Appointment</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="stitching-requests-body">
-                <tr>
-                  <td colspan="7">Loading custom stitching requests...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2>Stitching Analytics</h2>
-          </div>
-          <div class="analytics-grid">
-            <div class="analytics-card">
-              <h3>Total Requests</h3>
-              <h2 id="total-requests-count">0</h2>
-              <p>Custom Orders</p>
-            </div>
-            <div class="analytics-card">
-              <h3>In Progress</h3>
-              <h2 id="in-progress-count">0</h2>
-              <p>Tailoring Work</p>
-            </div>
-            <div class="analytics-card">
-              <h3>Completed</h3>
-              <h2 id="completed-count">0</h2>
-              <p>Finished Stitching</p>
-            </div>
-            <div class="analytics-card">
-              <h3>Appointments</h3>
-              <h2 id="appointment-count">0</h2>
-              <p>Scheduled Fittings</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="dashboard-box">
-          <div class="box-header">
-            <h2>Tailoring Notes</h2>
-          </div>
-          <div class="overview-content">
-            <div class="overview-card">
-              <h3>📏 Accurate Measurements</h3>
-              <p>Review measurement values and notes before stitching begins.</p>
-            </div>
-            <div class="overview-card">
-              <h3>🧵 Reference & Fabric</h3>
-              <p>Open design references and confirm fabric selection before cutting.</p>
-            </div>
-            <div class="overview-card">
-              <h3>💖 Customer Updates</h3>
-              <p>Use the status dropdown so customers can track request progress.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   </section>
-
-  <script>
-    const statusLabels = {
-      pending: "Pending",
-      "in-progress": "In Progress",
-      ready: "Ready",
-      completed: "Completed",
-      delivered: "Delivered",
-      cancelled: "Cancelled"
-    };
-    const statusClasses = {
-      pending: "status-pending",
-      "in-progress": "status-active",
-      ready: "status-active",
-      completed: "status-completed",
-      delivered: "status-completed",
-      cancelled: "status-cancelled"
-    };
-    let stitchingOrders = [];
-
-    const formatCurrency = amount => `₹${Number(amount || 0).toLocaleString("en-IN")}`;
-    const formatAppointment = order => [order.appointmentDate, order.appointmentTime].filter(Boolean).join(" at ") || "Not scheduled";
-    const formatMeasurements = measurements => {
-      if (!measurements || !Object.keys(measurements).length) return "Not submitted";
-      const values = ["bust", "waist", "hip", "shoulder", "sleeve", "length"]
-        .filter(key => measurements[key])
-        .map(key => `${key}: ${measurements[key]}`);
-      return values.length ? values.join(", ") : (measurements.notes || "Submitted");
-    };
-
-    const getFilteredOrders = () => {
-      const search = document.querySelector("#stitching-search").value.trim().toLowerCase();
-      const outfit = document.querySelector("#stitching-outfit-filter").value;
-      const status = document.querySelector("#stitching-status-filter").value;
-      return stitchingOrders.filter(order => {
-        const searchable = [
-          order.orderNumber,
-          order.customer?.name,
-          order.customer?.phone,
-          order.customer?.email,
-          order.stitchingDetails?.outfit,
-          order.fabricSelection?.type,
-          order.fabricSelection?.details,
-          order.appointmentDate,
-          order.status
-        ].filter(Boolean).join(" ").toLowerCase();
-        return (!search || searchable.includes(search))
-          && (!outfit || order.stitchingDetails?.outfit === outfit || order.productName === outfit)
-          && (!status || order.status === status);
-      });
-    };
-
-    const updateAnalytics = () => {
-      document.querySelector("#total-requests-count").textContent = stitchingOrders.length;
-      document.querySelector("#in-progress-count").textContent = stitchingOrders.filter(order => order.status === "in-progress").length;
-      document.querySelector("#completed-count").textContent = stitchingOrders.filter(order => ["completed", "delivered"].includes(order.status)).length;
-      document.querySelector("#appointment-count").textContent = stitchingOrders.filter(order => order.appointmentDate).length;
-    };
-
-    const renderOrders = () => {
-      const tbody = document.querySelector("#stitching-requests-body");
-      const orders = getFilteredOrders();
-      updateAnalytics();
-
-      if (!orders.length) {
-        tbody.innerHTML = '<tr><td colspan="7">No custom stitching requests found.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = orders.map(order => {
-        const referenceLink = order.designReference?.dataUrl || order.designReference?.url;
-        return `
-          <tr>
-            <td><strong>${order.orderNumber || order.id}</strong><br><small>${formatCurrency(order.totalAmount)}</small></td>
-            <td>${order.customer?.name || "-"}<br><small>${order.customer?.phone || ""} ${order.customer?.email || ""}</small></td>
-            <td><strong>${order.stitchingDetails?.outfit || order.productName || "Custom Design"}</strong><br><small>${order.fabricSelection?.type || "Fabric pending"} ${order.fabricSelection?.details || ""}</small></td>
-            <td><small>${formatMeasurements(order.measurements)}</small></td>
-            <td>${formatAppointment(order)}</td>
-            <td><span class="${statusClasses[order.status] || "status-active"}">${statusLabels[order.status] || order.status}</span></td>
-            <td>
-              <div class="table-action-buttons stitching-actions">
-                ${referenceLink ? `<a class="edit-btn" href="${referenceLink}" target="_blank" rel="noopener">View Reference</a>` : '<span class="edit-btn disabled-link">No Reference</span>'}
-                <select class="product-filter-select status-update" data-order-id="${order.id}" aria-label="Update status for ${order.orderNumber || order.id}">
-                  ${Object.entries(statusLabels).map(([value, label]) => `<option value="${value}" ${order.status === value ? "selected" : ""}>${label}</option>`).join("")}
-                </select>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
-    };
-
-    const loadOrders = async () => {
-      try {
-        const response = await fetch("/api/v1/orders/custom-stitching");
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || "Unable to load requests.");
-        stitchingOrders = result.data;
-        renderOrders();
-      } catch (error) {
-        document.querySelector("#stitching-requests-body").innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
-      }
-    };
-
-    document.querySelector("#stitching-search").addEventListener("input", renderOrders);
-    document.querySelector("#stitching-outfit-filter").addEventListener("change", renderOrders);
-    document.querySelector("#stitching-status-filter").addEventListener("change", renderOrders);
-    document.querySelector("#stitching-requests-body").addEventListener("change", async event => {
-      const select = event.target.closest(".status-update");
-      if (!select) return;
-      const orderId = select.dataset.orderId;
-      const nextStatus = select.value;
-      select.disabled = true;
-      try {
-        const response = await fetch(`/api/v1/orders/${encodeURIComponent(orderId)}/status`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: nextStatus })
-        });
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || "Unable to update status.");
-        stitchingOrders = stitchingOrders.map(order => order.id === orderId ? result.data : order);
-        renderOrders();
-      } catch (error) {
-        alert(error.message);
-        loadOrders();
-      } finally {
-        select.disabled = false;
-      }
-    });
-
-    loadOrders();
-  </script>
-  <script src="js/admin-auth.js"></script>
 </body>
 </html>

@@ -7,6 +7,18 @@
   };
 
   const WHATSAPP_LINK = "https://wa.me/917693849472";
+
+  function getWhatsappUrl(message) {
+    return `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+  }
+
+  function getCurrentPageUrl(params) {
+    const url = new URL(window.location.href);
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, value);
+    });
+    return url.toString();
+  }
   const PLACEHOLDER_CATEGORIES = ["Blouses", "Kurtis", "Bridal", "Kids Wear", "Accessories", "Custom Edit"];
 
   const state = {
@@ -60,12 +72,26 @@
     return value.toLowerCase().includes("request") ? value : value;
   }
 
+  function createProductOrderMessage(product) {
+    const title = product.title || product.name || "Boutique Product";
+    const category = product.category || "Boutique";
+    const price = formatPrice(product.discountPrice || product.price || "");
+    const productLink = getCurrentPageUrl({ product: product.slug || product.id || normalize(title) });
+    return `Hello RD Advance Boutique,\n\nI want to order this product.\n\nProduct Name: ${title}\nCategory: ${category}\nPrice: ${price}\nProduct Link: ${productLink}\n\nPlease guide me for payment and delivery.`;
+  }
+
+  function createDesignEnquiryMessage(item) {
+    const title = item.title || item.name || "Boutique Design";
+    const designLink = getCurrentPageUrl({ design: item.slug || item.id || normalize(title) });
+    return `Hello RD Advance Boutique,\n\nI am interested in this design.\n\nDesign Name: ${title}\nDesign Link: ${designLink}\n\nPlease provide stitching details and price.`;
+  }
+
   function renderProductCard(product) {
     const title = product.title || "Boutique Product";
     const category = product.category || "Boutique";
     const image = product.image || "assets/logo.png";
     const description = product.description || "Premium boutique fashion piece.";
-    const link = product.link || WHATSAPP_LINK;
+    const link = getWhatsappUrl(createProductOrderMessage(product));
 
     const article = createElement("article", "product-card");
     article.dataset.category = normalize(category);
@@ -81,8 +107,11 @@
     wishlistButton.type = "button";
     wishlistButton.setAttribute("aria-label", `Add ${title} to wishlist`);
 
-    const quickView = createElement("a", "quick-view-btn", "Quick View");
+    const quickView = createElement("a", "quick-view-btn", "WhatsApp Order");
     quickView.href = link;
+    quickView.target = "_blank";
+    quickView.rel = "noopener";
+    quickView.dataset.noTransition = "true";
 
     const content = createElement("div", "product-content");
     content.append(
@@ -215,14 +244,17 @@
   }
 
   function renderGalleryCard(item) {
-    const title = item.title || "Boutique Design";
+    const title = item.title || item.name || "Boutique Design";
     const category = item.category || "Boutique";
     const previewId = `preview-${item.id || normalize(title)}`;
     const layoutClass = item.layout && item.layout !== "default" ? ` gallery-card--${normalize(item.layout)}` : "";
 
-    const card = createElement("a", `gallery-card${layoutClass}`);
+    const card = createElement("article", `gallery-card${layoutClass}`);
     card.dataset.category = normalize(category).replace("kids-wear", "kids");
-    card.href = `#${previewId}`;
+
+    const preview = createElement("a", "gallery-card__preview");
+    preview.href = `#${previewId}`;
+    preview.setAttribute("aria-label", `Open fullscreen preview of ${title}`);
 
     const image = document.createElement("img");
     image.src = item.image || "assets/logo.png";
@@ -233,7 +265,14 @@
     const content = createElement("span", "gallery-card__content");
     content.append(createElement("small", "", category), createElement("strong", "", title));
 
-    card.append(image, shade, content);
+    const enquire = createElement("a", "gallery-card__whatsapp", "Enquire on WhatsApp");
+    enquire.href = getWhatsappUrl(createDesignEnquiryMessage(item));
+    enquire.target = "_blank";
+    enquire.rel = "noopener";
+    enquire.dataset.noTransition = "true";
+
+    preview.append(image, shade, content);
+    card.append(preview, enquire);
 
     return card;
   }

@@ -1,492 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Admin Login | RD Advance Boutique</title>
-
-  <!-- CSS -->
+  <title>Admin Login Removed | RD Advance Boutique</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- GOOGLE FONTS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- LOGIN SECTION -->
-  <!-- ========================= -->
-
-  <section class="admin-login-section">
-
-    <div class="admin-login-container">
-
-
-
-      <!-- LEFT SIDE -->
-
-      <div class="admin-left">
-
-
-
-        <img src="assets/logo.png" alt="RD Logo" class="admin-logo">
-        
-        
-
-
-
-        <h1>
-
-          RD Advance Boutique
-
-        </h1>
-
-
-
-        <p>
-
-          Admin Dashboard Access
-
-        </p>
-
-
-
-        
-
-      </div>
-
-
-
-
-
-      <!-- RIGHT SIDE -->
-
-      <div class="admin-right">
-
-
-
-        <div class="admin-form-box">
-
-          <span class="admin-tag">
-
-            Secure Login
-
-          </span>
-
-
-
-          <h2>
-
-            Welcome Back 👋
-
-          </h2>
-
-
-
-          <p>
-
-            Login to manage boutique products,
-            orders, gallery and course details.
-
-          </p>
-
-
-
-
-
-          <!-- LOGIN FORM -->
-
-          <form id="adminLoginForm">
-
-
-
-            <!-- EMAIL -->
-
-            <div class="input-group">
-
-              <label>
-
-                Email Address
-
-              </label>
-
-
-
-              <input
-                id="adminEmail"
-                name="email"
-                type="email"
-                autocomplete="username"
-                placeholder="Enter admin email"
-                required
-              >
-
-            </div>
-
-
-
-
-
-            <!-- PASSWORD -->
-
-            <div class="input-group">
-
-              <label>
-
-                Password
-
-              </label>
-
-
-
-              <input
-                id="adminPassword"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Enter password"
-                required
-              >
-
-            </div>
-
-
-
-
-
-            <!-- REMEMBER -->
-
-            <div class="remember-box">
-
-              <label>
-
-                <input id="rememberAdmin" type="checkbox">
-
-                Remember me
-
-              </label>
-
-              <a href="#forgot-password" id="forgotPasswordLink">Forgot password?</a>
-
-            </div>
-
-            <p id="adminLoginMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
-
-
-
-
-
-            <!-- BUTTON -->
-
-            <button type="submit" class="primary-btn admin-btn">
-
-              Login To Dashboard
-
-            </button>
-
-          </form>
-
-          <p class="admin-login-message">
-            Need admin access? <a href="admin-signup.html">Request admin signup</a>
-          </p>
-
-          <!-- FORGOT PASSWORD FORM -->
-
-          <form id="adminForgotPasswordForm" class="admin-forgot-password-form" hidden>
-
-            <div class="input-group">
-
-              <label>
-
-                Admin Email Address
-
-              </label>
-
-              <input
-                id="forgotAdminEmail"
-                name="email"
-                type="email"
-                autocomplete="username"
-                placeholder="Enter admin email"
-                required
-              >
-
-            </div>
-
-            <div id="securityResetFields" hidden>
-              <div class="input-group">
-                <label>Security Question</label>
-                <p id="securityQuestionText" class="admin-login-message"></p>
-              </div>
-
-              <div class="input-group">
-                <label for="securityAnswer">Security Answer</label>
-                <input
-                  id="securityAnswer"
-                  name="securityAnswer"
-                  type="text"
-                  autocomplete="off"
-                  placeholder="Enter security answer"
-                >
-              </div>
-
-              <div class="input-group">
-                <label for="resetNewPassword">New Password</label>
-                <input
-                  id="resetNewPassword"
-                  name="newPassword"
-                  type="password"
-                  autocomplete="new-password"
-                  placeholder="Enter new password"
-                >
-              </div>
-
-              <div class="input-group">
-                <label for="resetConfirmPassword">Confirm New Password</label>
-                <input
-                  id="resetConfirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autocomplete="new-password"
-                  placeholder="Confirm new password"
-                >
-              </div>
-            </div>
-
-            <p id="forgotPasswordMessage" class="admin-login-message" role="alert" aria-live="polite"></p>
-
-            <button type="submit" class="primary-btn admin-btn">
-
-              Load Security Question
-
-            </button>
-
-            <button type="button" id="backToLoginButton" class="secondary-btn admin-secondary-btn">
-
-              Back To Login
-
-            </button>
-
-          </form>
-
-
-
-
-
-          <!-- DASHBOARD INFO -->
-
-          <div class="admin-info">
-
-
-
-            <div class="admin-info-card">
-
-              <h3>
-
-                Manage Products
-
-              </h3>
-
-            </div>
-
-
-
-
-
-            <div class="admin-info-card">
-
-              <h3>
-
-                Update Gallery
-
-              </h3>
-
-            </div>
-
-
-
-
-
-            <div class="admin-info-card">
-
-              <h3>
-
-                Manage Courses
-
-              </h3>
-
-            </div>
-
-          </div>
-
+  <section class="dashboard-section">
+    <div class="dashboard-container">
+      <aside class="dashboard-sidebar">
+        <div class="dashboard-logo">
+          <img src="assets/logo.png" alt="RD Advance Boutique logo">
+          <h2>RD Advance</h2>
+          <p>Static Website</p>
         </div>
-
-      </div>
-
+        <nav class="dashboard-menu" aria-label="Static content management navigation">
+          <a href="admin-dashboard.html" class="menu-item">📋 Guide</a>
+          <a href="admin-products.html" class="menu-item">🛍 Products JSON</a>
+          <a href="admin-gallery.html" class="menu-item">🖼 Gallery JSON</a>
+          <a href="admin-categories.html" class="menu-item">🏷 Categories JSON</a>
+          <a href="admin-settings.html" class="menu-item">⚙ Settings JSON</a>
+          <a href="admin-notifications.html" class="menu-item">🔔 Notifications JSON</a>
+          <a href="index.html" class="menu-item">🏠 View Website</a>
+        </nav>
+      </aside>
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
+          <div>
+            <h1>Admin Login Removed</h1>
+            <p>This URL is preserved for GitHub Pages, but backend admin authentication and API writes have been removed.</p>
+          </div>
+          <a href="README.md" class="primary-btn">Read Guide</a>
+        </header>
+        <section class="dashboard-box">
+          <h2>How website management works now</h2>
+          <p>RD Advance Boutique is a fully static website. Update content by editing JSON files in the repository and committing the changes.</p>
+          <ul>
+            <li><strong>Products:</strong> edit <code>data/products.json</code> to add, edit, or delete products.</li>
+            <li><strong>Gallery:</strong> edit <code>data/gallery.json</code> to add, edit, or delete designs.</li>
+            <li><strong>Categories:</strong> edit <code>data/categories.json</code>.</li>
+            <li><strong>Settings:</strong> edit <code>data/settings.json</code> for branding, contact, SEO, and social links.</li>
+            <li><strong>Notifications:</strong> edit <code>data/notifications.json</code>.</li>
+          </ul>
+          <p>No login, sessions, server-side storage, Express backend, or JSON write operations are used. Customer product orders, gallery enquiries, custom stitching requests, course enquiries, and contact messages all open WhatsApp Business with prefilled messages.</p>
+          <div class="admin-form-buttons">
+            <a class="primary-btn" href="shop.html">Preview Shop</a>
+            <a class="secondary-btn" href="gallery.html">Preview Gallery</a>
+            <a class="secondary-btn" href="custom.html">Preview Custom Stitching</a>
+            <a class="secondary-btn" href="contact.html">Preview Contact</a>
+          </div>
+        </section>
+      </main>
     </div>
-
   </section>
-
-
-
-
-
-  <!-- ========================= -->
-  <!-- LOGIN SCRIPT -->
-  <!-- ========================= -->
-
-  <script>
-
-    const loginForm = document.getElementById("adminLoginForm");
-    const loginMessage = document.getElementById("adminLoginMessage");
-    const loginButton = loginForm.querySelector("button[type='submit']");
-    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-    const forgotPasswordForm = document.getElementById("adminForgotPasswordForm");
-    const forgotPasswordMessage = document.getElementById("forgotPasswordMessage");
-    const forgotPasswordButton = forgotPasswordForm.querySelector("button[type='submit']");
-    const backToLoginButton = document.getElementById("backToLoginButton");
-    const securityResetFields = document.getElementById("securityResetFields");
-    const securityQuestionText = document.getElementById("securityQuestionText");
-    let resetQuestionLoaded = false;
-    const params = new URLSearchParams(window.location.search);
-    const requestedNextPage = params.get("next") || "admin-dashboard.html";
-    const nextPage = requestedNextPage.startsWith("/") && !requestedNextPage.startsWith("//")
-      ? requestedNextPage
-      : "admin-dashboard.html";
-    const approvalStatus = params.get("approved");
-    const approvedEmail = params.get("email") || "";
-
-    const setMessage = (message, isError = false, target = loginMessage) => {
-      target.textContent = message;
-      target.classList.toggle("error", isError);
-    };
-
-    const showForgotPassword = () => {
-      forgotPasswordForm.hidden = false;
-      loginForm.hidden = true;
-      resetQuestionLoaded = false;
-      securityResetFields.hidden = true;
-      forgotPasswordButton.textContent = "Load Security Question";
-      document.getElementById("forgotAdminEmail").value = document.getElementById("adminEmail").value;
-      setMessage("Enter your admin email to load your security question.", false, forgotPasswordMessage);
-    };
-
-    const showLogin = () => {
-      forgotPasswordForm.hidden = true;
-      loginForm.hidden = false;
-      resetQuestionLoaded = false;
-      securityResetFields.hidden = true;
-      setMessage("", false, forgotPasswordMessage);
-    };
-
-    if (approvalStatus === "success") {
-      document.getElementById("adminEmail").value = approvedEmail;
-      setMessage("Admin signup approved. You can login now.");
-    } else if (approvalStatus === "invalid") {
-      setMessage("Approval link is invalid or expired.", true);
-    } else if (approvalStatus === "missing") {
-      setMessage("Approval token is missing.", true);
-    }
-
-    forgotPasswordLink.addEventListener("click", (event) => {
-      event.preventDefault();
-      showForgotPassword();
-    });
-
-    if (window.location.hash === "#forgot-password") {
-      showForgotPassword();
-    }
-
-    backToLoginButton.addEventListener("click", showLogin);
-
-    forgotPasswordForm.addEventListener("submit", async function(e){
-      e.preventDefault();
-      forgotPasswordButton.disabled = true;
-      setMessage(resetQuestionLoaded ? "Resetting password..." : "Loading security question...", false, forgotPasswordMessage);
-
-      try {
-        const email = document.getElementById("forgotAdminEmail").value;
-        const response = await fetch(resetQuestionLoaded
-          ? "/api/v1/admin/auth/password-reset/complete"
-          : "/api/v1/admin/auth/password-reset/question", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(resetQuestionLoaded ? {
-            email,
-            securityAnswer: document.getElementById("securityAnswer").value,
-            newPassword: document.getElementById("resetNewPassword").value,
-            confirmPassword: document.getElementById("resetConfirmPassword").value,
-          } : { email }),
-        });
-        const payload = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(payload.message || "Unable to reset password.");
-        }
-
-        if (!resetQuestionLoaded) {
-          resetQuestionLoaded = true;
-          securityResetFields.hidden = false;
-          securityQuestionText.textContent = payload.data?.securityQuestion || "Security question unavailable.";
-          forgotPasswordButton.textContent = "Set New Password";
-          setMessage(payload.message || "Answer the security question to set a new password.", false, forgotPasswordMessage);
-          return;
-        }
-
-        setMessage(payload.message || "Password reset successfully. You can login now.", false, forgotPasswordMessage);
-        setTimeout(showLogin, 1400);
-      } catch (error) {
-        setMessage(error.message, true, forgotPasswordMessage);
-      } finally {
-        forgotPasswordButton.disabled = false;
-      }
-    });
-
-    loginForm.addEventListener("submit", async function(e){
-      e.preventDefault();
-      loginButton.disabled = true;
-      setMessage("Checking credentials...");
-
-      try {
-        const response = await fetch("/api/v1/admin/auth/login", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: document.getElementById("adminEmail").value,
-            password: document.getElementById("adminPassword").value,
-            rememberMe: document.getElementById("rememberAdmin").checked,
-          }),
-        });
-        const payload = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(payload.message || "Invalid admin credentials.");
-        }
-
-        setMessage("Login successful. Redirecting...");
-        window.location.replace(nextPage);
-      } catch (error) {
-        setMessage(error.message, true);
-        loginButton.disabled = false;
-      }
-    });
-
-  </script>
-
 </body>
 </html>

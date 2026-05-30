@@ -3722,3 +3722,34 @@ iframe {
   0%, 100% { box-shadow: 0 0 0 4px rgba(52, 137, 89, 0.12); }
   50% { box-shadow: 0 0 0 8px rgba(52, 137, 89, 0.2); }
 }
+
+/* Static GitHub Pages WhatsApp enquiry actions for gallery cards. */
+.gallery-card__preview {
+  color: inherit;
+  display: block;
+  min-height: inherit;
+  position: relative;
+  text-decoration: none;
+}
+
+.gallery-card__whatsapp {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border-radius: 999px;
+  bottom: 1rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.72rem 1rem;
+  position: absolute;
+  right: 1rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+.gallery-card__whatsapp:hover,
+.gallery-card__whatsapp:focus-visible {
+  box-shadow: 0 16px 38px rgba(18, 140, 126, 0.35);
+  transform: translateY(-2px);
+}

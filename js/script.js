@@ -349,30 +349,36 @@
         source: "contact.html appointment form"
       };
 
-      try {
-        if (submitButton) submitButton.disabled = true;
-        setStatus("Sending your appointment request...", "success");
-
-        const response = await fetch("/api/v1/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-          throw new Error(result.message || "Unable to submit your appointment request.");
-        }
-
-        form.reset();
-        clearFieldErrors();
-        setStatus("Thank you! Your appointment request has been submitted. Our boutique team will contact you shortly.", "success");
-      } catch (error) {
-        setStatus(error.message || "Unable to submit your appointment request right now.", "error");
-      } finally {
-        if (submitButton) submitButton.disabled = false;
-      }
+      if (submitButton) submitButton.disabled = true;
+      const whatsappMessage = `Hello RD Advance Boutique,\n\nI want to contact you.\n\nName: ${payload.name}\nMobile: ${payload.phone}\nService / Occasion: ${payload.occasion}\nMessage: ${payload.message}\nPage Link: ${window.location.href}\n\nPlease guide me.`;
+      window.open(getWhatsappUrl(whatsappMessage), "_blank", "noopener");
+      form.reset();
+      clearFieldErrors();
+      setStatus("Your WhatsApp message is ready. Please send it in WhatsApp to complete the enquiry.", "success");
+      if (submitButton) submitButton.disabled = false;
     });
+  };
+
+  const getWhatsappUrl = message => `https://wa.me/917693849472?text=${encodeURIComponent(message)}`;
+
+  const getCurrentPageUrl = (params = {}) => {
+    const url = new URL(window.location.href);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, value);
+    });
+    return url.toString();
+  };
+
+  const loadStaticJson = async (source, fallback = []) => {
+    try {
+      const response = await fetch(source, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Unable to load ${source}.`);
+      const data = await response.json();
+      return data || fallback;
+    } catch (error) {
+      console.warn(error);
+      return fallback;
+    }
   };
 
   const setupFashionShop = () => {
@@ -395,7 +401,7 @@
 
     const formatPrice = value => {
       const numberValue = Number(value);
-      if (!Number.isFinite(numberValue)) return value ? String(value) : "Price on request";
+      if (!Number.isFinite(numberValue) || value === "") return value ? String(value) : "Price on request";
       return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(numberValue);
     };
 
@@ -406,22 +412,18 @@
       return element;
     };
 
-    const request = async (url, options = {}) => {
-      const response = await fetch(url, {
-        cache: "no-store",
-        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-        ...options
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || payload.success === false) throw new Error(payload.message || "Request failed.");
-      return payload.data;
+    const createProductOrderMessage = product => {
+      const title = product.title || product.name || "Boutique Product";
+      const category = product.category || "Boutique";
+      const price = formatPrice(product.discountPrice || product.price || "");
+      const productLink = getCurrentPageUrl({ product: product.slug || product.id || normalize(title) });
+      return `Hello RD Advance Boutique,\n\nI want to order this product.\n\nProduct Name: ${title}\nCategory: ${category}\nPrice: ${price}\nProduct Link: ${productLink}\n\nPlease guide me for payment and delivery.`;
     };
 
     const createProductCard = product => {
       const title = product.title || product.name || "Ready-made product";
       const category = product.category || "Ready-Made";
-      const price = Number(product.discountPrice || product.price || 0);
-      const stock = Number(product.stockQuantity ?? product.stock ?? 0);
+      const stock = Number(product.stockQuantity ?? product.stock ?? 1);
       const card = createElement("article", "product-card");
       card.dataset.category = normalize(category);
       card.dataset.section = normalize(product.productType || product.type || "ready-made");
@@ -436,16 +438,17 @@
       media.append(image, badge);
 
       const content = createElement("div", "product-content");
-      const action = createElement("button", "product-card__action", stock > 0 ? "Order Now" : "Out of Stock");
-      action.type = "button";
-      action.disabled = stock <= 0;
-      action.dataset.orderProduct = product.id;
+      const action = createElement("a", "product-card__action", stock > 0 ? "WhatsApp Order" : "Enquire on WhatsApp");
+      action.href = getWhatsappUrl(createProductOrderMessage(product));
+      action.target = "_blank";
+      action.rel = "noopener";
+      action.dataset.noTransition = "true";
       content.append(
         createElement("span", "product-category", category),
         createElement("h3", "", title),
         createElement("p", "product-description", product.description || "Premium boutique product."),
         createElement("p", "product-price", formatPrice(product.discountPrice || product.price)),
-        createElement("span", stock > 0 ? "stock-status" : "stock-status status-inactive", stock > 0 ? `${stock} in stock` : "Out of stock"),
+        createElement("span", stock > 0 ? "stock-status" : "stock-status status-inactive", stock > 0 ? `${stock} available` : "Confirm availability"),
         action
       );
       card.append(media, content);
@@ -462,49 +465,9 @@
       });
 
       productGrid.replaceChildren(...visible.map(createProductCard));
-      if (productCount) productCount.textContent = `${visible.length} product${visible.length === 1 ? "" : "s"} available`;
+      if (productCount) productCount.textContent = products.length ? `${visible.length} product${visible.length === 1 ? "" : "s"} available` : "No products in products.json yet";
       if (emptyProducts) emptyProducts.hidden = visible.length > 0;
-      if (!visible.length) productGrid.innerHTML = "<p>No matching products are available right now.</p>";
-    };
-
-    const submitReadyMadeOrder = async product => {
-      const name = window.prompt("Enter your name for this order:");
-      if (!name) return;
-      const phone = window.prompt("Enter your phone number:");
-      if (!phone) return;
-      const quantity = Number(window.prompt("Quantity:", "1") || 1);
-      if (!Number.isInteger(quantity) || quantity < 1) {
-        alert("Please enter a valid quantity.");
-        return;
-      }
-
-      const price = Number(product.discountPrice || product.price || 0);
-      const wantsUpi = window.confirm("Choose OK for manual UPI, or Cancel for Cash on Delivery / pay at boutique.");
-      const upiTransactionId = wantsUpi ? window.prompt("Enter UPI transaction ID (leave blank to submit later):", "") : "";
-      const paymentProofPath = wantsUpi && upiTransactionId ? window.prompt("Enter payment proof path/reference (optional):", "") : "";
-      const payment = wantsUpi
-        ? {
-          method: "manual-upi",
-          status: upiTransactionId && paymentProofPath ? "pending-verification" : "not-submitted",
-          amount: price * quantity,
-          upiTransactionId,
-          proofPath: paymentProofPath
-        }
-        : { method: "cod", status: "not-submitted", amount: price * quantity };
-      const order = await request("/api/v1/orders/ready-made", {
-        method: "POST",
-        body: JSON.stringify({
-          customer: { name, phone },
-          productId: product.id,
-          productName: product.title || product.name,
-          items: [{ productId: product.id, name: product.title || product.name, quantity, price }],
-          totalAmount: price * quantity,
-          payment
-        })
-      });
-      alert(`Order saved! Your order ID is ${order.orderNumber || order.id}. Payment method: ${wantsUpi ? "Manual UPI" : "COD / Pay at boutique"}.`);
-      products = await request("/api/v1/products?type=ready-made");
-      renderProducts();
+      if (!visible.length) productGrid.innerHTML = "<p>No matching products are available right now. Please message us on WhatsApp for current designs.</p>";
     };
 
     filterButtons.forEach(button => {
@@ -516,29 +479,11 @@
     });
 
     productSearch?.addEventListener("input", renderProducts);
-    productGrid.addEventListener("click", async event => {
-      const button = event.target.closest("[data-order-product]");
-      if (!button) return;
-      const product = products.find(item => String(item.id) === String(button.dataset.orderProduct));
-      if (!product) return;
-      try {
-        button.disabled = true;
-        await submitReadyMadeOrder(product);
-      } catch (error) {
-        alert(error.message || "Unable to create the order right now.");
-      } finally {
-        button.disabled = false;
-      }
-    });
-
-    productGrid.innerHTML = "<p>Loading products...</p>";
-    request("/api/v1/products?type=ready-made")
+    productGrid.innerHTML = "<p>Loading products from data/products.json...</p>";
+    loadStaticJson("data/products.json", [])
       .then(data => {
         products = Array.isArray(data) ? data : [];
         renderProducts();
-      })
-      .catch(error => {
-        productGrid.innerHTML = `<p>${escapeHtml(error.message || "Unable to load products.")}</p>`;
       });
   };
 
@@ -566,8 +511,6 @@
       path: `customer-uploads/${safeName}`
     });
   });
-
-  const getPublicOrderTrackingUrl = orderId => `/api/v1/orders/public/track/${encodeURIComponent(orderId)}`;
 
   const setupCustomStitchingRequests = () => {
     const form = doc.querySelector("#custom-stitching-request-form");
@@ -620,114 +563,51 @@
     };
 
     if (form) {
-      form.addEventListener("submit", async event => {
+      form.addEventListener("submit", event => {
         event.preventDefault();
         const submitButton = form.querySelector("button[type='submit']");
         const formData = new FormData(form);
+        const measurements = [
+          ["Bust", formData.get("bust")],
+          ["Waist", formData.get("waist")],
+          ["Hip", formData.get("hip")],
+          ["Shoulder", formData.get("shoulder")],
+          ["Sleeve", formData.get("sleeve")],
+          ["Garment Length", formData.get("length")],
+          ["Notes", formData.get("measurement_notes")]
+        ]
+          .filter(([, value]) => String(value || "").trim())
+          .map(([label, value]) => `${label}: ${value}`)
+          .join("; ") || "To be shared on WhatsApp";
+        const fabricPreference = [formData.get("fabric"), formData.get("fabric_details")]
+          .filter(Boolean)
+          .join(" - ") || "To be confirmed";
+        const designPreferences = [
+          formData.get("outfit"),
+          formData.get("occasion"),
+          formData.get("design_instructions"),
+          formData.get("consultation_type"),
+          formData.get("timeline"),
+          formData.get("appointment_date") && `Preferred date: ${formData.get("appointment_date")}`,
+          formData.get("appointment_time") && `Preferred time: ${formData.get("appointment_time")}`
+        ].filter(Boolean).join("; ") || "To be discussed";
 
-        try {
-          if (submitButton) submitButton.disabled = true;
-          setMessage("Saving your custom stitching request...", "info");
+        const whatsappMessage = `Hello RD Advance Boutique,\n\nI want to place a custom stitching request.\n\nName: ${formData.get("name") || ""}\nMobile: ${formData.get("phone") || ""}\nMeasurements: ${measurements}\nDesign preferences: ${designPreferences}\nFabric preference: ${fabricPreference}\n\nPlease guide me for stitching details, payment, and delivery.`;
 
-          const designReference = await readUploadFile(formData.get("reference_design"), { label: "Reference design" });
-          const paymentScreenshot = await readUploadFile(formData.get("payment_screenshot"), {
-            label: "Payment screenshot",
-            maxFileSize: 2 * 1024 * 1024,
-            required: false
-          });
-          const payload = {
-            orderType: "custom-stitching",
-            status: "pending",
-            customer: {
-              name: formData.get("name"),
-              phone: formData.get("phone"),
-              email: formData.get("email")
-            },
-            productName: formData.get("outfit"),
-            stitchingDetails: {
-              outfit: formData.get("outfit"),
-              occasion: formData.get("occasion"),
-              designInstructions: formData.get("design_instructions"),
-              consultationType: formData.get("consultation_type"),
-              timeline: formData.get("timeline")
-            },
-            measurements: {
-              bust: formData.get("bust"),
-              waist: formData.get("waist"),
-              hip: formData.get("hip"),
-              shoulder: formData.get("shoulder"),
-              sleeve: formData.get("sleeve"),
-              length: formData.get("length"),
-              notes: formData.get("measurement_notes")
-            },
-            fabricSelection: {
-              type: formData.get("fabric"),
-              details: formData.get("fabric_details")
-            },
-            designReference,
-            appointmentDate: formData.get("appointment_date"),
-            appointmentTime: formData.get("appointment_time"),
-            payment: {
-              method: "manual-upi",
-              status: "pending-verification",
-              upiTransactionId: formData.get("upi_transaction_id"),
-              amount: formData.get("payment_amount"),
-              proofPath: formData.get("payment_proof_path") || paymentScreenshot.path || "",
-              screenshot: paymentScreenshot
-            },
-            notes: formData.get("design_instructions")
-          };
-
-          const response = await fetch("/api/v1/orders", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          const result = await response.json();
-
-          if (!response.ok || !result.success) {
-            throw new Error(result.message || "Unable to save the request.");
-          }
-
-          form.reset();
-          setMessage(`Request saved! Your order ID is ${result.data.orderNumber || result.data.id}. Payment is pending admin verification. Current order status: ${formatStatus(result.data.status)}.`, "success");
-          const trackingResponse = await fetch(getPublicOrderTrackingUrl(result.data.orderNumber || result.data.id));
-          const trackingPayload = await trackingResponse.json();
-          renderTrackingResult(trackingPayload.success ? trackingPayload.data : null);
-        } catch (error) {
-          setMessage(error.message || "Unable to save the request right now.", "error");
-        } finally {
-          if (submitButton) submitButton.disabled = false;
-        }
+        if (submitButton) submitButton.disabled = true;
+        window.open(getWhatsappUrl(whatsappMessage), "_blank", "noopener");
+        form.reset();
+        setMessage("Your custom stitching WhatsApp message is ready. Please send it in WhatsApp to complete the request.", "success");
+        if (submitButton) submitButton.disabled = false;
       });
     }
 
     if (trackingForm) {
-      trackingForm.addEventListener("submit", async event => {
+      trackingForm.addEventListener("submit", event => {
         event.preventDefault();
-        const formData = new FormData(trackingForm);
-        const query = String(formData.get("tracking_query") || "").trim();
-        if (!query) return;
-
-        try {
-          if (trackingResult) {
-            trackingResult.dataset.type = "info";
-            trackingResult.textContent = "Checking request status...";
-          }
-
-          const response = await fetch(getPublicOrderTrackingUrl(query));
-          const result = await response.json();
-
-          if (!response.ok || !result.success) {
-            throw new Error(result.message || "Unable to track the request.");
-          }
-
-          renderTrackingResult(result.data);
-        } catch (error) {
-          if (trackingResult) {
-            trackingResult.dataset.type = "error";
-            trackingResult.textContent = error.message || "Unable to track the request right now.";
-          }
+        if (trackingResult) {
+          trackingResult.dataset.type = "info";
+          trackingResult.textContent = "Order tracking is handled on WhatsApp for the static website. Please send your order ID to RD Advance Boutique on WhatsApp.";
         }
       });
     }
