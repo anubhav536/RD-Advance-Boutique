@@ -384,22 +384,7 @@
 
     if (!productGrid) return;
 
-    const emptyProductSlots = [
-      { name: "Men Ready-Made Slot", category: "Men", section: "Ready-Made", tags: ["ready-made", "men"] },
-      { name: "Women Ready-Made Slot", category: "Women", section: "Ready-Made", tags: ["ready-made", "women"] },
-      { name: "Kids Ready-Made Slot", category: "Kids", section: "Ready-Made", tags: ["ready-made", "kids"] },
-      { name: "Ethnic Wear Slot", category: "Ethnic Wear", section: "Ready-Made", tags: ["ready-made", "women"] },
-      { name: "Casual Wear Slot", category: "Casual Wear", section: "Ready-Made", tags: ["ready-made", "men", "women"] },
-      { name: "Party Wear Slot", category: "Party Wear", section: "Ready-Made", tags: ["ready-made", "men", "women"] },
-      { name: "Winter Wear Slot", category: "Winter Wear", section: "Ready-Made", tags: ["ready-made", "men", "women", "kids"] },
-      { name: "Accessories Slot", category: "Accessories", section: "Ready-Made", tags: ["ready-made", "accessories"] },
-      { name: "Custom Blouse Design Slot", category: "Custom Blouse Designs", section: "Boutique", tags: ["boutique", "women"] },
-      { name: "Designer Suit Slot", category: "Designer Suits", section: "Boutique", tags: ["boutique", "men", "women"] },
-      { name: "Bridal Wear Slot", category: "Bridal Wear", section: "Boutique", tags: ["boutique", "bridal", "women"] },
-      { name: "Boutique Dress Slot", category: "Boutique Dresses", section: "Boutique", tags: ["boutique", "women"] },
-      { name: "Custom Stitching Slot", category: "Custom Stitching", section: "Boutique", tags: ["boutique", "men", "women", "kids"] },
-      { name: "Premium Tailoring Slot", category: "Premium Tailoring", section: "Boutique", tags: ["boutique", "men", "women"] }
-    ];
+    let products = [];
 
     const normalize = value => String(value || "")
       .trim()
@@ -408,6 +393,12 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
+    const formatPrice = value => {
+      const numberValue = Number(value);
+      if (!Number.isFinite(numberValue)) return value ? String(value) : "Price on request";
+      return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(numberValue);
+    };
+
     const createElement = (tagName, className, text) => {
       const element = doc.createElement(tagName);
       if (className) element.className = className;
@@ -415,87 +406,128 @@
       return element;
     };
 
-    const createMetaRow = (label, value, modifier = "") => {
-      const row = createElement("div", `product-meta-row${modifier ? ` ${modifier}` : ""}`);
-      row.append(createElement("span", "", label), createElement("span", "", value));
-      return row;
+    const request = async (url, options = {}) => {
+      const response = await fetch(url, {
+        cache: "no-store",
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.success === false) throw new Error(payload.message || "Request failed.");
+      return payload.data;
     };
 
-    const createEmptyProductCard = (slot, index) => {
-      const card = createElement("article", "product-card product-card--empty");
-      card.dataset.category = normalize(slot.category);
-      card.dataset.section = normalize(slot.section);
-      card.dataset.tags = [slot.section, slot.category, ...slot.tags].map(normalize).join(" ");
-      card.setAttribute("aria-label", `${slot.name} empty product card`);
+    const createProductCard = product => {
+      const title = product.title || product.name || "Ready-made product";
+      const category = product.category || "Ready-Made";
+      const price = Number(product.discountPrice || product.price || 0);
+      const stock = Number(product.stockQuantity ?? product.stock ?? 0);
+      const card = createElement("article", "product-card");
+      card.dataset.category = normalize(category);
+      card.dataset.section = normalize(product.productType || product.type || "ready-made");
+      card.dataset.tags = [category, product.productType, product.type, ...(product.tags || [])].map(normalize).join(" ");
 
       const media = createElement("div", "product-card__media");
-      const placeholder = createElement("div", "product-card__placeholder");
-      const imageLabel = createElement("span", "product-card__image-label", "Product Image");
-      const badge = createElement("span", "product-card__section-badge", slot.section);
-      placeholder.setAttribute("aria-hidden", "true");
-      media.append(placeholder, imageLabel, badge);
+      const image = doc.createElement("img");
+      image.src = product.image || product.images?.[0] || "assets/logo.png";
+      image.alt = product.alt || title;
+      image.loading = "lazy";
+      const badge = createElement("span", "product-card__section-badge", product.productType === "boutique" ? "Boutique" : "Ready-Made");
+      media.append(image, badge);
 
       const content = createElement("div", "product-content");
-      const metaGrid = createElement("div", "product-meta-grid");
-      const stock = createElement("span", "stock-status", "Awaiting Stock");
-      const action = createElement("a", "product-card__action", "View Details");
-
-      action.href = "#shop-products";
-      action.setAttribute("aria-disabled", "true");
-      action.addEventListener("click", event => event.preventDefault());
-
-      metaGrid.append(
-        createMetaRow("Price", "₹ —"),
-        createMetaRow("Discount Price", "₹ —", "product-meta-row--discount"),
-        createMetaRow("Stock Status", "Awaiting product")
-      );
-
+      const action = createElement("button", "product-card__action", stock > 0 ? "Order Now" : "Out of Stock");
+      action.type = "button";
+      action.disabled = stock <= 0;
+      action.dataset.orderProduct = product.id;
       content.append(
-        createElement("span", "product-category", slot.category),
-        createElement("h3", "", slot.name || `Product Slot ${index + 1}`),
-        createElement("p", "product-description", "Empty dynamic card ready for future admin-added product image, name, pricing, stock, and details."),
-        metaGrid,
-        stock,
+        createElement("span", "product-category", category),
+        createElement("h3", "", title),
+        createElement("p", "product-description", product.description || "Premium boutique product."),
+        createElement("p", "product-price", formatPrice(product.discountPrice || product.price)),
+        createElement("span", stock > 0 ? "stock-status" : "stock-status status-inactive", stock > 0 ? `${stock} in stock` : "Out of stock"),
         action
       );
-
       card.append(media, content);
       return card;
     };
 
-    const renderShopSlots = () => {
+    const renderProducts = () => {
       const activeCategory = filterButtons.find(button => button.classList.contains("active"))?.dataset.category || "all";
       const searchTerm = normalize(productSearch ? productSearch.value : "");
-      const visibleSlots = emptyProductSlots.filter(slot => {
-        const tags = ["all", slot.section, slot.category, ...slot.tags].map(normalize);
-        const searchableText = normalize(`${slot.name} ${slot.category} ${slot.section} ${slot.tags.join(" ")}`);
+      const visible = products.filter(product => {
+        const tags = ["all", product.category, product.productType, product.type, ...(product.tags || [])].map(normalize);
+        const searchableText = normalize(`${product.title || product.name} ${product.category} ${product.description} ${tags.join(" ")}`);
         return (activeCategory === "all" || tags.includes(activeCategory)) && (!searchTerm || searchableText.includes(searchTerm));
       });
 
-      productGrid.replaceChildren(...visibleSlots.map(createEmptyProductCard));
+      productGrid.replaceChildren(...visible.map(createProductCard));
+      if (productCount) productCount.textContent = `${visible.length} product${visible.length === 1 ? "" : "s"} available`;
+      if (emptyProducts) emptyProducts.hidden = visible.length > 0;
+      if (!visible.length) productGrid.innerHTML = "<p>No matching products are available right now.</p>";
+    };
 
-      if (productCount) {
-        productCount.textContent = `${visibleSlots.length} empty product card${visibleSlots.length === 1 ? "" : "s"} ready`;
+    const submitReadyMadeOrder = async product => {
+      const name = window.prompt("Enter your name for this order:");
+      if (!name) return;
+      const phone = window.prompt("Enter your phone number:");
+      if (!phone) return;
+      const quantity = Number(window.prompt("Quantity:", "1") || 1);
+      if (!Number.isInteger(quantity) || quantity < 1) {
+        alert("Please enter a valid quantity.");
+        return;
       }
 
-      if (emptyProducts) {
-        emptyProducts.hidden = false;
-      }
+      const price = Number(product.discountPrice || product.price || 0);
+      const order = await request("/api/v1/orders/ready-made", {
+        method: "POST",
+        body: JSON.stringify({
+          customer: { name, phone },
+          productId: product.id,
+          productName: product.title || product.name,
+          items: [{ productId: product.id, name: product.title || product.name, quantity, price }],
+          totalAmount: price * quantity,
+          payment: { method: "manual-upi", status: "not-submitted", amount: price * quantity }
+        })
+      });
+      alert(`Order saved! Your order ID is ${order.orderNumber || order.id}. Please share UPI payment proof with the boutique team.`);
+      products = await request("/api/v1/products?type=ready-made");
+      renderProducts();
     };
 
     filterButtons.forEach(button => {
       button.addEventListener("click", () => {
         filterButtons.forEach(item => item.classList.remove("active"));
         button.classList.add("active");
-        renderShopSlots();
+        renderProducts();
       });
     });
 
-    if (productSearch) {
-      productSearch.addEventListener("input", renderShopSlots);
-    }
+    productSearch?.addEventListener("input", renderProducts);
+    productGrid.addEventListener("click", async event => {
+      const button = event.target.closest("[data-order-product]");
+      if (!button) return;
+      const product = products.find(item => String(item.id) === String(button.dataset.orderProduct));
+      if (!product) return;
+      try {
+        button.disabled = true;
+        await submitReadyMadeOrder(product);
+      } catch (error) {
+        alert(error.message || "Unable to create the order right now.");
+      } finally {
+        button.disabled = false;
+      }
+    });
 
-    renderShopSlots();
+    productGrid.innerHTML = "<p>Loading products...</p>";
+    request("/api/v1/products?type=ready-made")
+      .then(data => {
+        products = Array.isArray(data) ? data : [];
+        renderProducts();
+      })
+      .catch(error => {
+        productGrid.innerHTML = `<p>${escapeHtml(error.message || "Unable to load products.")}</p>`;
+      });
   };
 
   const readUploadFile = (file, { label = "Upload", maxFileSize = 4 * 1024 * 1024, required = false } = {}) => new Promise((resolve, reject) => {

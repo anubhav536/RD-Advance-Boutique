@@ -24,6 +24,15 @@ const createOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const createReadyMadeOrder = asyncHandler(async (req, res) => {
+  const order = await OrderModel.createReadyMade(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: order,
+  });
+});
+
 const getOrder = asyncHandler(async (req, res) => {
   const order = await OrderModel.findById(req.params.id);
 
@@ -164,6 +173,7 @@ module.exports = {
   cancelOrder,
   completeOrder,
   createOrder,
+  createReadyMadeOrder,
   deleteOrder,
   getCancelledOrders,
   getCompletedOrders,
