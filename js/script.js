@@ -58,49 +58,16 @@
   };
 
   const markPageReady = () => {
-    requestAnimationFrame(() => body.classList.add("luxury-page-ready"));
+    body.classList.add("luxury-page-ready");
   };
 
   const setupPageTransitions = () => {
-    doc.addEventListener("click", event => {
-      const link = event.target.closest("a[href]");
-      if (!isInternalPageLink(link) || reduceMotion) return;
-
-      event.preventDefault();
-      body.classList.add("luxury-page-exit");
-      window.setTimeout(() => {
-        window.location.href = link.href;
-      }, 360);
-    });
+    // Intentionally disabled so GitHub Pages content is visible and clickable immediately.
   };
 
   const setupScrollReveal = () => {
     const revealItems = Array.from(doc.querySelectorAll(revealSelectors));
-    revealItems.forEach((item, index) => {
-      if (item.classList.contains("luxury-reveal")) return;
-
-      item.classList.add("luxury-reveal");
-      item.style.setProperty("--luxury-index", index % 5);
-
-      if (item.matches(".course__media, .booking-intro")) item.dataset.luxuryReveal = "left";
-      if (item.matches(".course__content, .booking-layout")) item.dataset.luxuryReveal = "right";
-      if (item.matches(".design-card, .product-card, .gallery-card, .fabric-card")) item.dataset.luxuryReveal = "scale";
-    });
-
-    if (reduceMotion || !("IntersectionObserver" in window)) {
-      revealItems.forEach(item => item.classList.add("is-visible"));
-      return;
-    }
-
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px 0px -12%", threshold: 0.16 });
-
-    revealItems.forEach(item => observer.observe(item));
+    revealItems.forEach(item => item.classList.add("is-visible"));
   };
 
   const setupResponsiveNavigation = () => {
@@ -438,16 +405,13 @@
       media.append(image, badge);
 
       const content = createElement("div", "product-content");
-      const action = createElement("a", "product-card__action", stock > 0 ? "WhatsApp Order" : "Enquire on WhatsApp");
-      action.href = getWhatsappUrl(createProductOrderMessage(product));
-      action.target = "_blank";
-      action.rel = "noopener";
-      action.dataset.noTransition = "true";
+      const action = createElement("a", "product-card__action", "View Details");
+      action.href = new URL(`product-details.html?id=${encodeURIComponent(product.slug || product.id || normalize(title))}`, window.location.href).toString();
       content.append(
         createElement("span", "product-category", category),
         createElement("h3", "", title),
-        createElement("p", "product-description", product.description || "Premium boutique product."),
-        createElement("p", "product-price", formatPrice(product.discountPrice || product.price)),
+        createElement("p", "product-description", product.shortDescription || product.description || "Premium boutique product."),
+        createElement("p", "product-price", formatPrice(product.price)),
         createElement("span", stock > 0 ? "stock-status" : "stock-status status-inactive", stock > 0 ? `${stock} available` : "Confirm availability"),
         action
       );
@@ -613,12 +577,24 @@
     }
   };
 
+  const setupCourseWhatsappLinks = () => {
+    const links = doc.querySelectorAll('a[href*="wa.me"][href*="tailoring%20course"], a[href*="wa.me"][href*="tailoring course"]');
+    if (!links.length) return;
+
+    const message = `Hello RD Advance Boutique,\n\nI am interested in joining your tailoring course.\n\nCourse Name: Basic to Advance Tailoring\nWebsite URL: ${window.location.href}\n\nPlease send complete details.`;
+    links.forEach(link => {
+      link.href = getWhatsappUrl(message);
+      link.dataset.noTransition = "true";
+    });
+  };
+
   const init = () => {
     markPageReady();
     setupPageTransitions();
     setupResponsiveNavigation();
     setupSecretAdminShortcut();
     setupFashionShop();
+    setupCourseWhatsappLinks();
     setupContactAppointmentForm();
     setupCustomStitchingRequests();
     setupScrollReveal();

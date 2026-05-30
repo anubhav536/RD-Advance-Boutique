@@ -6,7 +6,20 @@
     "image": "assets/design1.jpg",
     "alt": "Designer blouse with premium boutique detailing",
     "layout": "tall",
-    "featured": true
+    "featured": true,
+    "shortDescription": "Designer Blouse inspiration for refined blouse boutique styling.",
+    "longDescription": "Designer Blouse is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Blouse",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Premium neckline and sleeve detailing",
+      "Boutique finishing",
+      "Custom fit guidance"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Designer Blouse design. Please share stitching details and price."
   },
   {
     "id": "design2",
@@ -15,7 +28,20 @@
     "image": "assets/design2.jpg",
     "alt": "Boutique kurti with graceful custom stitching",
     "layout": "default",
-    "featured": false
+    "featured": false,
+    "shortDescription": "Boutique Kurti inspiration for refined kurti boutique styling.",
+    "longDescription": "Boutique Kurti is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Kurti",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Comfortable silhouette",
+      "Elegant everyday finish",
+      "Occasion-ready styling"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Boutique Kurti design. Please share stitching details and price."
   },
   {
     "id": "design3",
@@ -24,7 +50,20 @@
     "image": "assets/design3.jpg",
     "alt": "Bridal boutique collection with ornate festive styling",
     "layout": "wide",
-    "featured": true
+    "featured": true,
+    "shortDescription": "Bridal Collection inspiration for refined bridal boutique styling.",
+    "longDescription": "Bridal Collection is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Bridal",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Luxury festive detailing",
+      "Statement design inspiration",
+      "Personalized consultation"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Bridal Collection design. Please share stitching details and price."
   },
   {
     "id": "design4",
@@ -33,7 +72,20 @@
     "image": "assets/design4.jpg",
     "alt": "Kids wear boutique design with soft premium finishing",
     "layout": "default",
-    "featured": false
+    "featured": false,
+    "shortDescription": "Little Occasion Wear inspiration for refined kids wear boutique styling.",
+    "longDescription": "Little Occasion Wear is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Kids Wear",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Soft comfort finish",
+      "Celebration-ready look",
+      "Child-friendly styling"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Little Occasion Wear design. Please share stitching details and price."
   },
   {
     "id": "design5",
@@ -42,7 +94,20 @@
     "image": "assets/design5.jpg",
     "alt": "Custom stitched blouse with luxury boutique finish",
     "layout": "wide",
-    "featured": true
+    "featured": true,
+    "shortDescription": "Custom Stitching inspiration for refined blouse boutique styling.",
+    "longDescription": "Custom Stitching is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Blouse",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Premium neckline and sleeve detailing",
+      "Boutique finishing",
+      "Custom fit guidance"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Custom Stitching design. Please share stitching details and price."
   },
   {
     "id": "design6",
@@ -51,7 +116,20 @@
     "image": "assets/design6.png",
     "alt": "Modern kurti pattern from RD Advance Boutique",
     "layout": "tall",
-    "featured": false
+    "featured": false,
+    "shortDescription": "Modern Patterns inspiration for refined kurti boutique styling.",
+    "longDescription": "Modern Patterns is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Kurti",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Comfortable silhouette",
+      "Elegant everyday finish",
+      "Occasion-ready styling"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Modern Patterns design. Please share stitching details and price."
   },
   {
     "id": "course1",
@@ -60,7 +138,20 @@
     "image": "assets/coursedesign1.jpg",
     "alt": "Bridal-inspired course design with refined tailoring",
     "layout": "default",
-    "featured": false
+    "featured": false,
+    "shortDescription": "Celebration Detail inspiration for refined bridal boutique styling.",
+    "longDescription": "Celebration Detail is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Bridal",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Luxury festive detailing",
+      "Statement design inspiration",
+      "Personalized consultation"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Celebration Detail design. Please share stitching details and price."
   },
   {
     "id": "course2",
@@ -69,6 +160,19 @@
     "image": "assets/coursedesign2.jpg",
     "alt": "Kids boutique sample with polished sewing detail",
     "layout": "default",
-    "featured": false
+    "featured": false,
+    "shortDescription": "Playful Couture inspiration for refined kids wear boutique styling.",
+    "longDescription": "Playful Couture is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
+    "tags": [
+      "Kids Wear",
+      "Boutique",
+      "Custom Design"
+    ],
+    "features": [
+      "Soft comfort finish",
+      "Celebration-ready look",
+      "Child-friendly styling"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Playful Couture design. Please share stitching details and price."
   }
 ]

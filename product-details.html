@@ -3,57 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product URL Preserved | RD Advance Boutique</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="View RD Advance Boutique product details, sizes, colors, related products, and order on WhatsApp.">
+  <title>Product Details | RD Advance Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
 </head>
-<body>
-  <section class="dashboard-section">
-    <div class="dashboard-container">
-      <aside class="dashboard-sidebar">
-        <div class="dashboard-logo">
-          <img src="assets/logo.png" alt="RD Advance Boutique logo">
-          <h2>RD Advance</h2>
-          <p>Static Website</p>
+<body class="detail-page product-detail-page">
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text"><strong>RD Advance</strong><span>Boutique</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="shop.html" class="nav__link nav__link--active">Shop</a>
+      <a href="gallery.html" class="nav__link">Gallery</a>
+      <a href="learn.html" class="nav__link">Course</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </nav>
+    <a href="https://wa.me/917693849472" class="header-cta" data-no-transition="true">WhatsApp</a>
+  </header>
+
+  <main id="productDetails">
+    <section class="detail-hero" aria-labelledby="productTitle">
+      <div class="detail-hero__media">
+        <img id="productImage" src="assets/logo.png" alt="RD Advance Boutique product preview" loading="eager">
+      </div>
+      <div class="detail-hero__content">
+        <p class="eyebrow" id="productCategory">Boutique</p>
+        <h1 id="productTitle">Loading product details...</h1>
+        <div class="detail-price-row">
+          <strong id="productPrice">Price on request</strong>
+          <span id="productOldPrice" hidden></span>
         </div>
-        <nav class="dashboard-menu" aria-label="Static content management navigation">
-          <a href="admin-dashboard.html" class="menu-item">📋 Guide</a>
-          <a href="admin-products.html" class="menu-item">🛍 Products JSON</a>
-          <a href="admin-gallery.html" class="menu-item">🖼 Gallery JSON</a>
-          <a href="admin-categories.html" class="menu-item">🏷 Categories JSON</a>
-          <a href="admin-settings.html" class="menu-item">⚙ Settings JSON</a>
-          <a href="admin-notifications.html" class="menu-item">🔔 Notifications JSON</a>
-          <a href="index.html" class="menu-item">🏠 View Website</a>
-        </nav>
-      </aside>
-      <main class="dashboard-main">
-        <header class="dashboard-topbar">
+        <p id="productLongDescription" class="detail-description">Please wait while the product details load.</p>
+        <div class="detail-options" aria-label="Available product options">
           <div>
-            <h1>Product URL Preserved</h1>
-            <p>This URL is preserved for GitHub Pages, but backend admin authentication and API writes have been removed.</p>
+            <h2>Available sizes</h2>
+            <div class="detail-chip-list" id="productSizes"></div>
           </div>
-          <a href="README.md" class="primary-btn">Read Guide</a>
-        </header>
-        <section class="dashboard-box">
-          <h2>How website management works now</h2>
-          <p>RD Advance Boutique is a fully static website. Update content by editing JSON files in the repository and committing the changes.</p>
-          <ul>
-            <li><strong>Products:</strong> edit <code>data/products.json</code> to add, edit, or delete products.</li>
-            <li><strong>Gallery:</strong> edit <code>data/gallery.json</code> to add, edit, or delete designs.</li>
-            <li><strong>Categories:</strong> edit <code>data/categories.json</code>.</li>
-            <li><strong>Settings:</strong> edit <code>data/settings.json</code> for branding, contact, SEO, and social links.</li>
-            <li><strong>Notifications:</strong> edit <code>data/notifications.json</code>.</li>
-          </ul>
-          <p>No login, sessions, server-side storage, Express backend, or JSON write operations are used. Customer product orders, gallery enquiries, custom stitching requests, course enquiries, and contact messages all open WhatsApp Business with prefilled messages.</p>
-          <div class="admin-form-buttons">
-            <a class="primary-btn" href="shop.html">Preview Shop</a>
-            <a class="secondary-btn" href="gallery.html">Preview Gallery</a>
-            <a class="secondary-btn" href="custom.html">Preview Custom Stitching</a>
-            <a class="secondary-btn" href="contact.html">Preview Contact</a>
+          <div>
+            <h2>Available colors</h2>
+            <div class="detail-chip-list" id="productColors"></div>
           </div>
-        </section>
-      </main>
-    </div>
-  </section>
+        </div>
+        <div class="detail-actions">
+          <a id="productWhatsapp" class="btn btn--primary" href="https://wa.me/917693849472" target="_blank" rel="noopener" data-no-transition="true">Order on WhatsApp</a>
+          <button id="productShare" class="btn btn--ghost" type="button">Share</button>
+        </div>
+        <p id="productShareStatus" class="share-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="detail-related" aria-labelledby="related-products-title">
+      <div class="section__intro">
+        <p class="eyebrow">You may also like</p>
+        <h2 id="related-products-title">Related products</h2>
+      </div>
+      <div class="product-grid" id="relatedProducts"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__brand"><img src="assets/logo.png" alt="RD Advance Boutique logo"><h2>RD Advance Boutique</h2></div>
+    <div class="footer__links"><a href="index.html">Home</a><a href="shop.html">Shop</a><a href="gallery.html">Gallery</a><a href="learn.html">Course</a></div>
+    <div class="footer__contact"><a href="https://wa.me/917693849472">WhatsApp</a><span>Damoh, Madhya Pradesh</span></div>
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
+  </footer>
+
+  <script src="products.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script src="js/site-settings.js" defer></script>
 </body>
 </html>

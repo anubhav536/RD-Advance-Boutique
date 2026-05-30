@@ -72,26 +72,73 @@
     return value.toLowerCase().includes("request") ? value : value;
   }
 
+  function getProductUrl(product) {
+    const title = product.title || product.name || "Boutique Product";
+    return getCurrentPageUrlForPath("product-details.html", { id: product.slug || product.id || normalize(title) });
+  }
+
+  function getGalleryUrl(item) {
+    const title = item.title || item.name || "Boutique Design";
+    return getCurrentPageUrlForPath("gallery-details.html", { id: item.slug || item.id || normalize(title) });
+  }
+
+  function getCurrentPageUrlForPath(pathname, params) {
+    const url = new URL(pathname, window.location.href);
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, value);
+    });
+    return url.toString();
+  }
+
   function createProductOrderMessage(product) {
     const title = product.title || product.name || "Boutique Product";
     const category = product.category || "Boutique";
-    const price = formatPrice(product.discountPrice || product.price || "");
-    const productLink = getCurrentPageUrl({ product: product.slug || product.id || normalize(title) });
-    return `Hello RD Advance Boutique,\n\nI want to order this product.\n\nProduct Name: ${title}\nCategory: ${category}\nPrice: ${price}\nProduct Link: ${productLink}\n\nPlease guide me for payment and delivery.`;
+    const price = formatPrice(product.price || "");
+    const productLink = getProductUrl(product);
+    const customMessage = product.whatsappMessage ? `\nMessage: ${product.whatsappMessage}\n` : "";
+    return `Hello RD Advance Boutique,\n\nI want to order this product.\n\nProduct Name: ${title}\nCategory: ${category}\nPrice: ${price}\nProduct URL: ${productLink}${customMessage}\nPlease guide me for payment and delivery.`;
   }
 
   function createDesignEnquiryMessage(item) {
     const title = item.title || item.name || "Boutique Design";
-    const designLink = getCurrentPageUrl({ design: item.slug || item.id || normalize(title) });
-    return `Hello RD Advance Boutique,\n\nI am interested in this design.\n\nDesign Name: ${title}\nDesign Link: ${designLink}\n\nPlease provide stitching details and price.`;
+    const designLink = getGalleryUrl(item);
+    const customMessage = item.whatsappMessage ? `\nMessage: ${item.whatsappMessage}\n` : "";
+    return `Hello RD Advance Boutique,\n\nI am interested in this design.\n\nDesign Name: ${title}\nDesign URL: ${designLink}${customMessage}\nPlease provide stitching details and price.`;
+  }
+
+  async function shareCurrentPage(title, text) {
+    const shareData = { title, text, url: window.location.href };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return "Shared successfully.";
+      } catch (error) {
+        if (error.name === "AbortError") return "Share cancelled.";
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(window.location.href);
+    } else {
+      const field = document.createElement("textarea");
+      field.value = window.location.href;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.left = "-9999px";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+    return "Page link copied.";
   }
 
   function renderProductCard(product) {
-    const title = product.title || "Boutique Product";
+    const title = product.title || product.name || "Boutique Product";
     const category = product.category || "Boutique";
-    const image = product.image || "assets/logo.png";
-    const description = product.description || "Premium boutique fashion piece.";
-    const link = getWhatsappUrl(createProductOrderMessage(product));
+    const image = product.image || product.images?.[0] || "assets/logo.png";
+    const description = product.shortDescription || product.description || "Premium boutique fashion piece.";
+    const link = getProductUrl(product);
 
     const article = createElement("article", "product-card");
     article.dataset.category = normalize(category);
@@ -107,11 +154,8 @@
     wishlistButton.type = "button";
     wishlistButton.setAttribute("aria-label", `Add ${title} to wishlist`);
 
-    const quickView = createElement("a", "quick-view-btn", "WhatsApp Order");
+    const quickView = createElement("a", "quick-view-btn", "View Details");
     quickView.href = link;
-    quickView.target = "_blank";
-    quickView.rel = "noopener";
-    quickView.dataset.noTransition = "true";
 
     const content = createElement("div", "product-content");
     content.append(
@@ -253,8 +297,8 @@
     card.dataset.category = normalize(category).replace("kids-wear", "kids");
 
     const preview = createElement("a", "gallery-card__preview");
-    preview.href = `#${previewId}`;
-    preview.setAttribute("aria-label", `Open fullscreen preview of ${title}`);
+    preview.href = getGalleryUrl(item);
+    preview.setAttribute("aria-label", `Open details for ${title}`);
 
     const image = document.createElement("img");
     image.src = item.image || "assets/logo.png";
@@ -263,7 +307,7 @@
 
     const shade = createElement("span", "gallery-card__shade");
     const content = createElement("span", "gallery-card__content");
-    content.append(createElement("small", "", category), createElement("strong", "", title));
+    content.append(createElement("small", "", category), createElement("strong", "", title), createElement("em", "", item.shortDescription || "View design details"));
 
     const enquire = createElement("a", "gallery-card__whatsapp", "Enquire on WhatsApp");
     enquire.href = getWhatsappUrl(createDesignEnquiryMessage(item));
@@ -320,6 +364,84 @@
     }
   }
 
+
+  function getSelectedId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id") || params.get("product") || params.get("design") || "";
+  }
+
+  function renderList(container, items, className) {
+    container.replaceChildren(...(items || []).map(item => createElement("span", className, item)));
+  }
+
+  async function initProductDetails() {
+    const details = document.getElementById("productDetails");
+    if (!details) return;
+
+    const products = await loadJson(DATA_SOURCES.products).catch(() => []);
+    const selectedId = normalize(getSelectedId());
+    const product = (Array.isArray(products) ? products : []).find(item => normalize(item.id || item.slug || item.title || item.name) === selectedId) || products[0];
+    if (!product) {
+      details.textContent = "Product details are unavailable right now.";
+      return;
+    }
+
+    const title = product.title || product.name || "Boutique Product";
+    document.title = `${title} | RD Advance Boutique`;
+    document.getElementById("productImage").src = product.image || product.images?.[0] || "assets/logo.png";
+    document.getElementById("productImage").alt = product.alt || title;
+    document.getElementById("productCategory").textContent = product.category || "Boutique";
+    document.getElementById("productTitle").textContent = title;
+    document.getElementById("productPrice").textContent = formatPrice(product.price);
+    const oldPrice = document.getElementById("productOldPrice");
+    if (oldPrice) {
+      oldPrice.textContent = product.oldPrice ? formatPrice(product.oldPrice) : "";
+      oldPrice.hidden = !product.oldPrice;
+    }
+    document.getElementById("productLongDescription").textContent = product.longDescription || product.details || product.shortDescription || product.description || "Premium boutique fashion with personalized RD Advance Boutique guidance.";
+    renderList(document.getElementById("productSizes"), product.sizes || ["Custom measurements"], "detail-chip");
+    renderList(document.getElementById("productColors"), product.colors || ["As per fabric"], "detail-chip detail-chip--soft");
+    const orderButton = document.getElementById("productWhatsapp");
+    orderButton.href = getWhatsappUrl(createProductOrderMessage(product));
+    const shareButton = document.getElementById("productShare");
+    const shareStatus = document.getElementById("productShareStatus");
+    shareButton.addEventListener("click", async () => {
+      shareStatus.textContent = await shareCurrentPage(title, product.shortDescription || "RD Advance Boutique product");
+    });
+
+    const related = (Array.isArray(products) ? products : []).filter(item => item.id !== product.id && item.category === product.category).slice(0, 3);
+    document.getElementById("relatedProducts").replaceChildren(...related.map(renderProductCard));
+  }
+
+  async function initGalleryDetails() {
+    const details = document.getElementById("galleryDetails");
+    if (!details) return;
+
+    const galleryItems = await loadJson(DATA_SOURCES.gallery).catch(() => []);
+    const selectedId = normalize(getSelectedId());
+    const item = (Array.isArray(galleryItems) ? galleryItems : []).find(entry => normalize(entry.id || entry.slug || entry.title || entry.name) === selectedId) || galleryItems[0];
+    if (!item) {
+      details.textContent = "Gallery details are unavailable right now.";
+      return;
+    }
+
+    const title = item.title || item.name || "Boutique Design";
+    document.title = `${title} | RD Advance Boutique Gallery`;
+    document.getElementById("galleryImage").src = item.image || "assets/logo.png";
+    document.getElementById("galleryImage").alt = item.alt || title;
+    document.getElementById("galleryCategory").textContent = item.category || "Boutique";
+    document.getElementById("galleryTitle").textContent = title;
+    document.getElementById("galleryLongDescription").textContent = item.longDescription || item.shortDescription || "Premium boutique design inspiration.";
+    renderList(document.getElementById("galleryFeatures"), item.features || item.tags || ["Premium finishing", "Custom styling", "Boutique consultation"], "detail-feature");
+    const enquiryButton = document.getElementById("galleryWhatsapp");
+    enquiryButton.href = getWhatsappUrl(createDesignEnquiryMessage(item));
+    const shareButton = document.getElementById("galleryShare");
+    const shareStatus = document.getElementById("galleryShareStatus");
+    shareButton.addEventListener("click", async () => {
+      shareStatus.textContent = await shareCurrentPage(title, item.shortDescription || "RD Advance Boutique design");
+    });
+  }
+
   window.RDProductRenderer = {
     normalize,
     renderProductCard,
@@ -331,5 +453,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     initShop();
     initGallery();
+    initProductDetails();
+    initGalleryDetails();
   });
 })();

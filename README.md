@@ -7,10 +7,11 @@ All customer actions are completed through **WhatsApp Business** with prefilled 
 ## What changed
 
 - Public pages load content from static JSON files in `data/`.
-- Product ordering opens WhatsApp with product name, category, price, and current product URL.
-- Gallery design enquiries open WhatsApp with design name and current design URL.
+- Product cards show short descriptions, link to static product detail pages, and ordering opens WhatsApp with product name, category, price, and product URL.
+- Gallery cards link to static gallery detail pages; design enquiries open WhatsApp with design name and design URL.
+- Product and gallery detail pages include native share buttons with copy-link fallback.
 - Custom stitching and contact forms generate WhatsApp messages instead of submitting to a backend.
-- Course enquiry buttons open WhatsApp with the course name.
+- Course enquiry buttons open WhatsApp with the course name and website URL.
 - Former admin URLs are preserved as static content-management guide pages.
 - Backend source, Express dependencies, API writes, admin login, sessions, and server storage were removed.
 
@@ -27,16 +28,18 @@ Recommended product object:
 ```json
 {
   "id": "designer-blouse-001",
-  "title": "Designer Blouse",
-  "category": "Blouse",
-  "productType": "boutique",
-  "price": 2499,
-  "discountPrice": 1999,
-  "stock": 1,
+  "name": "Designer Blouse",
+  "category": "Blouses",
   "image": "assets/design1.jpg",
-  "alt": "Designer blouse by RD Advance Boutique",
-  "description": "Premium custom blouse with elegant finishing.",
-  "tags": ["blouse", "custom", "women"]
+  "price": 1999,
+  "oldPrice": 2499,
+  "shortDescription": "Premium custom blouse with elegant finishing.",
+  "longDescription": "Full boutique description shown on the product details page.",
+  "sizes": ["S", "M", "L", "XL", "Custom"],
+  "colors": ["Pink", "Gold", "Maroon"],
+  "featured": true,
+  "tags": ["blouse", "custom", "women"],
+  "whatsappMessage": "Please share availability, fitting, payment, and delivery details."
 }
 ```
 
@@ -57,9 +60,11 @@ Recommended gallery object:
   "title": "Bridal Design",
   "category": "Bridal",
   "image": "assets/design5.jpg",
-  "alt": "Bridal boutique design",
-  "layout": "tall",
-  "description": "Luxury bridal stitching inspiration."
+  "shortDescription": "Luxury bridal stitching inspiration.",
+  "longDescription": "Full design description shown on the gallery details page.",
+  "tags": ["bridal", "boutique", "custom design"],
+  "featured": true,
+  "whatsappMessage": "Please share stitching details and price."
 }
 ```
 
@@ -135,7 +140,7 @@ Every shop product gets a **WhatsApp Order** button. The generated message conta
 Every gallery design gets an **Enquire on WhatsApp** button. The generated message contains:
 
 - Design Name
-- Design Link
+- Design URL
 
 ### Custom stitching
 
@@ -152,6 +157,7 @@ The custom stitching form generates a WhatsApp message with:
 Course buttons generate a WhatsApp message with:
 
 - Course Name
+- Website URL
 
 ### Contact form
 
@@ -171,6 +177,8 @@ The contact form generates a WhatsApp message with customer name, mobile, servic
    - `index.html`
    - `shop.html`
    - `gallery.html`
+   - `product-details.html?id=designer-blouse`
+   - `gallery-details.html?id=design1`
    - `custom.html`
    - `learn.html`
    - `contact.html`
