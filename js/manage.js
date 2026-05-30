@@ -295,6 +295,118 @@
   }
 
   /* ─────────────────────────────────────────────
+     IMAGE PICKER HELPERS
+  ───────────────────────────────────────────── */
+  function makeImgPicker(name, val, label, hint) {
+    const hasVal = !!val;
+    return `<div class="adm-img-picker">
+      <label>${label}${hint ? ` <small>${hint}</small>` : ""}</label>
+      <div class="adm-img-picker-row">
+        <input type="text" name="${name}" value="${esc(val || "")}" placeholder="assets/image.jpg ya https://...">
+        <label class="adm-upload-btn" title="File upload karein">
+          📁 Upload
+          <input type="file" accept="image/*" class="adm-file-input" data-target="${name}" hidden>
+        </label>
+      </div>
+      <img class="adm-img-preview" src="${esc(val || "")}" ${hasVal ? "" : "hidden"} onerror="this.hidden=true">
+    </div>`;
+  }
+
+  function makeMultiImgPicker(images) {
+    const rows = (images && images.length ? images : [""]).map((src, i) => `
+      <div class="adm-multi-img-row">
+        <input type="text" name="images[]" value="${esc(src)}" placeholder="assets/img${i + 1}.jpg ya upload karein">
+        <label class="adm-upload-btn adm-upload-btn--sm" title="Upload">
+          📁
+          <input type="file" accept="image/*" class="adm-file-input adm-file-input--multi" hidden>
+        </label>
+        <img class="adm-multi-img-thumb" src="${esc(src)}" ${src ? "" : "hidden"} onerror="this.hidden=true">
+        <button type="button" class="adm-multi-img-del" title="Is row ko hatao">✕</button>
+      </div>`).join("");
+    return `<div class="adm-multi-img-picker" id="multiImgPicker">
+      ${rows}
+      <button type="button" class="adm-btn-ghost adm-multi-add-btn" id="btnAddImgRow">+ Aur Image Add Karein</button>
+    </div>`;
+  }
+
+  function attachImgPickerListeners(container) {
+    // Single image pickers — file upload
+    container.querySelectorAll(".adm-file-input:not(.adm-file-input--multi)").forEach(inp => {
+      inp.addEventListener("change", () => {
+        const file = inp.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          const b64 = e.target.result;
+          const urlInput = container.querySelector(`[name="${inp.dataset.target}"]`);
+          if (urlInput) { urlInput.value = b64; urlInput.dispatchEvent(new Event("input")); }
+          const picker = inp.closest(".adm-img-picker");
+          if (picker) {
+            const prev = picker.querySelector(".adm-img-preview");
+            if (prev) { prev.src = b64; prev.hidden = false; }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+    // Single image pickers — live URL preview
+    container.querySelectorAll(".adm-img-picker").forEach(picker => {
+      const urlInp = picker.querySelector("input[type=text]");
+      const prev   = picker.querySelector(".adm-img-preview");
+      if (!urlInp || !prev) return;
+      urlInp.addEventListener("input", () => {
+        if (urlInp.value.trim()) { prev.src = urlInp.value.trim(); prev.hidden = false; }
+        else prev.hidden = true;
+      });
+    });
+    // Multi image picker
+    attachMultiImgListeners(container);
+  }
+
+  function attachMultiImgListeners(container) {
+    const picker = container.querySelector("#multiImgPicker");
+    if (!picker) return;
+
+    function bindRow(row) {
+      const fileInp = row.querySelector(".adm-file-input--multi");
+      const urlInp  = row.querySelector("input[type=text]");
+      const thumb   = row.querySelector(".adm-multi-img-thumb");
+      const delBtn  = row.querySelector(".adm-multi-img-del");
+      if (fileInp) fileInp.addEventListener("change", () => {
+        const file = fileInp.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          if (urlInp) urlInp.value = e.target.result;
+          if (thumb)  { thumb.src = e.target.result; thumb.hidden = false; }
+        };
+        reader.readAsDataURL(file);
+      });
+      if (urlInp && thumb) urlInp.addEventListener("input", () => {
+        if (urlInp.value.trim()) { thumb.src = urlInp.value.trim(); thumb.hidden = false; }
+        else thumb.hidden = true;
+      });
+      if (delBtn) delBtn.addEventListener("click", () => { row.remove(); });
+    }
+
+    picker.querySelectorAll(".adm-multi-img-row").forEach(bindRow);
+
+    picker.querySelector("#btnAddImgRow")?.addEventListener("click", () => {
+      const idx = picker.querySelectorAll(".adm-multi-img-row").length;
+      const div = document.createElement("div");
+      div.className = "adm-multi-img-row";
+      div.innerHTML = `
+        <input type="text" name="images[]" value="" placeholder="assets/img${idx + 1}.jpg ya upload karein">
+        <label class="adm-upload-btn adm-upload-btn--sm" title="Upload">
+          📁
+          <input type="file" accept="image/*" class="adm-file-input adm-file-input--multi" hidden>
+        </label>
+        <img class="adm-multi-img-thumb" hidden>
+        <button type="button" class="adm-multi-img-del" title="Hatao">✕</button>`;
+      picker.insertBefore(div, picker.querySelector("#btnAddImgRow"));
+      bindRow(div);
+    });
+  }
+
+  /* ─────────────────────────────────────────────
      PRODUCTS
   ───────────────────────────────────────────── */
   function renderProducts() {
@@ -365,14 +477,18 @@
       <div class="adm-fg"><label>Status</label><select name="status"><option value="active" ${item.status !== "inactive" ? "selected" : ""}>Active</option><option value="inactive" ${item.status === "inactive" ? "selected" : ""}>Inactive</option></select></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> Featured Product</label></div>
       <div class="adm-fg adm-fg--full"><label>Short Description</label><textarea name="shortDescription" rows="2" placeholder="Brief product description...">${esc(item.shortDescription || "")}</textarea></div>
-      <div class="adm-fg adm-fg--full"><label>Main Image URL</label><input type="text" name="image" value="${esc(item.image || "")}" placeholder="assets/product.jpg"></div>
-      <div class="adm-fg adm-fg--full"><label>All Image URLs <small>(one per line)</small></label><textarea name="images" rows="4" placeholder="assets/img1.jpg&#10;assets/img2.jpg">${(item.images || []).join("\n")}</textarea></div>
+      <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "", "Main Image", "Cover photo jo shop mein dikhegi")}</div>
+      <div class="adm-fg adm-fg--full">
+        <label>Saari Images <small>(URL type karo ya file upload karo — ek ek karke)</small></label>
+        ${makeMultiImgPicker(item.images || [])}
+      </div>
       <div class="adm-fg adm-fg--full"><label>Available Colors <small>(one per line)</small></label><textarea name="colors" rows="3" placeholder="Black &amp; Maroon&#10;Royal Blue &amp; Green">${(item.colors || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Available Sizes <small>(one per line)</small></label><textarea name="sizes" rows="3" placeholder="S&#10;M&#10;L&#10;XL">${(item.sizes || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Features <small>(one per line, start with ✔)</small></label><textarea name="features" rows="4" placeholder="✔ Premium quality&#10;✔ Comfortable fit">${(item.features || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Tags <small>(one per line)</small></label><textarea name="tags" rows="3" placeholder="Saree&#10;Handloom">${(item.tags || []).join("\n")}</textarea></div>
     </div>`;
     el("admEditModal").hidden = false;
+    attachImgPickerListeners(el("admModalBody"));
   }
 
   function collectProductForm() {
@@ -381,6 +497,7 @@
     const ex = S.editItem || {};
     const pType = f.querySelector('[name="productType"]:checked')?.value || ex.productType || "readymade";
     const selectedCategories = Array.from(f.querySelectorAll('[name="categories"]:checked')).map(cb => cb.value);
+    const multiImgs = Array.from(f.querySelectorAll('[name="images[]"]')).map(i => i.value.trim()).filter(Boolean);
     return {
       ...ex,
       id: ex.id || slug(v("title")) || uid(),
@@ -392,8 +509,8 @@
       price: parseFloat(v("price")) || 0,
       status: v("status"), featured: cb("featured"),
       shortDescription: v("shortDescription"),
-      image: v("image") || ls("images")[0] || "",
-      images: ls("images"), colors: ls("colors"), sizes: ls("sizes"),
+      image: v("image") || multiImgs[0] || "",
+      images: multiImgs, colors: ls("colors"), sizes: ls("sizes"),
       features: ls("features"), tags: ls("tags"),
       createdAt: ex.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -480,13 +597,14 @@
       <div class="adm-fg"><label>Category</label><input type="text" name="category" value="${esc(item.category || "")}" placeholder="e.g. Blouse"></div>
       <div class="adm-fg"><label>Layout</label><select name="layout"><option value="default" ${!item.layout || item.layout === "default" ? "selected" : ""}>Default</option><option value="tall" ${item.layout === "tall" ? "selected" : ""}>Tall</option><option value="wide" ${item.layout === "wide" ? "selected" : ""}>Wide</option></select></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> Featured</label></div>
-      <div class="adm-fg adm-fg--full"><label>Image URL</label><input type="text" name="image" value="${esc(item.image || "")}" placeholder="assets/design1.jpg"></div>
+      <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "", "Image", "URL type karo ya file upload karo")}</div>
       <div class="adm-fg adm-fg--full"><label>Alt Text <small>(for accessibility)</small></label><input type="text" name="alt" value="${esc(item.alt || "")}" placeholder="Short image description"></div>
       <div class="adm-fg adm-fg--full"><label>Short Description</label><textarea name="shortDescription" rows="2">${esc(item.shortDescription || "")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Tags <small>(one per line)</small></label><textarea name="tags" rows="2">${(item.tags || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>WhatsApp Enquiry Message</label><textarea name="whatsappMessage" rows="2" placeholder="Hello, I am interested in this design...">${esc(item.whatsappMessage || "")}</textarea></div>
     </div>`;
     el("admEditModal").hidden = false;
+    attachImgPickerListeners(el("admModalBody"));
   }
 
   function collectGalleryForm() {
@@ -536,11 +654,12 @@
       <div class="adm-fg"><label>Category</label><input type="text" name="category" value="${esc(item.category || "General Update")}" placeholder="General Update"></div>
       <div class="adm-fg"><label>Button Label</label><input type="text" name="ctaLabel" value="${esc(item.ctaLabel || "")}" placeholder="e.g. View Now"></div>
       <div class="adm-fg"><label>Button URL</label><input type="text" name="ctaUrl" value="${esc(item.ctaUrl || "")}" placeholder="shop.html or https://..."></div>
-      <div class="adm-fg adm-fg--full"><label>Image URL</label><input type="text" name="image" value="${esc(item.image || "assets/logo.png")}" placeholder="assets/logo.png"></div>
+      <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "assets/logo.png", "Image", "URL type karo ya file upload karo")}</div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="showAsPopup" ${item.showAsPopup ? "checked" : ""}> Show as Popup on page load</label></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="dismissible" ${item.dismissible !== false ? "checked" : ""}> Dismissible (user can close it)</label></div>
     </div>`;
     el("admEditModal").hidden = false;
+    attachImgPickerListeners(el("admModalBody"));
   }
 
   function collectNotifForm() {
