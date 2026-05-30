@@ -127,23 +127,15 @@
   };
 
   const setupSecretAdminShortcut = () => {
+    const isHomePage = /(^|\/)index\.html$/.test(window.location.pathname) || /\/$/.test(window.location.pathname);
+    if (!isHomePage) return;
+
     const trigger = doc.querySelector(".site-header .brand__logo");
     if (!trigger) return;
 
-    const shortcutPath = "admin-signup.html";
-    const requiredTapCount = 5;
-    const tapWindowMs = 2800;
-    const requiredHoldDurationMs = 2500;
+    const shortcutPath = "manage.html";
+    const requiredHoldDurationMs = 11000;
     let holdTimer = 0;
-    let tapCount = 0;
-    let tapResetTimer = 0;
-
-    const resetTaps = () => {
-      tapCount = 0;
-      if (!tapResetTimer) return;
-      window.clearTimeout(tapResetTimer);
-      tapResetTimer = 0;
-    };
 
     const cancelHold = () => {
       if (!holdTimer) return;
@@ -151,34 +143,17 @@
       holdTimer = 0;
     };
 
-    const openAdminSignup = () => {
+    const openContentManager = () => {
       cancelHold();
-      resetTaps();
       window.location.assign(shortcutPath);
-    };
-
-    const registerTap = () => {
-      tapCount += 1;
-      if (tapCount >= requiredTapCount) {
-        openAdminSignup();
-        return;
-      }
-
-      if (tapResetTimer) window.clearTimeout(tapResetTimer);
-      tapResetTimer = window.setTimeout(resetTaps, tapWindowMs);
     };
 
     trigger.addEventListener("pointerdown", () => {
       cancelHold();
-      holdTimer = window.setTimeout(openAdminSignup, requiredHoldDurationMs);
+      holdTimer = window.setTimeout(openContentManager, requiredHoldDurationMs);
     });
 
-    trigger.addEventListener("pointerup", () => {
-      cancelHold();
-      registerTap();
-    });
-
-    ["pointercancel", "pointerleave", "blur"].forEach(eventName => {
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(eventName => {
       trigger.addEventListener(eventName, cancelHold);
     });
 
