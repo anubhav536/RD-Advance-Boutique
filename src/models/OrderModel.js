@@ -1,6 +1,7 @@
 const BaseModel = require('./BaseModel');
 const AppError = require('../utils/AppError');
 const jsonDatabase = require('../utils/jsonDatabase');
+const ProductModel = require('./ProductModel');
 const { DEFAULT_PAYMENT_METHOD, DEFAULT_PAYMENT_STATUS, PAYMENT_STATUSES } = require('../services/payment/paymentConstants');
 
 const ORDER_COLLECTION = 'orders';
@@ -119,7 +120,7 @@ const normalizePaymentScreenshot = (screenshot = {}, currentScreenshot = {}) => 
     });
   }
 
-  ['fileName', 'fileType', 'dataUrl', 'url'].forEach((field) => {
+  ['fileName', 'fileType', 'dataUrl', 'url', 'path'].forEach((field) => {
     if (source[field] !== undefined && source[field] !== null && source[field] !== '') {
       source[field] = String(source[field]).trim();
     }
@@ -166,7 +167,7 @@ const normalizePayment = (payload = {}, currentPayment = {}) => {
   const explicitStatus = incomingPayment.status ?? payload.paymentStatus;
   if (explicitStatus !== undefined && explicitStatus !== null && explicitStatus !== '') {
     payment.status = normalizePaymentStatus(explicitStatus);
-  } else if (payment.upiTransactionId || payment.screenshot?.dataUrl || payment.screenshot?.url) {
+  } else if (payment.upiTransactionId || payment.screenshot?.dataUrl || payment.screenshot?.url || payment.screenshot?.path) {
     payment.status = currentPayment.status && currentPayment.status !== 'not-submitted'
       ? normalizePaymentStatus(currentPayment.status)
       : 'pending-verification';
@@ -315,7 +316,7 @@ const normalizeDesignReference = (payload = {}, currentDesignReference = {}) => 
     ...cleanObject(incomingReference),
   };
 
-  ['fileName', 'fileType', 'dataUrl', 'url'].forEach((field) => {
+  ['fileName', 'fileType', 'dataUrl', 'url', 'path'].forEach((field) => {
     const payloadValue = payload[`reference${field.charAt(0).toUpperCase()}${field.slice(1)}`];
     if (payloadValue !== undefined && payloadValue !== null && payloadValue !== '') {
       designReference[field] = String(payloadValue).trim();
@@ -551,8 +552,54 @@ class OrderModel extends BaseModel {
       throw new AppError(`An order with orderNumber "${order.orderNumber}" already exists.`, 409);
     }
 
+    await OrderModel.validateReadyMadeOrder(order);
     await jsonDatabase.writeData(ORDER_COLLECTION, [...orders, order]);
+    await OrderModel.reserveReadyMadeStock(order);
     return order;
+  }
+
+  static async createReadyMade(payload) {
+    return OrderModel.create({
+      ...payload,
+      orderType: 'ready-made',
+    });
+  }
+
+
+  static async validateReadyMadeOrder(order) {
+    if (order.orderType !== 'ready-made') {
+      return;
+    }
+
+    const items = order.items?.length ? order.items : [{ productId: order.productId, name: order.productName, quantity: 1 }];
+    if (!items.some((item) => item.productId)) {
+      throw new AppError('At least one productId is required for ready-made orders.', 400);
+    }
+
+    await Promise.all(items.filter((item) => item.productId).map(async (item) => {
+      const product = await ProductModel.findById(item.productId);
+      if ((product.productType || product.type) !== 'ready-made') {
+        throw new AppError(`Product "${item.productId}" is not a ready-made product.`, 400);
+      }
+      const quantity = Number(item.quantity || 1);
+      const stockQuantity = Number(product.stockQuantity ?? product.stock ?? 0);
+      if (stockQuantity < quantity) {
+        throw new AppError(`Only ${stockQuantity} item(s) are available for ${product.title || product.name}.`, 409);
+      }
+    }));
+  }
+
+  static async reserveReadyMadeStock(order) {
+    if (order.orderType !== 'ready-made') {
+      return;
+    }
+
+    const items = order.items?.length ? order.items : [{ productId: order.productId, quantity: 1 }];
+    await Promise.all(items.filter((item) => item.productId).map(async (item) => {
+      const product = await ProductModel.findById(item.productId);
+      const nextStock = Math.max(0, Number(product.stockQuantity ?? product.stock ?? 0) - Number(item.quantity || 1));
+      await ProductModel.updateStock(item.productId, nextStock);
+    }));
   }
 
   static async update(id, payload) {
@@ -688,7 +735,7 @@ class OrderModel extends BaseModel {
       throw new AppError('UPI transaction ID is required for manual payment verification.', 400);
     }
 
-    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url) {
+    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url && !payment.screenshot?.path) {
       throw new AppError('Payment screenshot is required for manual payment verification.', 400);
     }
 
@@ -715,7 +762,7 @@ class OrderModel extends BaseModel {
   static async approvePayment(id, verifier = 'admin') {
     const order = await OrderModel.findById(id);
 
-    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url)) {
+    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url && !order.payment?.screenshot?.path)) {
       throw new AppError('Payment cannot be approved until a UPI transaction ID and screenshot are submitted.', 400);
     }
 

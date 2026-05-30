@@ -16,7 +16,7 @@ class ManualPaymentGateway {
       requiresAdminVerification: true,
       requiredFields: [
         'upiTransactionId',
-        'payment.screenshot.dataUrl or payment.screenshot.url',
+        'payment.screenshot.path or payment.screenshot.url',
       ],
       statusFlow: ['not-submitted', 'pending-verification', 'approved', 'rejected'],
     };
@@ -27,7 +27,7 @@ class ManualPaymentGateway {
       throw new AppError('UPI transaction ID is required for manual payment verification.', 400);
     }
 
-    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url) {
+    if (!payment.screenshot?.dataUrl && !payment.screenshot?.url && !payment.screenshot?.path) {
       throw new AppError('Payment screenshot is required for manual payment verification.', 400);
     }
 
@@ -47,7 +47,7 @@ class ManualPaymentGateway {
   }
 
   approve({ order, verifiedBy = 'admin' }) {
-    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url)) {
+    if (!order.payment?.upiTransactionId || (!order.payment?.screenshot?.dataUrl && !order.payment?.screenshot?.url && !order.payment?.screenshot?.path)) {
       throw new AppError('Payment cannot be approved until a UPI transaction ID and screenshot are submitted.', 400);
     }
 

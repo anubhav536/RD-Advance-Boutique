@@ -10,12 +10,14 @@ const COLLECTIONS = Object.freeze({
   orders: { file: 'orders.json', type: 'array' },
   gallery: { file: 'gallery.json', type: 'array' },
   categories: { file: 'categories.json', type: 'array' },
-  students: { file: 'students.json', type: 'array' },
+  students: { file: 'students.json', type: 'object' },
   notifications: { file: 'notifications.json', type: 'array' },
   contact: { file: 'contact.json', type: 'object' },
   settings: { file: 'settings.json', type: 'object' },
   assets: { file: 'assets.json', type: 'object' },
 });
+
+const writeQueues = new Map();
 
 const getCollectionConfig = (collection) => {
   const config = COLLECTIONS[collection];
@@ -31,6 +33,19 @@ const getCollectionConfig = (collection) => {
 
 const getDefaultData = (collection) => {
   const config = getCollectionConfig(collection);
+  if (collection === 'students') {
+    return {
+      courseCategories: [],
+      enquiries: [],
+      admissions: [],
+      studentRecords: [],
+      enrollments: [],
+      updatedAt: new Date().toISOString(),
+    };
+  }
+  if (collection === 'contact') {
+    return { submissions: [], tickets: [], updatedAt: new Date().toISOString() };
+  }
   return config.type === 'array' ? [] : {};
 };
 
@@ -38,6 +53,57 @@ const getCollectionPath = (collection) => {
   const config = getCollectionConfig(collection);
   return path.join(DATA_DIR, config.file);
 };
+
+const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const normalizeCollectionData = (collection, data) => {
+  const config = getCollectionConfig(collection);
+
+  if (collection === 'students' && Array.isArray(data)) {
+    return {
+      courseCategories: [],
+      enquiries: [],
+      admissions: [],
+      studentRecords: data,
+      enrollments: [],
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  if (config.type === 'array') {
+    if (!Array.isArray(data)) {
+      throw new AppError(`${collection}.json must contain an array.`, 500, { collection });
+    }
+    return data;
+  }
+
+  if (!isPlainObject(data)) {
+    throw new AppError(`${collection}.json must contain an object.`, 500, { collection });
+  }
+
+  if (collection === 'students') {
+    return {
+      courseCategories: Array.isArray(data.courseCategories) ? data.courseCategories : [],
+      enquiries: Array.isArray(data.enquiries) ? data.enquiries : [],
+      admissions: Array.isArray(data.admissions) ? data.admissions : [],
+      studentRecords: Array.isArray(data.studentRecords) ? data.studentRecords : [],
+      enrollments: Array.isArray(data.enrollments) ? data.enrollments : [],
+      updatedAt: data.updatedAt || new Date().toISOString(),
+    };
+  }
+
+  if (collection === 'contact') {
+    return {
+      submissions: Array.isArray(data.submissions) ? data.submissions : [],
+      tickets: Array.isArray(data.tickets) ? data.tickets : [],
+      updatedAt: data.updatedAt || new Date().toISOString(),
+    };
+  }
+
+  return data;
+};
+
+const validateWritableData = (collection, data) => normalizeCollectionData(collection, data);
 
 const ensureDataFile = async (collection) => {
   const filePath = getCollectionPath(collection);
@@ -66,22 +132,43 @@ const readData = async (collection) => {
   }
 
   try {
-    return JSON.parse(rawData);
+    return normalizeCollectionData(collection, JSON.parse(rawData));
   } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError(`Invalid JSON in ${collection}.json`, 500, { filePath, error: error.message });
   }
 };
 
-const writeData = async (collection, data) => {
-  const filePath = await ensureDataFile(collection);
-  const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-  const payload = `${JSON.stringify(data, null, 2)}\n`;
+const withCollectionWriteLock = async (collection, operation) => {
+  const previous = writeQueues.get(collection) || Promise.resolve();
+  let release;
+  const current = new Promise((resolve) => { release = resolve; });
+  const queued = previous.then(() => current, () => current);
+  writeQueues.set(collection, queued);
 
+  try {
+    await previous;
+    return await operation();
+  } finally {
+    release();
+    if (writeQueues.get(collection) === queued) {
+      writeQueues.delete(collection);
+    }
+  }
+};
+
+const writeData = async (collection, data) => withCollectionWriteLock(collection, async () => {
+  const filePath = await ensureDataFile(collection);
+  const validatedData = validateWritableData(collection, data);
+  const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.${crypto.randomUUID()}.tmp`;
+  const payload = `${JSON.stringify(validatedData, null, 2)}\n`;
+
+  JSON.parse(payload);
   await fs.writeFile(temporaryPath, payload, 'utf8');
   await fs.rename(temporaryPath, filePath);
 
-  return data;
-};
+  return validatedData;
+});
 
 const createId = (item = {}) => {
   if (item.id) {
@@ -113,10 +200,6 @@ const addData = async (collection, item) => {
     return writeData(collection, updatedData);
   }
 
-  if (!Array.isArray(currentData)) {
-    throw new AppError(`${collection}.json must contain an array.`, 500);
-  }
-
   const newItem = {
     ...item,
     id: createId(item),
@@ -144,10 +227,6 @@ const updateData = async (collection, id, updates) => {
     };
 
     return writeData(collection, updatedData);
-  }
-
-  if (!Array.isArray(currentData)) {
-    throw new AppError(`${collection}.json must contain an array.`, 500);
   }
 
   const itemIndex = currentData.findIndex((entry) => String(entry.id) === String(id));
@@ -188,10 +267,6 @@ const deleteData = async (collection, id) => {
     updatedData.updatedAt = new Date().toISOString();
     await writeData(collection, updatedData);
     return { deleted: true, id };
-  }
-
-  if (!Array.isArray(currentData)) {
-    throw new AppError(`${collection}.json must contain an array.`, 500);
   }
 
   const item = currentData.find((entry) => String(entry.id) === String(id));
