@@ -3786,18 +3786,19 @@ iframe {
 
 .product-gallery {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
-  max-height: 82vh;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
   scrollbar-width: thin;
   scrollbar-color: var(--gold) transparent;
   border-radius: 2rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-gallery::-webkit-scrollbar {
-  width: 5px;
+  height: 5px;
 }
 
 .product-gallery::-webkit-scrollbar-thumb {
@@ -3806,8 +3807,9 @@ iframe {
 }
 
 .product-gallery img {
+  flex: 0 0 100%;
   width: 100%;
-  height: auto;
+  height: 28rem;
   display: block;
   object-fit: cover;
   scroll-snap-align: start;
