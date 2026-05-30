@@ -158,42 +158,138 @@
     const signupForm = document.getElementById("adminSignupForm");
     const signupMessage = document.getElementById("adminSignupMessage");
     const signupButton = signupForm.querySelector("button[type='submit']");
+    const signupEndpoint = "/api/v1/admin/auth/signup";
 
     const setMessage = (message, isError = false) => {
       signupMessage.textContent = message;
       signupMessage.classList.toggle("error", isError);
+      signupMessage.classList.toggle("success", !isError && Boolean(message));
+    };
+
+    const getFieldValue = (id) => document.getElementById(id).value.trim();
+
+    const buildSignupPayload = () => ({
+      name: getFieldValue("adminSignupName"),
+      email: getFieldValue("adminSignupEmail").toLowerCase(),
+      password: document.getElementById("adminSignupPassword").value,
+      confirmPassword: document.getElementById("adminSignupConfirmPassword").value,
+      securityQuestion: getFieldValue("adminSignupSecurityQuestion"),
+      securityAnswer: getFieldValue("adminSignupSecurityAnswer"),
+    });
+
+    const validateSignupPayload = (payload) => {
+      const errors = [];
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!payload.name) errors.push("Full name is required.");
+      if (!payload.email) {
+        errors.push("Email address is required.");
+      } else if (!emailPattern.test(payload.email)) {
+        errors.push("Please enter a valid admin email address.");
+      }
+      if (!payload.password) {
+        errors.push("Password is required.");
+      } else if (payload.password.length < 8) {
+        errors.push("Password must be at least 8 characters long.");
+      }
+      if (!payload.confirmPassword) errors.push("Confirm password is required.");
+      if (payload.password && payload.confirmPassword && payload.password !== payload.confirmPassword) {
+        errors.push("Password and confirm password must match.");
+      }
+      if (!payload.securityQuestion) errors.push("Security question is required.");
+      if (!payload.securityAnswer) errors.push("Security answer is required.");
+
+      return errors;
+    };
+
+    const parseResponsePayload = async (response) => {
+      const contentType = response.headers.get("content-type") || "";
+      const responseText = await response.text();
+
+      if (!responseText) return {};
+
+      if (!contentType.includes("application/json")) {
+        console.error("Admin signup API returned a non-JSON response.", {
+          endpoint: signupEndpoint,
+          status: response.status,
+          statusText: response.statusText,
+          contentType,
+          responseText,
+        });
+        return { message: responseText };
+      }
+
+      try {
+        return JSON.parse(responseText);
+      } catch (error) {
+        console.error("Unable to parse admin signup API JSON response.", {
+          endpoint: signupEndpoint,
+          status: response.status,
+          statusText: response.statusText,
+          responseText,
+          error,
+        });
+        throw new Error(`The approval API returned invalid JSON: ${error.message}`);
+      }
     };
 
     signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      setMessage("");
+
+      const payload = buildSignupPayload();
+      const validationErrors = validateSignupPayload(payload);
+      if (validationErrors.length) {
+        console.error("Admin signup validation failed.", { validationErrors, payload: { ...payload, password: "[hidden]", confirmPassword: "[hidden]", securityAnswer: "[hidden]" } });
+        setMessage(validationErrors.join(" "), true);
+        return;
+      }
+
       signupButton.disabled = true;
       setMessage("Sending approval request...");
+      console.debug("Sending admin signup approval request.", {
+        endpoint: signupEndpoint,
+        method: "POST",
+        payload: { ...payload, password: "[hidden]", confirmPassword: "[hidden]", securityAnswer: "[hidden]" },
+      });
 
       try {
-        const response = await fetch("/api/v1/admin/auth/signup", {
+        const response = await fetch(signupEndpoint, {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: document.getElementById("adminSignupName").value,
-            email: document.getElementById("adminSignupEmail").value,
-            password: document.getElementById("adminSignupPassword").value,
-            confirmPassword: document.getElementById("adminSignupConfirmPassword").value,
-            securityQuestion: document.getElementById("adminSignupSecurityQuestion").value,
-            securityAnswer: document.getElementById("adminSignupSecurityAnswer").value,
-          }),
+          body: JSON.stringify(payload),
         });
-        const payload = await response.json().catch(() => ({}));
+        const responsePayload = await parseResponsePayload(response);
+        const debugContext = {
+          endpoint: signupEndpoint,
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          responsePayload,
+        };
 
-        if (!response.ok) {
-          throw new Error(payload.message || "Unable to send approval request.");
+        if (!response.ok || responsePayload.success === false) {
+          const backendMessage = responsePayload.message
+            || responsePayload.error
+            || (Array.isArray(responsePayload.details) ? responsePayload.details.join(" ") : responsePayload.details)
+            || `Approval request failed with HTTP ${response.status} ${response.statusText || ""}`.trim();
+          console.error("Admin signup approval request failed.", debugContext);
+          throw new Error(backendMessage);
         }
 
-        const preview = payload.data?.previewLink ? ` Development approval link: ${payload.data.previewLink}` : "";
-        setMessage(`${payload.message}${preview}`);
+        console.debug("Admin signup approval request succeeded.", debugContext);
+        const preview = responsePayload.data?.previewLink ? ` Development approval link: ${responsePayload.data.previewLink}` : "";
+        setMessage(`${responsePayload.message || "Approval request saved successfully."}${preview}`);
         signupForm.reset();
       } catch (error) {
-        setMessage(error.message, true);
+        console.error("Unable to send admin signup approval request.", {
+          endpoint: signupEndpoint,
+          message: error.message,
+          stack: error.stack,
+          error,
+        });
+        setMessage(error.message || "Unable to send approval request. Check the browser console and server logs for details.", true);
       } finally {
         signupButton.disabled = false;
       }
