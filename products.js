@@ -388,8 +388,35 @@
 
     const title = product.title || product.name || "Boutique Product";
     document.title = `${title} | RD Advance Boutique`;
-    document.getElementById("productImage").src = product.image || product.images?.[0] || "assets/logo.png";
-    document.getElementById("productImage").alt = product.alt || title;
+
+    const mainImg = document.getElementById("productImage");
+    const allImages = (product.images && product.images.length > 0) ? product.images : [product.image || "assets/logo.png"];
+    mainImg.src = allImages[0];
+    mainImg.alt = product.alt || title;
+
+    const thumbsContainer = document.getElementById("productThumbs");
+    if (thumbsContainer) {
+      thumbsContainer.replaceChildren();
+      if (allImages.length > 1) {
+        allImages.forEach((imgSrc, index) => {
+          const thumb = document.createElement("button");
+          thumb.className = "product-gallery__thumb" + (index === 0 ? " active" : "");
+          thumb.type = "button";
+          thumb.setAttribute("aria-label", `View image ${index + 1}`);
+          const thumbImg = document.createElement("img");
+          thumbImg.src = imgSrc;
+          thumbImg.alt = `${title} - image ${index + 1}`;
+          thumbImg.loading = "lazy";
+          thumb.appendChild(thumbImg);
+          thumb.addEventListener("click", () => {
+            mainImg.src = imgSrc;
+            thumbsContainer.querySelectorAll(".product-gallery__thumb").forEach(t => t.classList.remove("active"));
+            thumb.classList.add("active");
+          });
+          thumbsContainer.appendChild(thumb);
+        });
+      }
+    }
     document.getElementById("productCategory").textContent = product.category || "Boutique";
     document.getElementById("productTitle").textContent = title;
     document.getElementById("productPrice").textContent = formatPrice(product.price);
