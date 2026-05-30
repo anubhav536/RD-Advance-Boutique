@@ -12,46 +12,20 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 620ms var(--luxury-ease),
-    transform 620ms var(--luxury-ease),
-    filter 620ms var(--luxury-ease);
-}
-
-body.luxury-page-ready {
-  opacity: 1;
-  transform: translateY(0);
-}
-
+body,
+body.luxury-page-ready,
 body.luxury-page-exit {
-  filter: blur(8px);
-  opacity: 0;
-  transform: translateY(-12px) scale(0.992);
+  filter: none;
+  opacity: 1;
+  transform: none;
 }
 
 body::before {
-  background:
-    radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(201, 164, 92, 0.16), transparent 22rem),
-    linear-gradient(120deg, transparent, rgba(255, 253, 248, 0.22), transparent);
-  content: "";
-  inset: 0;
-  mix-blend-mode: soft-light;
-  opacity: 0;
-  pointer-events: none;
-  position: fixed;
-  transition: opacity 700ms var(--luxury-ease);
-  z-index: 9999;
-}
-
-body.luxury-page-ready::before {
-  opacity: 1;
+  content: none;
 }
 
 .site-header {
-  animation: luxuryHeaderDrop 820ms var(--luxury-ease) both;
+  animation: none;
 }
 
 .nav__link,
@@ -121,17 +95,14 @@ body.luxury-page-ready::before {
 .contact-hero__card,
 .gallery-hero__content,
 .learn-hero__content {
-  animation: luxuryHeroRise 980ms var(--luxury-ease) both;
-  will-change: transform;
+  animation: none;
 }
 
 .hero__card,
 .shop-hero__panel,
 .custom-hero__card,
 .contact-hero__card {
-  animation:
-    luxuryHeroRise 980ms var(--luxury-ease) 140ms both,
-    luxuryFloat 6.8s ease-in-out 1.1s infinite;
+  animation: none;
   transform-style: preserve-3d;
 }
 
@@ -168,18 +139,13 @@ body.luxury-page-ready::before {
 .shop-hero__actions,
 .custom-hero__actions,
 .contact-hero__actions {
-  animation: luxuryFadeUp 920ms var(--luxury-ease) 260ms both;
+  animation: none;
 }
 
 .luxury-reveal {
-  opacity: 0;
-  transform: translate3d(0, 34px, 0);
-  transition:
-    opacity var(--luxury-duration) var(--luxury-ease),
-    transform var(--luxury-duration) var(--luxury-ease),
-    filter var(--luxury-duration) var(--luxury-ease);
-  transition-delay: calc(var(--luxury-index, 0) * var(--luxury-stagger));
-  will-change: opacity, transform, filter;
+  filter: none;
+  opacity: 1;
+  transform: none;
 }
 
 .luxury-reveal[data-luxury-reveal="left"] {
@@ -191,14 +157,14 @@ body.luxury-page-ready::before {
 }
 
 .luxury-reveal[data-luxury-reveal="scale"] {
-  filter: blur(10px);
-  transform: translate3d(0, 24px, 0) scale(0.965);
+  filter: none;
+  transform: none;
 }
 
 .luxury-reveal.is-visible {
-  filter: blur(0);
+  filter: none;
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  transform: none;
 }
 
 .btn,

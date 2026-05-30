@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View RD Advance Boutique gallery design details, features, and enquire on WhatsApp.">
+  <title>Gallery Details | RD Advance Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body class="detail-page gallery-detail-page">
+  <header class="site-header gallery-header">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text"><strong>RD Advance</strong><span>Boutique</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="nav__link" href="index.html">Home</a>
+      <a class="nav__link" href="shop.html">Shop</a>
+      <a class="nav__link nav__link--active" href="gallery.html">Gallery</a>
+      <a class="nav__link" href="learn.html">Course</a>
+      <a class="nav__link" href="contact.html">Contact</a>
+    </nav>
+    <a href="https://wa.me/917693849472" class="header-cta" data-no-transition="true">WhatsApp</a>
+  </header>
+
+  <main id="galleryDetails">
+    <section class="detail-hero detail-hero--gallery" aria-labelledby="galleryTitle">
+      <div class="detail-hero__media detail-hero__media--large">
+        <img id="galleryImage" src="assets/logo.png" alt="RD Advance Boutique gallery design preview" loading="eager">
+      </div>
+      <div class="detail-hero__content">
+        <p class="eyebrow" id="galleryCategory">Boutique Design</p>
+        <h1 id="galleryTitle">Loading design details...</h1>
+        <p id="galleryLongDescription" class="detail-description">Please wait while the design details load.</p>
+        <div class="detail-feature-box">
+          <h2>Design features</h2>
+          <div class="detail-feature-list" id="galleryFeatures"></div>
+        </div>
+        <div class="detail-actions">
+          <a id="galleryWhatsapp" class="btn btn--primary" href="https://wa.me/917693849472" target="_blank" rel="noopener" data-no-transition="true">Enquire on WhatsApp</a>
+          <button id="galleryShare" class="btn btn--ghost" type="button">Share</button>
+        </div>
+        <p id="galleryShareStatus" class="share-status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer gallery-footer">
+    <p>© 2026 RD Advance Boutique. All Rights Reserved.</p>
+  </footer>
+  <script src="products.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script src="js/site-settings.js" defer></script>
+</body>
+</html>

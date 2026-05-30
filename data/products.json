@@ -6,7 +6,7 @@
     "category": "Blouses",
     "productType": "boutique",
     "type": "boutique",
-    "price": 1499,
+    "price": 1299,
     "discountPrice": 1299,
     "image": "assets/design1.jpg",
     "images": [
@@ -31,7 +31,23 @@
     "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Designer%20Blouse",
     "affiliateUrl": "",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": 1499,
+    "shortDescription": "Premium boutique blouse inspiration with refined detailing for festive styling.",
+    "longDescription": "Custom blouse design with premium boutique finishing, festive styling support, and personalized fit guidance.",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "Custom"
+    ],
+    "colors": [
+      "Pink",
+      "Gold",
+      "Maroon"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Designer Blouse. Please share availability, fitting, payment, and delivery details."
   },
   {
     "id": "boutique-kurti",
@@ -40,7 +56,7 @@
     "category": "Kurtis",
     "productType": "boutique",
     "type": "boutique",
-    "price": 1899,
+    "price": 1699,
     "discountPrice": 1699,
     "image": "assets/design2.jpg",
     "images": [
@@ -65,7 +81,23 @@
     "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Boutique%20Kurti",
     "affiliateUrl": "",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": 1899,
+    "shortDescription": "Graceful custom-stitched kurti silhouette designed for everyday elegance.",
+    "longDescription": "Boutique kurti tailored for everyday elegance with custom stitch support and premium finishing.",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "Custom"
+    ],
+    "colors": [
+      "Pastel Pink",
+      "Cream",
+      "Teal"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Boutique Kurti. Please share availability, fitting, payment, and delivery details."
   },
   {
     "id": "bridal-collection",
@@ -99,7 +131,19 @@
     "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Bridal%20Collection%20Edit",
     "affiliateUrl": "",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": null,
+    "shortDescription": "Occasion-ready bridal inspiration with luxury finishing and custom-fit support.",
+    "longDescription": "Premium bridal collection service for luxury occasion wear, measurements, styling, and finishing consultation.",
+    "sizes": [
+      "Custom measurements"
+    ],
+    "colors": [
+      "Red",
+      "Gold",
+      "Wine"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Bridal Collection Edit. Please share availability, fitting, payment, and delivery details."
   },
   {
     "id": "little-occasion-wear",
@@ -108,7 +152,7 @@
     "category": "Kids Wear",
     "productType": "ready-made",
     "type": "ready-made",
-    "price": 999,
+    "price": 899,
     "discountPrice": 899,
     "image": "assets/design4.jpg",
     "images": [
@@ -133,7 +177,22 @@
     "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Little%20Occasion%20Wear",
     "affiliateUrl": "",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": 999,
+    "shortDescription": "Soft, polished kids wear design for celebrations, birthdays, and family events.",
+    "longDescription": "Ready-made kids occasion wear option for birthdays, celebrations, and family events.",
+    "sizes": [
+      "2-3Y",
+      "4-5Y",
+      "6-7Y",
+      "Custom"
+    ],
+    "colors": [
+      "Peach",
+      "Mint",
+      "Ivory"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Little Occasion Wear. Please share availability, fitting, payment, and delivery details."
   },
   {
     "id": "custom-stitching",
@@ -167,7 +226,19 @@
     "link": "custom.html",
     "affiliateUrl": "",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": null,
+    "shortDescription": "Personalized stitching package shaped around your preferred fabric, fit, and finish.",
+    "longDescription": "Boutique custom stitching package for blouses, dresses, suits, and tailored fashion requests.",
+    "sizes": [
+      "Custom measurements"
+    ],
+    "colors": [
+      "Fabric based",
+      "Pink",
+      "Black"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Custom Stitching Package. Please share availability, fitting, payment, and delivery details."
   },
   {
     "id": "boutique-accessory-set",
@@ -176,7 +247,7 @@
     "category": "Accessories",
     "productType": "affiliate",
     "type": "affiliate",
-    "price": 699,
+    "price": 599,
     "discountPrice": 599,
     "image": "assets/design6.png",
     "images": [
@@ -201,6 +272,18 @@
     "link": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Boutique%20Accessory%20Set",
     "affiliateUrl": "https://wa.me/917693849472?text=I%20am%20interested%20in%20Boutique%20Accessory%20Set",
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-29T00:00:00.000Z",
+    "oldPrice": 699,
+    "shortDescription": "A curated accessory-style inspiration set to complete your boutique look.",
+    "longDescription": "Affiliate accessory set curated to complement boutique outfits and traditional styling.",
+    "sizes": [
+      "Free size"
+    ],
+    "colors": [
+      "Gold",
+      "Pearl",
+      "Rose Gold"
+    ],
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in Boutique Accessory Set. Please share availability, fitting, payment, and delivery details."
   }
 ]
