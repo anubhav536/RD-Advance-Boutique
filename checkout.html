@@ -29,160 +29,176 @@
 
   <main class="co-wrap">
 
-    <div class="co-steps" id="coSteps" aria-label="Checkout steps">
-      <span class="co-step active" data-step="1">1 Details</span>
+    <div class="co-steps" id="coSteps">
+      <span class="co-step active" data-step="1">1&nbsp;Options</span>
       <span class="co-step-sep"></span>
-      <span class="co-step" data-step="2">2 Payment</span>
+      <span class="co-step" data-step="2">2&nbsp;Details</span>
       <span class="co-step-sep"></span>
-      <span class="co-step" data-step="3">3 Confirm</span>
+      <span class="co-step" data-step="3">3&nbsp;Payment</span>
+      <span class="co-step-sep"></span>
+      <span class="co-step" data-step="4">4&nbsp;Review</span>
     </div>
 
-    <div class="co-body">
-
-      <div class="co-product-card" id="coProductCard">
-        <div class="co-product-img-wrap">
-          <img id="coProductImg" src="assets/logo.png" alt="Product">
-        </div>
-        <div class="co-product-info">
-          <span class="co-product-cat" id="coProductCat">Boutique</span>
-          <h2 class="co-product-name" id="coProductName">Loading…</h2>
-          <p class="co-product-price" id="coProductPrice">₹—</p>
-        </div>
+    <!-- Product Summary Card -->
+    <div class="co-product-card" id="coProductCard">
+      <div class="co-product-img-wrap">
+        <img id="coProductImg" src="assets/logo.png" alt="Product">
       </div>
+      <div class="co-product-info">
+        <span class="co-product-cat" id="coProductCat">Boutique</span>
+        <h2 class="co-product-name" id="coProductName">Loading…</h2>
+        <p class="co-product-price" id="coProductPrice">₹—</p>
+      </div>
+    </div>
 
-      <form class="co-form" id="coForm" novalidate autocomplete="off">
+    <!-- STEP 1-3: Order Form -->
+    <form class="co-form" id="coForm" novalidate autocomplete="off">
 
-        <section class="co-section" id="sectionDetails">
-          <h3 class="co-section__title">Your Details</h3>
+      <!-- SECTION 1: Dynamic Product Options (filled by JS) -->
+      <section class="co-section" id="sectionOptions">
+        <h3 class="co-section__title" id="optionsTitle">Product Options</h3>
+        <div id="productOptionsContainer">
+          <div class="co-loading">Loading product options…</div>
+        </div>
+      </section>
 
+      <!-- SECTION 2: Customer Details (always fixed) -->
+      <section class="co-section" id="sectionCustomer">
+        <h3 class="co-section__title">Your Details</h3>
+        <div class="co-field">
+          <label for="custName">Full Name *</label>
+          <input type="text" id="custName" placeholder="Apna pura naam likhein" required>
+        </div>
+        <div class="co-field">
+          <label for="custPhone">Phone Number *</label>
+          <input type="tel" id="custPhone" placeholder="10-digit mobile number" maxlength="10" required>
+        </div>
+        <div class="co-field">
+          <label for="custAddress">Full Address *</label>
+          <textarea id="custAddress" rows="2" placeholder="Ghar ka pata, mohalla, colony…" required></textarea>
+        </div>
+        <div class="co-field-row">
           <div class="co-field">
-            <label for="custName">Full Name *</label>
-            <input type="text" id="custName" placeholder="Apna pura naam likhein" required>
+            <label for="custCity">City *</label>
+            <input type="text" id="custCity" placeholder="City" required>
           </div>
           <div class="co-field">
-            <label for="custPhone">Phone Number *</label>
-            <input type="tel" id="custPhone" placeholder="10-digit mobile number" maxlength="10" required>
+            <label for="custPin">Pincode *</label>
+            <input type="text" id="custPin" placeholder="000000" maxlength="6" required>
           </div>
-          <div class="co-field">
-            <label for="custAddress">Full Address *</label>
-            <textarea id="custAddress" rows="2" placeholder="Ghar ka pata, mohalla, colony…" required></textarea>
-          </div>
-          <div class="co-field-row">
-            <div class="co-field">
-              <label for="custCity">City *</label>
-              <input type="text" id="custCity" placeholder="City" required>
-            </div>
-            <div class="co-field">
-              <label for="custPin">Pincode *</label>
-              <input type="text" id="custPin" placeholder="000000" maxlength="6" required>
-            </div>
-          </div>
+        </div>
+        <div class="co-field">
+          <label for="coNotes">Special Instructions (optional)</label>
+          <textarea id="coNotes" rows="2" placeholder="Koi special instruction ho to yahan likhein…"></textarea>
+        </div>
+      </section>
 
-          <div class="co-divider"></div>
-          <h3 class="co-section__title">Order Options</h3>
-
-          <div class="co-field">
-            <label for="coQty">Quantity *</label>
-            <select id="coQty" required>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-          </div>
-
-          <div id="dynamicFields"></div>
-
-          <div class="co-field">
-            <label for="coNotes">Special Instructions (optional)</label>
-            <textarea id="coNotes" rows="2" placeholder="Koi special instruction ho to yahan likhein…"></textarea>
-          </div>
-        </section>
-
-        <section class="co-section" id="sectionPayment">
-          <h3 class="co-section__title">Payment Method</h3>
-
-          <div class="co-pay-tabs" role="tablist">
-            <button type="button" class="co-pay-tab active" data-method="upi" role="tab">
-              <span class="co-pay-icon">📱</span> UPI Payment
-            </button>
-            <button type="button" class="co-pay-tab" data-method="cod" role="tab">
-              <span class="co-pay-icon">💵</span> Cash on Delivery
-            </button>
-          </div>
-
-          <div class="co-pay-panel" id="panelUpi">
-            <p class="co-pay-note">Neeche diye QR code ya UPI ID se payment karein, phir screenshot upload karein.</p>
-            <div class="co-upi-box">
-              <img src="assets/upi-qr.jpg" alt="UPI QR Code - RD Advance Boutique" class="co-qr-img">
-              <div class="co-upi-details">
-                <div class="co-upi-row">
-                  <span class="co-upi-label">UPI ID</span>
-                  <span class="co-upi-val">8643090832@jio</span>
-                  <button type="button" class="co-copy-btn" data-copy="8643090832@jio">Copy</button>
-                </div>
-                <div class="co-upi-row">
-                  <span class="co-upi-label">Phone</span>
-                  <span class="co-upi-val">+91 86430 90832</span>
-                  <button type="button" class="co-copy-btn" data-copy="+918643090832">Copy</button>
-                </div>
-                <div class="co-upi-row">
-                  <span class="co-upi-label">Name</span>
-                  <span class="co-upi-val">Anunay Shrivastava</span>
-                </div>
-              </div>
-            </div>
-            <div class="co-field co-upload-field">
-              <label for="payScreenshot">Payment Screenshot Upload *</label>
-              <div class="co-upload-box" id="uploadBox">
-                <input type="file" id="payScreenshot" accept="image/*" class="co-file-input">
-                <div class="co-upload-ui" id="uploadUi">
-                  <span class="co-upload-icon">📷</span>
-                  <span>Screenshot select karein</span>
-                  <small>JPG, PNG, WebP</small>
-                </div>
-                <img id="uploadPreview" class="co-upload-preview" src="" alt="Payment screenshot preview" hidden>
-              </div>
-            </div>
-          </div>
-
-          <div class="co-pay-panel" id="panelCod" hidden>
-            <div class="co-cod-box">
-              <span class="co-cod-icon">🏠</span>
-              <div>
-                <strong>Cash on Delivery</strong>
-                <p>Delivery ke samay cash dein. Hum aapko confirm karenge.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div class="co-actions">
-          <button type="submit" class="btn btn--primary co-submit-btn" id="coSubmitBtn">
-            Confirm Order →
+      <!-- SECTION 3: Payment Method -->
+      <section class="co-section" id="sectionPayment">
+        <h3 class="co-section__title">Payment Method</h3>
+        <div class="co-pay-tabs" role="tablist">
+          <button type="button" class="co-pay-tab active" data-method="upi" role="tab">
+            <span class="co-pay-icon">📱</span> UPI Payment
           </button>
-          <p class="co-terms">Order place karne par aap hamare terms se agree karte hain.</p>
+          <button type="button" class="co-pay-tab" data-method="cod" role="tab">
+            <span class="co-pay-icon">💵</span> Cash on Delivery
+          </button>
         </div>
 
-      </form>
+        <div class="co-pay-panel" id="panelUpi">
+          <p class="co-pay-note">Neeche diye QR code ya UPI ID se payment karein, phir screenshot upload karein.</p>
+          <div class="co-upi-box">
+            <img src="assets/upi-qr.jpg" alt="UPI QR Code" class="co-qr-img">
+            <div class="co-upi-details">
+              <div class="co-upi-row">
+                <span class="co-upi-label">UPI ID</span>
+                <span class="co-upi-val">8643090832@jio</span>
+                <button type="button" class="co-copy-btn" data-copy="8643090832@jio">Copy</button>
+              </div>
+              <div class="co-upi-row">
+                <span class="co-upi-label">Phone</span>
+                <span class="co-upi-val">+91 86430 90832</span>
+                <button type="button" class="co-copy-btn" data-copy="+918643090832">Copy</button>
+              </div>
+              <div class="co-upi-row">
+                <span class="co-upi-label">Name</span>
+                <span class="co-upi-val">Anunay Shrivastava</span>
+              </div>
+            </div>
+          </div>
+          <div class="co-field">
+            <label for="payScreenshot">Payment Screenshot *</label>
+            <div class="co-upload-box" id="uploadBox">
+              <input type="file" id="payScreenshot" accept="image/*" class="co-file-input">
+              <div class="co-upload-ui" id="uploadUi">
+                <span class="co-upload-icon">📷</span>
+                <span>Screenshot select karein ya drag karein</span>
+                <small>JPG, PNG, WebP supported</small>
+              </div>
+              <img id="uploadPreview" class="co-upload-preview" src="" alt="Payment screenshot" hidden>
+            </div>
+          </div>
+        </div>
 
-      <div class="co-success" id="coSuccess" hidden>
-        <div class="co-success__icon">✅</div>
-        <h2 class="co-success__title">Order Confirmed!</h2>
-        <p class="co-success__sub">Order ID: <strong id="successOrderId"></strong></p>
+        <div class="co-pay-panel" id="panelCod" hidden>
+          <div class="co-cod-box">
+            <span class="co-cod-icon">🏠</span>
+            <div>
+              <strong>Cash on Delivery</strong>
+              <p>Delivery ke samay cash dein. Order place hone ke baad hum aapko call karenge.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <div class="co-summary-card" id="coSummaryCard"></div>
-
-        <button class="btn btn--whatsapp co-wa-btn" id="coWhatsappBtn" type="button">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          WhatsApp par Order Bhejein
+      <div class="co-actions">
+        <button type="submit" class="btn co-review-btn" id="coReviewBtn">
+          Review Order →
         </button>
+        <p class="co-terms">Aage badhne par aap hamare terms se agree karte hain.</p>
+      </div>
+    </form>
 
-        <a href="shop.html" class="btn btn--ghost co-back-btn">← Shop par wapas jaayein</a>
+    <!-- STEP 4: Order Review (before confirm) -->
+    <div class="co-review-panel" id="coReview" hidden>
+      <div class="co-review-header">
+        <h2 class="co-review-title">📋 Order Review</h2>
+        <p class="co-review-sub">Sabhi details check karein, phir confirm karein.</p>
       </div>
 
+      <!-- Product + Image in review -->
+      <div class="co-review-product" id="reviewProductCard"></div>
+
+      <!-- All order details -->
+      <div class="co-summary-card" id="coReviewDetails"></div>
+
+      <div class="co-review-actions">
+        <button class="btn co-confirm-btn" id="coConfirmBtn" type="button">
+          ✅ Confirm Order
+        </button>
+        <button class="btn btn--ghost co-edit-btn" id="coEditBtn" type="button">
+          ← Edit Details
+        </button>
+      </div>
     </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="co-success" id="coSuccess" hidden>
+      <div class="co-success__icon">🎉</div>
+      <h2 class="co-success__title">Order Confirmed!</h2>
+      <p class="co-success__sub">Order ID: <strong id="successOrderId"></strong></p>
+      <p class="co-success__msg">Neeche diya button dabayein — ek click mein owner ko poora order WhatsApp par jayega.</p>
+
+      <button class="btn btn--whatsapp co-wa-btn" id="coWhatsappBtn" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Owner ko WhatsApp Order Bhejein
+      </button>
+
+      <div class="co-summary-card co-success-summary" id="coSuccessSummary"></div>
+
+      <a href="shop.html" class="btn btn--ghost co-back-btn">← Shop par wapas jaayein</a>
+    </div>
+
   </main>
 
   <footer class="footer">
