@@ -3952,3 +3952,287 @@ iframe {
     min-height: 22rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   SHOP — SPLIT HERO (Ready-Made | Boutique)
+═══════════════════════════════════════════════════ */
+.shop-hero--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 52vh;
+  border-bottom: 1px solid var(--line);
+}
+
+.shop-hero__half {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 3.5rem 5%;
+  overflow: hidden;
+}
+
+.shop-hero__half--rm {
+  background: linear-gradient(135deg, var(--black) 0%, #2d1c12 100%);
+}
+
+.shop-hero__half--bt {
+  background: linear-gradient(135deg, #3a1520 0%, #5e2130 60%, var(--rose) 140%);
+}
+
+.shop-hero__half::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(201,164,92,.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.shop-hero__half-inner { position: relative; z-index: 1; max-width: 32rem; }
+
+.shop-hero__half-inner .eyebrow {
+  color: var(--gold);
+  opacity: .85;
+  margin-bottom: .6rem;
+}
+
+.shop-hero__half-inner h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: .75rem;
+}
+
+.shop-hero__half-inner p {
+  font-size: .88rem;
+  color: rgba(255,255,255,.7);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+.shop-hero__half--bt .btn--ghost {
+  border-color: rgba(255,255,255,.5);
+  color: #fff;
+}
+
+.shop-hero__half--bt .btn--ghost:hover {
+  background: rgba(255,255,255,.12);
+  border-color: #fff;
+}
+
+@media (max-width: 700px) {
+  .shop-hero--split { grid-template-columns: 1fr; }
+  .shop-hero__half  { padding: 2.5rem 6%; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SHOP MAIN SECTION
+═══════════════════════════════════════════════════ */
+.shop-main {
+  padding: 0 5% 4rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   TYPE TABS  (All | Ready-Made | Boutique)
+═══════════════════════════════════════════════════ */
+.shop-type-bar {
+  display: flex;
+  gap: .75rem;
+  padding: 2rem 0 1.5rem;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.type-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .2rem;
+  padding: .85rem 1.6rem;
+  background: #fff;
+  border: 2px solid rgba(201,164,92,.22);
+  border-radius: 1rem;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  transition: all .18s;
+  min-width: 130px;
+  text-align: center;
+  position: relative;
+}
+
+.type-tab:hover {
+  border-color: var(--rose);
+  background: rgba(190,107,114,.05);
+  transform: translateY(-1px);
+}
+
+.type-tab.active {
+  background: var(--black);
+  border-color: var(--black);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(16,13,11,.2);
+}
+
+.type-tab.active[data-type="readymade"] {
+  background: linear-gradient(135deg, #1a3a2a 0%, #2a5a3e 100%);
+  border-color: #2a5a3e;
+}
+
+.type-tab.active[data-type="boutique"] {
+  background: linear-gradient(135deg, #5e2130 0%, var(--rose) 100%);
+  border-color: var(--rose);
+}
+
+.type-tab__icon  { font-size: 1.4rem; line-height: 1; }
+.type-tab__label { font-size: .82rem; font-weight: 700; letter-spacing: .02em; }
+.type-tab__sub   { font-size: .65rem; opacity: .65; letter-spacing: .04em; font-weight: 500; }
+
+.type-tab.active .type-tab__sub { opacity: .75; color: rgba(255,255,255,.8); }
+
+@media (max-width: 540px) {
+  .shop-type-bar { gap: .5rem; }
+  .type-tab      { min-width: 100px; padding: .7rem 1rem; }
+  .type-tab__sub { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   PRODUCT COUNT + LOADING
+═══════════════════════════════════════════════════ */
+.shop-product-count {
+  font-size: .78rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 1.5rem;
+  min-height: 1.2em;
+}
+
+.shop-loading,
+.shop-no-results {
+  text-align: center;
+  color: var(--muted);
+  font-size: .9rem;
+  padding: 3rem 1rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   PRODUCT BADGE — type-specific colours
+═══════════════════════════════════════════════════ */
+.product-card__section-badge--readymade {
+  background: rgba(30,90,60,.88);
+  border-color: rgba(80,180,120,.35);
+  color: #d4f7e7;
+}
+
+.product-card__section-badge--boutique {
+  background: rgba(130,30,55,.88);
+  border-color: rgba(201,164,92,.35);
+  color: #fde8ee;
+}
+
+/* ═══════════════════════════════════════════════════
+   BOUTIQUE EMPTY CTA
+═══════════════════════════════════════════════════ */
+.boutique-empty-cta {
+  padding: 3rem 0;
+}
+
+.boutique-cta-card {
+  background: linear-gradient(135deg, #2d0e18 0%, #4a1826 60%, #5e2130 100%);
+  border-radius: 1.75rem;
+  padding: clamp(2rem,5vw,3.5rem);
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(94,33,48,.35);
+}
+
+.boutique-cta-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 0%, rgba(201,164,92,.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.boutique-cta-icon {
+  display: inline-block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.boutique-cta-card .eyebrow {
+  position: relative; z-index: 1;
+  color: var(--gold); opacity: .9; margin-bottom: .6rem;
+}
+
+.boutique-cta-card h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.5rem,4vw,2.2rem);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: .85rem;
+  position: relative; z-index: 1;
+}
+
+.boutique-cta-card > p {
+  font-size: .88rem;
+  color: rgba(255,255,255,.72);
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto 1.75rem;
+  position: relative; z-index: 1;
+}
+
+.boutique-cta-actions {
+  display: flex;
+  gap: .75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+  position: relative; z-index: 1;
+}
+
+.boutique-cta-actions .btn--ghost {
+  border-color: rgba(255,255,255,.45);
+  color: #fff;
+}
+
+.boutique-cta-actions .btn--ghost:hover {
+  background: rgba(255,255,255,.1);
+  border-color: #fff;
+}
+
+.boutique-cta-chips {
+  list-style: none;
+  display: flex;
+  gap: .6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0;
+  position: relative; z-index: 1;
+}
+
+.boutique-cta-chips li {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  padding: .35rem .85rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  letter-spacing: .03em;
+}
+
+@media (max-width: 540px) {
+  .boutique-cta-actions { flex-direction: column; align-items: center; }
+  .boutique-cta-actions .btn { width: 100%; max-width: 280px; text-align: center; }
+}

@@ -324,106 +324,194 @@
   };
 
   const setupFashionShop = () => {
-    const productGrid = doc.getElementById("productGrid");
-    const productSearch = doc.getElementById("productSearch");
-    const productCount = doc.getElementById("productCount");
-    const emptyProducts = doc.getElementById("emptyProducts");
-    const filterButtons = Array.from(doc.querySelectorAll(".category-filter .filter-btn"));
+    const productGrid     = doc.getElementById("productGrid");
+    const productSearch   = doc.getElementById("productSearch");
+    const productCount    = doc.getElementById("productCount");
+    const emptyProducts   = doc.getElementById("emptyProducts");
+    const categoryFilter  = doc.getElementById("categoryFilter");
+    const typeTabs        = Array.from(doc.querySelectorAll(".type-tab"));
+    const boutiqueEmptyCta = doc.getElementById("boutiqueEmptyCta");
 
     if (!productGrid) return;
 
-    let products = [];
+    let allProducts   = [];
+    let activeType    = "all";
+    let activeCategory = "all";
+    let searchTerm    = "";
 
-    const normalize = value => String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/&/g, "and")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+    const normalize = v => String(v || "").trim().toLowerCase()
+      .replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
     const formatPrice = value => {
-      const numberValue = Number(value);
-      if (!Number.isFinite(numberValue) || value === "") return value ? String(value) : "Price on request";
-      return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(numberValue);
+      const n = Number(value);
+      if (!Number.isFinite(n) || value === "") return value ? String(value) : "Price on request";
+      return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
     };
 
-    const createElement = (tagName, className, text) => {
-      const element = doc.createElement(tagName);
-      if (className) element.className = className;
-      if (text !== undefined) element.textContent = text;
-      return element;
+    // Determine a product's section: "boutique" or "readymade"
+    const getProductType = p => {
+      const t = normalize(p.productType || p.type || "readymade");
+      return t === "boutique" ? "boutique" : "readymade";
     };
 
-    const createProductOrderMessage = product => {
-      const title = product.title || product.name || "Boutique Product";
-      const category = product.category || "Boutique";
-      const price = formatPrice(product.discountPrice || product.price || "");
-      const productLink = getCurrentPageUrl({ product: product.slug || product.id || normalize(title) });
-      return `Hello RD Advance Boutique,\n\nI want to order this product.\n\nProduct Name: ${title}\nCategory: ${category}\nPrice: ${price}\nProduct Link: ${productLink}\n\nPlease guide me for payment and delivery.`;
+    const getFilteredProducts = () => allProducts.filter(p => {
+      if (p.status === "inactive") return false;
+      const pType = getProductType(p);
+      const typeMatch = activeType === "all" || pType === activeType;
+      const catNorm   = normalize(p.category || "");
+      const catMatch  = activeCategory === "all" || catNorm === activeCategory;
+      const text = normalize([p.title, p.name, p.category, ...(p.tags || [])].join(" "));
+      const searchMatch = !searchTerm || text.includes(searchTerm);
+      return typeMatch && catMatch && searchMatch;
+    });
+
+    const buildCategoryChips = type => {
+      const relevant = allProducts.filter(p =>
+        p.status !== "inactive" && (type === "all" || getProductType(p) === type)
+      );
+      return [...new Set(relevant.map(p => p.category).filter(Boolean))];
+    };
+
+    const renderCategoryChips = type => {
+      if (!categoryFilter) return;
+      const cats = buildCategoryChips(type);
+      categoryFilter.innerHTML = [
+        `<button class="filter-btn active" type="button" data-category="all" role="listitem">All</button>`,
+        ...cats.map(c =>
+          `<button class="filter-btn" type="button" data-category="${normalize(c)}" role="listitem">${c}</button>`
+        )
+      ].join("");
+      activeCategory = "all";
+      categoryFilter.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          categoryFilter.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeCategory = btn.dataset.category;
+          renderProductGrid();
+        });
+      });
     };
 
     const createProductCard = product => {
-      const title = product.title || product.name || "Ready-made product";
-      const category = product.category || "Ready-Made";
-      const stock = Number(product.stockQuantity ?? product.stock ?? 1);
-      const card = createElement("article", "product-card");
+      const title    = product.title || product.name || "Product";
+      const category = product.category || "";
+      const pType    = getProductType(product);
+      const stock    = Number(product.stockQuantity ?? product.stock ?? 1);
+
+      const card = doc.createElement("article");
+      card.className = "product-card";
+      card.dataset.type     = pType;
       card.dataset.category = normalize(category);
-      card.dataset.section = normalize(product.productType || product.type || "ready-made");
-      card.dataset.tags = [category, product.productType, product.type, ...(product.tags || [])].map(normalize).join(" ");
 
-      const media = createElement("div", "product-card__media");
-      const image = doc.createElement("img");
-      image.src = product.image || product.images?.[0] || "assets/logo.png";
-      image.alt = product.alt || title;
-      image.loading = "lazy";
-      const badge = createElement("span", "product-card__section-badge", product.productType === "boutique" ? "Boutique" : "Ready-Made");
-      media.append(image, badge);
+      // Media
+      const img = doc.createElement("img");
+      img.src     = product.image || product.images?.[0] || "assets/logo.png";
+      img.alt     = product.alt || title;
+      img.loading = "lazy";
 
-      const content = createElement("div", "product-content");
-      const action = createElement("a", "product-card__action", "View Details");
-      action.href = new URL(`product-details.html?id=${encodeURIComponent(product.slug || product.id || normalize(title))}`, window.location.href).toString();
-      content.append(
-        createElement("span", "product-category", category),
-        createElement("h3", "", title),
-        createElement("p", "product-description", product.shortDescription || product.description || "Premium boutique product."),
-        createElement("p", "product-price", formatPrice(product.price)),
-        createElement("span", stock > 0 ? "stock-status" : "stock-status status-inactive", stock > 0 ? `${stock} available` : "Confirm availability"),
-        action
-      );
+      const badge = doc.createElement("span");
+      if (pType === "boutique") {
+        badge.className   = "product-card__section-badge product-card__section-badge--boutique";
+        badge.textContent = "✂️ Boutique";
+      } else {
+        badge.className   = "product-card__section-badge product-card__section-badge--readymade";
+        badge.textContent = "🛍️ Ready-Made";
+      }
+
+      const media = doc.createElement("div");
+      media.className = "product-card__media";
+      media.append(img, badge);
+
+      // Content
+      const detailUrl = new URL(
+        `product-details.html?id=${encodeURIComponent(product.slug || product.id || normalize(title))}`,
+        window.location.href
+      ).toString();
+      const action = doc.createElement("a");
+      action.className   = "product-card__action";
+      action.href        = detailUrl;
+      action.textContent = "View Details";
+
+      const content = doc.createElement("div");
+      content.className = "product-content";
+      content.innerHTML = `
+        <span class="product-category">${category}</span>
+        <h3>${title}</h3>
+        <p class="product-description">${product.shortDescription || product.description || "Premium boutique product."}</p>
+        <p class="product-price">${formatPrice(product.price)}</p>
+        <span class="${stock > 0 ? "stock-status" : "stock-status status-inactive"}">
+          ${stock > 0 ? stock + " available" : "Confirm availability"}
+        </span>
+      `;
+      content.append(action);
       card.append(media, content);
       return card;
     };
 
-    const renderProducts = () => {
-      const activeCategory = filterButtons.find(button => button.classList.contains("active"))?.dataset.category || "all";
-      const searchTerm = normalize(productSearch ? productSearch.value : "");
-      const visible = products.filter(product => {
-        const tags = ["all", product.category, product.productType, product.type, ...(product.tags || [])].map(normalize);
-        const searchableText = normalize(`${product.title || product.name} ${product.category} ${product.description} ${tags.join(" ")}`);
-        return (activeCategory === "all" || tags.includes(activeCategory)) && (!searchTerm || searchableText.includes(searchTerm));
-      });
+    const renderProductGrid = () => {
+      const visible       = getFilteredProducts();
+      const isBoutiqueTab = activeType === "boutique";
+      const hasItems      = visible.length > 0;
+      const showBoutiqueCta = isBoutiqueTab && !hasItems;
+      const showNoMatch     = !showBoutiqueCta && !hasItems;
 
-      productGrid.replaceChildren(...visible.map(createProductCard));
-      if (productCount) productCount.textContent = products.length ? `${visible.length} product${visible.length === 1 ? "" : "s"} available` : "No products in products.json yet";
-      if (emptyProducts) emptyProducts.hidden = visible.length > 0;
-      if (!visible.length) productGrid.innerHTML = "<p>No matching products are available right now. Please message us on WhatsApp for current designs.</p>";
+      if (emptyProducts)    emptyProducts.hidden    = !showNoMatch;
+      if (boutiqueEmptyCta) boutiqueEmptyCta.hidden = !showBoutiqueCta;
+
+      productGrid.innerHTML = "";
+      if (hasItems) {
+        productGrid.replaceChildren(...visible.map(createProductCard));
+      } else if (showNoMatch) {
+        productGrid.innerHTML = '<p class="shop-no-results">No matching products found. Try a different filter or search term.</p>';
+      }
+
+      if (productCount) {
+        const total = allProducts.filter(p =>
+          p.status !== "inactive" && (activeType === "all" || getProductType(p) === activeType)
+        ).length;
+        productCount.textContent = hasItems
+          ? `${visible.length} of ${total} product${total !== 1 ? "s" : ""}`
+          : "";
+      }
     };
 
-    filterButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        filterButtons.forEach(item => item.classList.remove("active"));
-        button.classList.add("active");
-        renderProducts();
+    // Type tab switching
+    typeTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        typeTabs.forEach(t => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        activeType = tab.dataset.type;
+        renderCategoryChips(activeType);
+        renderProductGrid();
       });
     });
 
-    productSearch?.addEventListener("input", renderProducts);
-    productGrid.innerHTML = "<p>Loading products from data/products.json...</p>";
-    loadStaticJson("data/products.json", [])
-      .then(data => {
-        products = Array.isArray(data) ? data : [];
-        renderProducts();
+    // Hero jump links: "Shop Ready-Made →" / "Explore Boutique →"
+    doc.querySelectorAll(".shop-type-jump").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const jump = link.dataset.jump;
+        const target = doc.getElementById("shop-products");
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+        const matchTab = typeTabs.find(t => t.dataset.type === jump);
+        if (matchTab) matchTab.click();
       });
+    });
+
+    // Search
+    productSearch?.addEventListener("input", () => {
+      searchTerm = normalize(productSearch.value);
+      renderProductGrid();
+    });
+
+    // Load products
+    productGrid.innerHTML = '<p class="shop-loading">Loading products…</p>';
+    loadStaticJson("data/products.json", []).then(data => {
+      allProducts = Array.isArray(data) ? data : [];
+      renderCategoryChips("all");
+      renderProductGrid();
+    });
   };
 
   const readUploadFile = (file, { label = "Upload", maxFileSize = 4 * 1024 * 1024, required = false } = {}) => new Promise((resolve, reject) => {

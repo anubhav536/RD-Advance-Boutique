@@ -34,135 +34,107 @@
   </header>
 
   <main>
-    <section class="shop-hero" aria-labelledby="shop-title">
-      <div class="shop-hero__content">
-        <p class="eyebrow">Luxury fashion ecommerce</p>
-        <h1 id="shop-title">Shop premium ready-made fashion and custom boutique couture.</h1>
-        <p>Explore a fashion-store experience built for future product launches: ready-made outfits, accessories, bridal edits, and made-to-measure boutique services in a black, pink, and gold luxury aesthetic.</p>
-        <div class="shop-hero__actions">
-          <a href="#shop-products" class="btn btn--primary">Explore Products</a>
-          <a href="#boutique-collection" class="btn btn--ghost">Custom Collection</a>
-        </div>
-      </div>
 
-      <aside class="shop-hero__panel" aria-label="Shop highlights">
-        <span>Admin-ready storefront</span>
-        <strong>Ready-made collections, bridal couture & premium tailoring.</strong>
-        <p>Empty product cards are prepared for future JSON, database, or admin-panel products.</p>
-      </aside>
-    </section>
-
-    <section class="collection-sections" aria-label="Main shopping sections">
-      <article class="collection-panel collection-panel--ready" id="ready-made-collection">
-        <div class="collection-panel__header">
+    <!-- ── SHOP HERO ─────────────────────────────── -->
+    <section class="shop-hero shop-hero--split" aria-label="Shop introduction">
+      <div class="shop-hero__half shop-hero__half--rm">
+        <div class="shop-hero__half-inner">
           <p class="eyebrow">Ready-Made Collection</p>
-          <h2>Luxury fashion ready to wear.</h2>
-          <p>Structured for everyday edits, occasionwear, family shopping, and premium accessories.</p>
+          <h2>Tayaar kapde — seedha ghar pe.</h2>
+          <p>Premium sarees, kurtis, suits, kids wear and more. Choose size, colour and order instantly.</p>
+          <a href="#shop-products" class="btn btn--primary shop-type-jump" data-jump="readymade">Shop Ready-Made →</a>
         </div>
-        <ul class="collection-chip-list" aria-label="Ready-Made Collection categories">
-          <li>Men</li>
-          <li>Women</li>
-          <li>Kids</li>
-          <li>Ethnic Wear</li>
-          <li>Casual Wear</li>
-          <li>Party Wear</li>
-          <li>Winter Wear</li>
-          <li>Accessories</li>
-        </ul>
-      </article>
+      </div>
+      <div class="shop-hero__half shop-hero__half--bt">
+        <div class="shop-hero__half-inner">
+          <p class="eyebrow">Boutique Custom</p>
+          <h2>Custom stitching — aapke nap par.</h2>
+          <p>Blouses, bridal wear, designer suits & premium tailoring — handcrafted to your measurements.</p>
+          <a href="#shop-products" class="btn btn--ghost shop-type-jump" data-jump="boutique">Explore Boutique →</a>
+        </div>
+      </div>
+    </section>
 
-      <article class="collection-panel collection-panel--boutique" id="boutique-collection">
-        <div class="collection-panel__header">
+    <!-- ── TYPE TABS + PRODUCTS ──────────────────── -->
+    <section class="shop-main" id="shop-products" aria-label="Shop products">
+
+      <!-- Type switcher -->
+      <div class="shop-type-bar" role="tablist" aria-label="Product type">
+        <button class="type-tab active" type="button" data-type="all" role="tab" aria-selected="true">
+          <span class="type-tab__icon">🏪</span>
+          <span class="type-tab__label">All Products</span>
+        </button>
+        <button class="type-tab" type="button" data-type="readymade" role="tab" aria-selected="false">
+          <span class="type-tab__icon">🛍️</span>
+          <span class="type-tab__label">Ready-Made</span>
+          <span class="type-tab__sub">Tayaar kapde</span>
+        </button>
+        <button class="type-tab" type="button" data-type="boutique" role="tab" aria-selected="false">
+          <span class="type-tab__icon">✂️</span>
+          <span class="type-tab__label">Boutique Custom</span>
+          <span class="type-tab__sub">Custom stitching</span>
+        </button>
+      </div>
+
+      <!-- Search + Category chips -->
+      <div class="shop-toolbar" aria-label="Search and filter">
+        <div class="shop-search" role="search">
+          <label class="sr-only" for="productSearch">Search products</label>
+          <span aria-hidden="true">⌕</span>
+          <input id="productSearch" type="search" placeholder="Search sarees, blouses, kurtis…" autocomplete="off">
+        </div>
+        <div class="category-filter" id="categoryFilter" role="list" aria-label="Category filter"></div>
+      </div>
+
+      <!-- Product count -->
+      <p id="productCount" class="shop-product-count" aria-live="polite"></p>
+
+      <!-- Product grid -->
+      <div class="product-grid" id="productGrid" aria-live="polite"></div>
+
+      <!-- Boutique empty CTA -->
+      <div class="boutique-empty-cta" id="boutiqueEmptyCta" hidden>
+        <div class="boutique-cta-card">
+          <span class="boutique-cta-icon">✂️</span>
           <p class="eyebrow">Boutique Custom Collection</p>
-          <h2>Designed, stitched, and finished for you.</h2>
-          <p>Built for future custom orders, consultation-led products, and premium tailoring services.</p>
+          <h2>Custom blouse, bridal wear & designer stitching</h2>
+          <p>Boutique products coming soon. Meanwhile, place a custom order directly — share your design, fabric, and measurements with us.</p>
+          <div class="boutique-cta-actions">
+            <a href="custom.html" class="btn btn--primary">Start Custom Order</a>
+            <a href="https://wa.me/917693849472?text=Boutique%20custom%20order%20ke%20liye%20baat%20karni%20hai" class="btn btn--ghost" target="_blank" rel="noopener">WhatsApp Us</a>
+          </div>
+          <ul class="boutique-cta-chips" aria-label="What we offer">
+            <li>✂️ Custom Blouse</li>
+            <li>👰 Bridal Wear</li>
+            <li>👗 Designer Suits</li>
+            <li>🧵 Custom Stitching</li>
+            <li>✨ Premium Tailoring</li>
+          </ul>
         </div>
-        <ul class="collection-chip-list" aria-label="Boutique Custom Collection categories">
-          <li>Custom Blouse Designs</li>
-          <li>Designer Suits</li>
-          <li>Bridal Wear</li>
-          <li>Boutique Dresses</li>
-          <li>Custom Stitching</li>
-          <li>Premium Tailoring</li>
-        </ul>
-      </article>
-    </section>
-
-    <section class="shop-toolbar" aria-label="Shop search and filters">
-      <div class="shop-toolbar__intro">
-        <p class="eyebrow">Collection room</p>
-        <h2>Filter the complete fashion store.</h2>
-        <p>Products are intentionally empty today and will be populated dynamically later.</p>
       </div>
 
-      <div class="shop-search" role="search">
-        <label class="sr-only" for="productSearch">Search products</label>
-        <span aria-hidden="true">⌕</span>
-        <input id="productSearch" type="search" placeholder="Search men, bridal, accessories, tailoring..." autocomplete="off">
-      </div>
-
-      <div class="category-filter" role="list" aria-label="Product categories">
-        <button class="filter-btn active" type="button" data-category="all" role="listitem">All Products</button>
-        <button class="filter-btn" type="button" data-category="ready-made" role="listitem">Ready-Made</button>
-        <button class="filter-btn" type="button" data-category="boutique" role="listitem">Boutique</button>
-        <button class="filter-btn" type="button" data-category="men" role="listitem">Men</button>
-        <button class="filter-btn" type="button" data-category="women" role="listitem">Women</button>
-        <button class="filter-btn" type="button" data-category="kids" role="listitem">Kids</button>
-        <button class="filter-btn" type="button" data-category="bridal" role="listitem">Bridal</button>
-        <button class="filter-btn" type="button" data-category="accessories" role="listitem">Accessories</button>
-      </div>
-    </section>
-
-    <section class="products-section" id="shop-products" aria-labelledby="products-title">
-      <div class="products-section__header">
-        <div>
-          <p class="eyebrow">Dynamic storefront</p>
-          <h2 id="products-title">Empty product cards ready for launch</h2>
-        </div>
-        <p id="productCount" aria-live="polite">Preparing collection</p>
-      </div>
-
-      <div class="product-grid" id="productGrid" aria-live="polite">
-        <!-- Empty dynamic product cards render here from js/script.js. -->
-      </div>
-
-      <div class="empty-products" id="emptyProducts" aria-live="polite">
+      <!-- No-match empty state -->
+      <div class="empty-products" id="emptyProducts" hidden aria-live="polite">
         <div class="empty-box">
-          <img src="assets/logo.png" alt="RD Advance Boutique emblem">
-          <h2>Products are empty for now.</h2>
-          <p>The storefront is ready for future admin-added products with image, name, category, price, discount price, stock status, and view details support.</p>
-          <a href="https://wa.me/917693849472" class="btn btn--primary">Ask on WhatsApp</a>
+          <img src="assets/logo.png" alt="RD Advance Boutique">
+          <h2>No products found.</h2>
+          <p>Try a different filter or search term, or ask us directly on WhatsApp.</p>
+          <a href="https://wa.me/917693849472" class="btn btn--primary" target="_blank" rel="noopener">Ask on WhatsApp</a>
         </div>
       </div>
     </section>
 
-    <section class="shop-info" aria-label="Boutique promises">
-      <article class="info-card">
-        <span>01</span>
-        <h3>Premium Ecommerce Feel</h3>
-        <p>Luxury storefront layouts, category browsing, product status details, and polished shopping actions.</p>
-      </article>
-      <article class="info-card">
-        <span>02</span>
-        <h3>Ready for Admin Products</h3>
-        <p>Card slots are prepared to receive future JSON/database products without changing the visual system.</p>
-      </article>
-      <article class="info-card">
-        <span>03</span>
-        <h3>Custom Boutique Fashion</h3>
-        <p>Ready-made collections sit beside bespoke bridal, blouse, tailoring, and stitching categories.</p>
-      </article>
-    </section>
-
+    <!-- ── CUSTOM BANNER ──────────────────────────── -->
     <section class="custom-stitching-banner">
       <div class="custom-banner-content">
         <p class="eyebrow">Bespoke appointment</p>
-        <h2>Need a custom fashion consultation?</h2>
-        <p>Share your design inspiration and prepare for premium boutique stitching, bridal finishing, suits, dresses, or tailoring.</p>
+        <h2>Custom boutique order chahiye?</h2>
+        <p>Share your design inspiration — blouse stitching, bridal finishing, suits, or premium tailoring, all crafted to your measurements.</p>
         <a href="custom.html" class="btn btn--primary">Start Custom Order</a>
       </div>
     </section>
 
+    <!-- ── CONTACT ────────────────────────────────── -->
     <section class="shop-contact" aria-label="Shop contact details">
       <div class="contact-card">
         <p class="eyebrow">Visit or message us</p>
@@ -172,6 +144,7 @@
         <a href="https://wa.me/917693849472" class="btn btn--ghost">Chat on WhatsApp</a>
       </div>
     </section>
+
   </main>
 
   <footer class="footer">

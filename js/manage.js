@@ -304,20 +304,24 @@
       return;
     }
     list.innerHTML = `<table class="adm-table">
-      <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Price</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
-      <tbody>${S.products.map((p, i) => `
+      <thead><tr><th>Image</th><th>Title</th><th>Type</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${S.products.map((p, i) => {
+        const pt = (p.productType || p.type || "readymade").toLowerCase();
+        const isBoutique = pt === "boutique";
+        return `
         <tr>
           <td><img src="${esc(p.image || (p.images && p.images[0]) || "")}" class="adm-table-img" onerror="this.style.display='none'"></td>
           <td><strong>${esc(p.title || p.name || "—")}</strong></td>
+          <td><span class="adm-badge ${isBoutique ? "adm-badge--boutique" : "adm-badge--readymade"}">${isBoutique ? "✂️ Boutique" : "🛍️ Ready-Made"}</span></td>
           <td><span class="adm-tag">${esc(p.category || "—")}</span></td>
           <td>${p.price ? "₹" + p.price : "—"}</td>
           <td><span class="adm-badge ${p.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${p.status || "active"}</span></td>
-          <td>${p.featured ? "⭐" : "—"}</td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
             <button class="adm-btn-sm adm-btn-del" data-idx="${i}">🗑️</button>
           </td>
-        </tr>`).join("")}
+        </tr>`;
+      }).join("")}
       </tbody></table>`;
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openProductForm(+b.dataset.idx)));
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => {
@@ -328,10 +332,24 @@
   function openProductForm(idx) {
     S.editType = "product"; S.editItem = idx >= 0 ? S.products[idx] : null; S.editIdx = idx;
     const item = S.editItem || {};
+    const currentType = item.productType || item.type || "readymade";
     const catOpts = S.categories.map(c => `<option value="${esc(c.name)}" ${item.category === c.name ? "selected" : ""}>${esc(c.name)}</option>`).join("");
     el("admModalTitle").textContent = idx >= 0 ? "Edit Product" : "Add Product";
     el("admModalBody").innerHTML = `<div class="adm-form-grid">
       <div class="adm-fg adm-fg--full"><label>Product Title *</label><input type="text" name="title" value="${esc(item.title || item.name || "")}" placeholder="e.g. Woven Handloom Cotton Saree"></div>
+      <div class="adm-fg adm-fg--full">
+        <label>Product Type *</label>
+        <div class="adm-type-toggle">
+          <label class="adm-type-opt">
+            <input type="radio" name="productType" value="readymade" ${currentType !== "boutique" ? "checked" : ""}>
+            <span class="adm-type-opt-inner adm-type-opt--rm">🛍️ Ready-Made<small>Tayaar kapda — size/color choose karke order</small></span>
+          </label>
+          <label class="adm-type-opt">
+            <input type="radio" name="productType" value="boutique" ${currentType === "boutique" ? "checked" : ""}>
+            <span class="adm-type-opt-inner adm-type-opt--bt">✂️ Boutique Custom<small>Custom stitching — nap, design, fabric</small></span>
+          </label>
+        </div>
+      </div>
       <div class="adm-fg"><label>Category</label><select name="category"><option value="">— Select —</option>${catOpts}</select></div>
       <div class="adm-fg"><label>Price (₹)</label><input type="number" name="price" value="${item.price || ""}" min="0" placeholder="349"></div>
       <div class="adm-fg"><label>Status</label><select name="status"><option value="active" ${item.status !== "inactive" ? "selected" : ""}>Active</option><option value="inactive" ${item.status === "inactive" ? "selected" : ""}>Inactive</option></select></div>
@@ -351,12 +369,14 @@
     const f = el("admModalBody");
     const v = n => fv(f, n); const ls = n => lines(v(n)); const cb = n => fcb(f, n);
     const ex = S.editItem || {};
+    const pType = f.querySelector('[name="productType"]:checked')?.value || ex.productType || "readymade";
     return {
       ...ex,
       id: ex.id || slug(v("title")) || uid(),
       title: v("title"), name: v("title"),
       category: v("category"),
-      productType: ex.productType || "boutique", type: ex.type || "boutique",
+      productType: pType,
+      type: pType,
       price: parseFloat(v("price")) || 0,
       status: v("status"), featured: cb("featured"),
       shortDescription: v("shortDescription"),

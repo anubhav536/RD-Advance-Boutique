@@ -377,6 +377,41 @@
 .badge--green { background: rgba(52,168,83,.12); color: #198038; }
 .badge--red   { background: rgba(224,85,85,.12); color: #b51c1c; }
 
+/* ── PRODUCT TYPE BADGES ────────────────────────────────────── */
+.adm-badge--readymade { background: rgba(30,90,60,.12); color: #1a5a3a; }
+.adm-badge--boutique  { background: rgba(190,107,114,.12); color: #8a2035; }
+
+/* ── PRODUCT TYPE TOGGLE (in product form) ──────────────────── */
+.adm-type-toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-top: .25rem;
+}
+.adm-type-opt { cursor: pointer; }
+.adm-type-opt input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+.adm-type-opt-inner {
+  display: flex; flex-direction: column; gap: .2rem;
+  padding: .85rem 1rem; border: 2px solid rgba(45,28,18,.14);
+  border-radius: .75rem; background: #fff; transition: all .15s; font-size: .82rem;
+  font-weight: 700; color: #3a2a1a; line-height: 1.2;
+}
+.adm-type-opt-inner small {
+  font-size: .68rem; font-weight: 500; color: #8a7060; letter-spacing: 0; text-transform: none;
+}
+.adm-type-opt input:checked + .adm-type-opt-inner {
+  border-width: 2px;
+}
+.adm-type-opt input:checked + .adm-type-opt--rm {
+  border-color: #2a5a3e; background: rgba(30,90,60,.06); color: #1a5a3a;
+}
+.adm-type-opt input:checked + .adm-type-opt--bt {
+  border-color: #be6b72; background: rgba(190,107,114,.06); color: #8a2035;
+}
+.adm-type-opt-inner:hover {
+  border-color: #be6b72; background: rgba(190,107,114,.04);
+}
+@media (max-width: 480px) {
+  .adm-type-toggle { grid-template-columns: 1fr; }
+}
+
 /* ── MOBILE RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px) {
   .adm-sidebar {
