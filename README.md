@@ -36,22 +36,21 @@ data/
 
 ### Admin authentication
 
-Admin authentication uses only local credentials from `config/admin-auth.json`; no external identity provider or third-party API is used. The password is stored as a PBKDF2 hash and successful logins receive an HTTP-only, signed same-site session cookie.
+Admin authentication uses only local credentials from `data/users.json` plus session settings from `config/admin-auth.json`; no Firebase, external identity provider, or third-party identity API is used. Signup and password changes store hashed passwords, login verifies the stored hash with `bcrypt.compare()`, and successful logins receive an HTTP-only same-site admin session cookie.
 
-Default local development admin email is `rdadvanceboutique@gmail.com`. The admin password is stored only as a PBKDF2 hash in `config/admin-auth.json`; do not publish the plaintext password in documentation.
+Default local development admin email is `rdadvanceboutique@gmail.com`. The admin password is stored only as a hash; do not publish the plaintext password in documentation. Legacy PBKDF2 hashes are still recognized so old admins can login once and be upgraded to the new hash format automatically.
 
-Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: `/rd-secret-admin`) to open the admin login flow without adding an admin link to the public site navigation. Admins can also press and hold the public site logo for about two seconds on mobile or desktop to open the same hidden shortcut. After successful login, the shortcut sends the admin to `admin-dashboard.html`.
+Use the secret admin shortcut URL configured by `ADMIN_SHORTCUT_PATH` (default: `/rd-secret-admin`) to open admin access without adding an admin link to the public site navigation. The server shortcut and public-site logo long-press now send unauthenticated visitors to `admin-signup.html`; already-authenticated admins are sent to `admin-dashboard.html`.
 
 Change both the password hash, `sessionSecret`, and `ADMIN_SHORTCUT_PATH` before deploying. You can generate replacement values locally with Node.js `crypto.pbkdf2Sync` and `crypto.randomBytes`.
 
-Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Configure SMTP environment variables so the server can send reset links to the configured admin email: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, and `APP_BASE_URL` (or `SITE_URL`) for the public reset-link origin. If SMTP is not configured in development, the reset link is printed to the server console and returned as a development preview response.
+Admin password reset is available from the `Forgot password?` link on `admin-login.html`. Email reset links have been removed; the page now loads the admin user's security question and allows a new password only after the security answer is verified. Existing legacy users without a saved security answer can use the registered admin email as the initial answer, then update credentials from the admin settings page.
 
 Admin auth endpoints:
 
 - `POST /api/v1/admin/auth/login` creates an admin session from the configured local credentials.
-- `POST /api/v1/admin/auth/password-reset/request` sends a one-hour password reset link to the configured admin email when the submitted email matches.
-- `GET /api/v1/admin/auth/password-reset/validate` validates a reset token before showing the reset form.
-- `POST /api/v1/admin/auth/password-reset/complete` changes the admin password with a valid reset token.
+- `POST /api/v1/admin/auth/password-reset/question` returns the stored security question for a valid admin email.
+- `POST /api/v1/admin/auth/password-reset/complete` changes the admin password after the security answer is verified.
 - `GET /api/v1/admin/auth/session` verifies the current admin session.
 - `POST /api/v1/admin/auth/logout` destroys the current admin session.
 

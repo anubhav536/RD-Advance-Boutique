@@ -7,11 +7,13 @@ const configureSecurity = require('./middleware/securityMiddleware');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const notFoundMiddleware = require('./middleware/notFoundMiddleware');
 const routes = require('./routes');
+const sessionMiddleware = require('./middleware/sessionMiddleware');
 const { attachAdminSession, requireAdminPage } = require('./middleware/adminAuthMiddleware');
 
 const app = express();
 
 configureSecurity(app);
+app.use(sessionMiddleware);
 app.use(attachAdminSession);
 
 if (config.env === 'development') {
@@ -29,7 +31,7 @@ app.get(config.adminShortcutPath, (req, res) => {
     return res.redirect(302, '/admin-dashboard.html');
   }
 
-  return res.redirect(302, `/admin-login.html?next=${encodeURIComponent('/admin-dashboard.html')}`);
+  return res.redirect(302, '/admin-signup.html');
 });
 
 const protectedAdminPages = new Set([

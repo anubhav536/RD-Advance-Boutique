@@ -1,37 +1,44 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const bcrypt = require('../utils/bcrypt');
 
 const CONFIG_PATH = path.resolve(__dirname, '../../config/admin-auth.json');
+const USERS_PATH = path.resolve(__dirname, '../../data/users.json');
 const DEFAULT_SESSION_MINUTES = 120;
-const DEFAULT_RESET_MINUTES = 60;
+const REMEMBER_SESSION_MINUTES = 30 * 24 * 60;
 const DEFAULT_SIGNUP_APPROVAL_MINUTES = 7 * 24 * 60;
-const PASSWORD_HASH_ALGORITHM = 'sha256';
-const PASSWORD_HASH_ITERATIONS = 310000;
-const PASSWORD_HASH_BYTES = 32;
 const ADMIN_APPROVAL_EMAIL = 'rdadvanceboutique@gmail.com';
+const DEFAULT_SECURITY_QUESTION = 'What is the registered admin email address?';
+const BCRYPT_SALT_ROUNDS = 12;
 
 let cachedConfig = null;
-let cachedMtimeMs = 0;
+let cachedConfigMtimeMs = 0;
+let cachedUsers = null;
+let cachedUsersMtimeMs = 0;
 
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
 
-const readConfigFile = () => {
-  let rawConfig;
-
+const readJsonFile = (filePath, fallback = null) => {
   try {
-    rawConfig = fs.readFileSync(CONFIG_PATH, 'utf8');
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return raw.trim() ? JSON.parse(raw) : fallback;
   } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new Error(`Admin authentication config is missing at ${CONFIG_PATH}.`);
-    }
+    if (error.code === 'ENOENT' && fallback !== null) return fallback;
     throw error;
   }
-
-  return JSON.parse(rawConfig);
 };
+
+const writeJsonFile = (filePath, data) => {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(temporaryPath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+  fs.renameSync(temporaryPath, filePath);
+};
+
+const readConfigFile = () => readJsonFile(CONFIG_PATH);
 
 const normalizeAdminUser = (user) => {
   const username = normalizeEmail(user?.username || user?.email);
@@ -40,10 +47,15 @@ const normalizeAdminUser = (user) => {
 
   return {
     username,
+    email: username,
     passwordHash,
     role: String(user?.role || 'admin').trim() || 'admin',
+    name: String(user?.name || '').trim(),
+    securityQuestion: String(user?.securityQuestion || DEFAULT_SECURITY_QUESTION).trim(),
+    securityAnswerHash: String(user?.securityAnswerHash || '').trim(),
     approvedAt: Number(user?.approvedAt || Date.now()),
     createdAt: Number(user?.createdAt || user?.approvedAt || Date.now()),
+    updatedAt: Number(user?.updatedAt || user?.approvedAt || Date.now()),
   };
 };
 
@@ -79,9 +91,24 @@ const normalizePendingSignup = (request, now = Date.now()) => {
     ...normalized,
     passwordHash,
     name: String(request?.name || '').trim(),
+    securityQuestion: String(request?.securityQuestion || DEFAULT_SECURITY_QUESTION).trim(),
+    securityAnswerHash: String(request?.securityAnswerHash || '').trim(),
     requestedAt: Number(request?.requestedAt || request?.createdAt || now),
   };
 };
+
+const getLegacyUsersFromConfig = (parsedConfig, now = Date.now()) => uniqueUsers([
+  normalizeAdminUser({
+    username: parsedConfig.username,
+    passwordHash: parsedConfig.passwordHash,
+    role: 'owner',
+    securityQuestion: parsedConfig.securityQuestion || DEFAULT_SECURITY_QUESTION,
+    securityAnswerHash: parsedConfig.securityAnswerHash || '',
+    approvedAt: Number(parsedConfig.primaryApprovedAt || parsedConfig.createdAt || now),
+    createdAt: Number(parsedConfig.createdAt || parsedConfig.primaryApprovedAt || now),
+  }),
+  ...(Array.isArray(parsedConfig.users) ? parsedConfig.users.map(normalizeAdminUser) : []),
+]);
 
 const normalizeConfig = (parsedConfig) => {
   const username = normalizeEmail(parsedConfig.username);
@@ -98,43 +125,9 @@ const normalizeConfig = (parsedConfig) => {
     throw new Error('Admin authentication sessionSecret must be at least 32 characters long.');
   }
 
-  const legacyUser = normalizeAdminUser({
-    username,
-    passwordHash,
-    role: 'owner',
-    approvedAt: Number(parsedConfig.primaryApprovedAt || parsedConfig.createdAt || now),
-    createdAt: Number(parsedConfig.createdAt || parsedConfig.primaryApprovedAt || now),
-  });
-
-  const users = uniqueUsers([
-    legacyUser,
-    ...(Array.isArray(parsedConfig.users) ? parsedConfig.users.map(normalizeAdminUser) : []),
-  ]);
-
   const pendingSignups = Array.isArray(parsedConfig.pendingSignups)
     ? parsedConfig.pendingSignups.map((request) => normalizePendingSignup(request, now)).filter(Boolean)
     : [];
-
-  const passwordResets = Array.isArray(parsedConfig.passwordResets)
-    ? parsedConfig.passwordResets.map((request) => normalizeTokenRequest(request, now)).filter(Boolean)
-    : [];
-
-  const resetExpiresAt = Number(parsedConfig.passwordReset?.expiresAt || 0);
-  const passwordReset = parsedConfig.passwordReset?.tokenHash && resetExpiresAt > now
-    ? {
-      tokenHash: String(parsedConfig.passwordReset.tokenHash),
-      expiresAt: resetExpiresAt,
-    }
-    : null;
-
-  if (passwordReset && !passwordResets.some((request) => request.tokenHash === passwordReset.tokenHash)) {
-    passwordResets.push({
-      username,
-      tokenHash: passwordReset.tokenHash,
-      expiresAt: passwordReset.expiresAt,
-      createdAt: now,
-    });
-  }
 
   return {
     username,
@@ -146,57 +139,150 @@ const normalizeConfig = (parsedConfig) => {
     sessionDurationMs: Number.isFinite(sessionDurationMinutes)
       ? sessionDurationMinutes * 60 * 1000
       : DEFAULT_SESSION_MINUTES * 60 * 1000,
-    users,
+    rememberSessionDurationMinutes: Number(parsedConfig.rememberSessionDurationMinutes || REMEMBER_SESSION_MINUTES),
     pendingSignups,
-    passwordResets,
-    passwordReset,
   };
 };
 
 const getAdminAuthConfig = () => {
   const stats = fs.statSync(CONFIG_PATH);
 
-  if (!cachedConfig || stats.mtimeMs !== cachedMtimeMs) {
+  if (!cachedConfig || stats.mtimeMs !== cachedConfigMtimeMs) {
     cachedConfig = normalizeConfig(readConfigFile());
-    cachedMtimeMs = stats.mtimeMs;
+    cachedConfigMtimeMs = stats.mtimeMs;
   }
 
   return cachedConfig;
 };
 
-const hashPassword = (password, salt = crypto.randomBytes(16).toString('hex')) => {
-  const hash = crypto
-    .pbkdf2Sync(String(password || ''), salt, PASSWORD_HASH_ITERATIONS, PASSWORD_HASH_BYTES, PASSWORD_HASH_ALGORITHM)
-    .toString('hex');
+const serializeConfig = (config, users = getAdminUsers()) => {
+  const primaryUser = users.find((user) => user.username === config.username) || users[0];
 
-  return `pbkdf2_${PASSWORD_HASH_ALGORITHM}$${PASSWORD_HASH_ITERATIONS}$${salt}$${hash}`;
-};
-
-const serializeConfig = (config) => {
-  const serialized = {
-    username: config.username,
-    passwordHash: config.passwordHash,
+  return {
+    username: primaryUser?.username || config.username,
+    passwordHash: primaryUser?.passwordHash || config.passwordHash,
     sessionSecret: config.sessionSecret,
     sessionDurationMinutes: config.sessionDurationMinutes,
+    rememberSessionDurationMinutes: config.rememberSessionDurationMinutes,
+    securityQuestion: primaryUser?.securityQuestion || DEFAULT_SECURITY_QUESTION,
+    securityAnswerHash: primaryUser?.securityAnswerHash || '',
+    pendingSignups: config.pendingSignups || [],
   };
-
-  const extraUsers = uniqueUsers(config.users || [])
-    .filter((user) => user.username !== config.username);
-  if (extraUsers.length) serialized.users = extraUsers;
-
-  if (config.pendingSignups?.length) serialized.pendingSignups = config.pendingSignups;
-  if (config.passwordResets?.length) serialized.passwordResets = config.passwordResets;
-  if (config.passwordReset) serialized.passwordReset = config.passwordReset;
-
-  return serialized;
 };
 
-const writeConfigFile = (config) => {
-  const normalizedConfig = normalizeConfig(config);
-  fs.writeFileSync(CONFIG_PATH, `${JSON.stringify(serializeConfig(normalizedConfig), null, 2)}\n`);
-  const stats = fs.statSync(CONFIG_PATH);
-  cachedConfig = normalizeConfig(readConfigFile());
-  cachedMtimeMs = stats.mtimeMs;
+const writeConfigFile = (nextConfig, users) => {
+  writeJsonFile(CONFIG_PATH, serializeConfig(nextConfig, users));
+  cachedConfig = null;
+  cachedConfigMtimeMs = 0;
+};
+
+const readUsersFromDisk = () => readJsonFile(USERS_PATH, []);
+
+const ensureUsersFile = () => {
+  const config = getAdminAuthConfig();
+  if (fs.existsSync(USERS_PATH)) return;
+
+  const legacyUsers = getLegacyUsersFromConfig(readConfigFile()).map((user) => ({
+    ...user,
+    securityQuestion: user.securityQuestion || DEFAULT_SECURITY_QUESTION,
+    securityAnswerHash: user.securityAnswerHash || '',
+  }));
+
+  writeJsonFile(USERS_PATH, legacyUsers.length ? legacyUsers : [{
+    username: config.username,
+    email: config.username,
+    passwordHash: config.passwordHash,
+    role: 'owner',
+    name: 'Primary Admin',
+    securityQuestion: DEFAULT_SECURITY_QUESTION,
+    securityAnswerHash: '',
+    approvedAt: Date.now(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  }]);
+};
+
+const getAdminUsers = () => {
+  ensureUsersFile();
+  const stats = fs.statSync(USERS_PATH);
+
+  if (!cachedUsers || stats.mtimeMs !== cachedUsersMtimeMs) {
+    cachedUsers = uniqueUsers(readUsersFromDisk().map(normalizeAdminUser));
+    cachedUsersMtimeMs = stats.mtimeMs;
+  }
+
+  return cachedUsers;
+};
+
+const writeAdminUsers = (users) => {
+  const normalizedUsers = uniqueUsers(users.map(normalizeAdminUser));
+  writeJsonFile(USERS_PATH, normalizedUsers);
+  cachedUsers = null;
+  cachedUsersMtimeMs = 0;
+  writeConfigFile(getAdminAuthConfig(), normalizedUsers);
+  return getAdminUsers();
+};
+
+const hashPassword = async (password) => bcrypt.hash(String(password || ''), BCRYPT_SALT_ROUNDS);
+
+const hashSecurityAnswer = async (answer) => hashPassword(String(answer || '').trim().toLowerCase());
+
+const getAdminUserByUsername = (username) => {
+  const submittedUsername = normalizeEmail(username);
+  if (!submittedUsername) return null;
+
+  return getAdminUsers().find((user) => user.username === submittedUsername) || null;
+};
+
+const getPrimaryAdminUser = () => getAdminUserByUsername(getAdminAuthConfig().username) || getAdminUsers()[0] || null;
+
+const adminSignupExists = (username) => {
+  const submittedUsername = normalizeEmail(username);
+  const currentConfig = getAdminAuthConfig();
+  return getAdminUsers().some((user) => user.username === submittedUsername)
+    || currentConfig.pendingSignups.some((request) => request.username === submittedUsername);
+};
+
+const updateAdminCredentials = async ({ username, password, securityQuestion, securityAnswer }) => {
+  const currentConfig = getAdminAuthConfig();
+  const nextUsername = normalizeEmail(username);
+
+  if (!nextUsername || !String(password || '').trim()) {
+    throw new Error('Admin email and password are required.');
+  }
+
+  const currentPrimary = getPrimaryAdminUser();
+  const nextPasswordHash = await hashPassword(password);
+  const nextSecurityQuestion = String(securityQuestion || currentPrimary?.securityQuestion || DEFAULT_SECURITY_QUESTION).trim();
+  const nextSecurityAnswerHash = String(securityAnswer || '').trim()
+    ? await hashSecurityAnswer(securityAnswer)
+    : currentPrimary?.securityAnswerHash || '';
+  const updatedAt = Date.now();
+  const users = [
+    {
+      ...(currentPrimary || {}),
+      username: nextUsername,
+      email: nextUsername,
+      passwordHash: nextPasswordHash,
+      role: currentPrimary?.role || 'owner',
+      securityQuestion: nextSecurityQuestion,
+      securityAnswerHash: nextSecurityAnswerHash,
+      approvedAt: currentPrimary?.approvedAt || updatedAt,
+      createdAt: currentPrimary?.createdAt || updatedAt,
+      updatedAt,
+    },
+    ...getAdminUsers().filter((user) => user.username !== currentConfig.username && user.username !== nextUsername),
+  ];
+
+  writeAdminUsers(users);
+  writeConfigFile({
+    ...currentConfig,
+    username: nextUsername,
+    passwordHash: nextPasswordHash,
+    pendingSignups: [],
+  }, users);
+
+  return getAdminAuthConfig();
 };
 
 const createTokenHash = (token, sessionSecret = getAdminAuthConfig().sessionSecret) => crypto
@@ -207,69 +293,22 @@ const createTokenHash = (token, sessionSecret = getAdminAuthConfig().sessionSecr
 const findByToken = (requests, token, currentConfig = getAdminAuthConfig()) => {
   const tokenHash = createTokenHash(token, currentConfig.sessionSecret);
   return requests.find((request) => {
-    const expectedBuffer = Buffer.from(request.tokenHash, 'hex');
-    const submittedBuffer = Buffer.from(tokenHash, 'hex');
-    return expectedBuffer.length === submittedBuffer.length
-      && crypto.timingSafeEqual(expectedBuffer, submittedBuffer);
+    const expected = Buffer.from(String(request.tokenHash || ''));
+    const submitted = Buffer.from(tokenHash);
+    return expected.length === submitted.length && crypto.timingSafeEqual(expected, submitted);
   });
 };
 
-const writeNormalizedConfig = (overrides = {}) => {
+const writePendingSignups = (pendingSignups) => {
   const currentConfig = getAdminAuthConfig();
-  const nextConfig = {
-    username: currentConfig.username,
-    passwordHash: currentConfig.passwordHash,
-    sessionSecret: currentConfig.sessionSecret,
-    sessionDurationMinutes: currentConfig.sessionDurationMinutes,
-    users: currentConfig.users,
-    pendingSignups: currentConfig.pendingSignups,
-    passwordResets: currentConfig.passwordResets,
-    ...overrides,
-  };
-
-  writeConfigFile(nextConfig);
-  return getAdminAuthConfig();
-};
-
-const getAdminUserByUsername = (username) => {
-  const submittedUsername = normalizeEmail(username);
-  if (!submittedUsername) return null;
-
-  return getAdminAuthConfig().users.find((user) => user.username === submittedUsername) || null;
-};
-
-const adminSignupExists = (username) => {
-  const submittedUsername = normalizeEmail(username);
-  const currentConfig = getAdminAuthConfig();
-  return currentConfig.users.some((user) => user.username === submittedUsername)
-    || currentConfig.pendingSignups.some((request) => request.username === submittedUsername);
-};
-
-const updateAdminCredentials = ({ username, password }) => {
-  const currentConfig = getAdminAuthConfig();
-  const nextUsername = normalizeEmail(username);
-  const nextPasswordHash = hashPassword(password);
-
-  if (!nextUsername || !String(password || '').trim()) {
-    throw new Error('Admin email and password are required.');
-  }
-
-  const users = currentConfig.users
-    .filter((user) => user.username !== currentConfig.username && user.username !== nextUsername);
-
   writeConfigFile({
-    username: nextUsername,
-    passwordHash: nextPasswordHash,
-    sessionSecret: currentConfig.sessionSecret,
-    sessionDurationMinutes: currentConfig.sessionDurationMinutes,
-    users,
-    pendingSignups: currentConfig.pendingSignups,
-    passwordResets: [],
+    ...currentConfig,
+    pendingSignups,
   });
   return getAdminAuthConfig();
 };
 
-const createAdminSignupApprovalToken = ({ email, password, name }, minutes = DEFAULT_SIGNUP_APPROVAL_MINUTES) => {
+const createAdminSignupApprovalToken = async ({ email, password, name, securityQuestion, securityAnswer }, minutes = DEFAULT_SIGNUP_APPROVAL_MINUTES) => {
   const currentConfig = getAdminAuthConfig();
   const username = normalizeEmail(email);
 
@@ -281,6 +320,10 @@ const createAdminSignupApprovalToken = ({ email, password, name }, minutes = DEF
     throw new Error('Admin password must be at least 8 characters long.');
   }
 
+  if (!String(securityQuestion || '').trim() || !String(securityAnswer || '').trim()) {
+    throw new Error('Security question and answer are required.');
+  }
+
   if (adminSignupExists(username)) {
     throw new Error('This admin email is already registered or waiting for approval.');
   }
@@ -289,20 +332,20 @@ const createAdminSignupApprovalToken = ({ email, password, name }, minutes = DEF
   const now = Date.now();
   const expiresAt = now + minutes * 60 * 1000;
 
-  writeNormalizedConfig({
-    pendingSignups: [
-      ...currentConfig.pendingSignups,
-      {
-        username,
-        name: String(name || '').trim(),
-        passwordHash: hashPassword(password),
-        tokenHash: createTokenHash(token, currentConfig.sessionSecret),
-        requestedAt: now,
-        createdAt: now,
-        expiresAt,
-      },
-    ],
-  });
+  writePendingSignups([
+    ...currentConfig.pendingSignups,
+    {
+      username,
+      name: String(name || '').trim(),
+      passwordHash: await hashPassword(password),
+      securityQuestion: String(securityQuestion || '').trim(),
+      securityAnswerHash: await hashSecurityAnswer(securityAnswer),
+      tokenHash: createTokenHash(token, currentConfig.sessionSecret),
+      requestedAt: now,
+      createdAt: now,
+      expiresAt,
+    },
+  ]);
 
   return {
     token,
@@ -320,20 +363,23 @@ const approveAdminSignupWithToken = (token) => {
 
   const approvedAt = Date.now();
   const users = uniqueUsers([
-    ...currentConfig.users,
+    ...getAdminUsers(),
     {
       username: pendingSignup.username,
+      email: pendingSignup.username,
       passwordHash: pendingSignup.passwordHash,
       role: 'admin',
+      name: pendingSignup.name,
+      securityQuestion: pendingSignup.securityQuestion,
+      securityAnswerHash: pendingSignup.securityAnswerHash,
       approvedAt,
       createdAt: pendingSignup.requestedAt,
+      updatedAt: approvedAt,
     },
   ]);
 
-  writeNormalizedConfig({
-    users,
-    pendingSignups: currentConfig.pendingSignups.filter((request) => request.tokenHash !== pendingSignup.tokenHash),
-  });
+  writeAdminUsers(users);
+  writePendingSignups(currentConfig.pendingSignups.filter((request) => request.tokenHash !== pendingSignup.tokenHash));
 
   return {
     username: pendingSignup.username,
@@ -341,85 +387,67 @@ const approveAdminSignupWithToken = (token) => {
   };
 };
 
-const createAdminPasswordResetToken = (username = getAdminAuthConfig().username, minutes = DEFAULT_RESET_MINUTES) => {
-  const currentConfig = getAdminAuthConfig();
-  const adminUser = getAdminUserByUsername(username);
-  if (!adminUser) return null;
-
-  const token = crypto.randomBytes(32).toString('base64url');
-  const now = Date.now();
-  const expiresAt = now + minutes * 60 * 1000;
-  const tokenHash = createTokenHash(token, currentConfig.sessionSecret);
-
-  writeNormalizedConfig({
-    passwordResets: [
-      ...currentConfig.passwordResets.filter((request) => request.username !== adminUser.username),
-      {
-        username: adminUser.username,
-        tokenHash,
-        expiresAt,
-        createdAt: now,
-      },
-    ],
-    ...(adminUser.username === currentConfig.username
-      ? { passwordReset: { tokenHash, expiresAt } }
-      : { passwordReset: currentConfig.passwordReset }),
-  });
+const getPasswordResetChallenge = (email) => {
+  const user = getAdminUserByUsername(email);
+  if (!user) return null;
 
   return {
-    token,
-    username: adminUser.username,
-    expiresAt,
-    expiresInMinutes: minutes,
+    email: user.username,
+    securityQuestion: user.securityQuestion || DEFAULT_SECURITY_QUESTION,
+    configured: Boolean(user.securityAnswerHash),
   };
 };
 
-const verifyAdminPasswordResetToken = (token) => {
-  const currentConfig = getAdminAuthConfig();
-  const reset = findByToken(currentConfig.passwordResets, token, currentConfig);
-  return Boolean(reset && reset.expiresAt > Date.now());
-};
-
-const resetAdminPasswordWithToken = ({ token, password }) => {
-  const currentConfig = getAdminAuthConfig();
-  const reset = findByToken(currentConfig.passwordResets, token, currentConfig);
-
-  if (!reset || reset.expiresAt <= Date.now()) {
-    return null;
+const verifySecurityAnswer = async (user, answer) => {
+  if (!user?.securityAnswerHash) {
+    return normalizeEmail(answer) === user?.username;
   }
 
-  const nextPasswordHash = hashPassword(password);
-  const users = currentConfig.users.map((user) => (
-    user.username === reset.username
-      ? { ...user, passwordHash: nextPasswordHash }
-      : user
+  return bcrypt.compare(String(answer || '').trim().toLowerCase(), user.securityAnswerHash);
+};
+
+const resetAdminPasswordWithSecurityAnswer = async ({ email, securityAnswer, password }) => {
+  const user = getAdminUserByUsername(email);
+  if (!user) return null;
+
+  const answerMatches = await verifySecurityAnswer(user, securityAnswer);
+  if (!answerMatches) return null;
+
+  const nextPasswordHash = await hashPassword(password);
+  const users = getAdminUsers().map((entry) => (
+    entry.username === user.username
+      ? { ...entry, passwordHash: nextPasswordHash, updatedAt: Date.now() }
+      : entry
   ));
-  const nextConfig = {
-    users,
-    passwordResets: currentConfig.passwordResets.filter((request) => request.tokenHash !== reset.tokenHash),
-  };
 
-  if (reset.username === currentConfig.username) {
-    nextConfig.passwordHash = nextPasswordHash;
-    nextConfig.passwordReset = null;
+  writeAdminUsers(users);
+  if (user.username === getAdminAuthConfig().username) {
+    writeConfigFile({
+      ...getAdminAuthConfig(),
+      passwordHash: nextPasswordHash,
+    }, users);
   }
 
-  writeNormalizedConfig(nextConfig);
-
-  return getAdminAuthConfig();
+  return getAdminUserByUsername(user.username);
 };
+
+const replaceAdminUser = (updatedUser) => writeAdminUsers(getAdminUsers().map((user) => (
+  user.username === updatedUser.username ? updatedUser : user
+)));
 
 module.exports = {
   ADMIN_APPROVAL_EMAIL,
   approveAdminSignupWithToken,
-  createAdminPasswordResetToken,
   createAdminSignupApprovalToken,
   getAdminAuthConfig,
   getAdminUserByUsername,
+  getAdminUsers,
+  getPasswordResetChallenge,
   hashPassword,
   isValidEmail,
   normalizeEmail,
-  resetAdminPasswordWithToken,
+  replaceAdminUser,
+  resetAdminPasswordWithSecurityAnswer,
   updateAdminCredentials,
-  verifyAdminPasswordResetToken,
+  verifySecurityAnswer,
 };
