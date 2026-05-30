@@ -47,7 +47,7 @@ const createDefaultConfigFile = () => {
     sessionDurationMinutes: DEFAULT_SESSION_MINUTES,
     rememberSessionDurationMinutes: REMEMBER_SESSION_MINUTES,
     securityQuestion: DEFAULT_SECURITY_QUESTION,
-    securityAnswerHash: '',
+    securityAnswerHash: String(process.env.ADMIN_SECURITY_ANSWER_HASH || '').trim(),
     pendingSignups: [],
   };
 
@@ -456,7 +456,7 @@ const getPasswordResetChallenge = (email) => {
 
 const verifySecurityAnswer = async (user, answer) => {
   if (!user?.securityAnswerHash) {
-    return normalizeEmail(answer) === user?.username;
+    return false;
   }
 
   return bcrypt.compare(String(answer || '').trim().toLowerCase(), user.securityAnswerHash);

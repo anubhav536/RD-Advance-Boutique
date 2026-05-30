@@ -239,6 +239,13 @@ const requestPasswordResetQuestion = asyncHandler(async (req, res) => {
     });
   }
 
+  if (!challenge.configured) {
+    return res.status(409).json({
+      success: false,
+      message: 'Password reset is unavailable until an authenticated admin configures a security answer.',
+    });
+  }
+
   return res.status(200).json({
     success: true,
     message: 'Security question loaded. Answer it to set a new password.',
