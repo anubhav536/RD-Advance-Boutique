@@ -10,6 +10,7 @@ const REMEMBER_SESSION_MINUTES = 30 * 24 * 60;
 const DEFAULT_SIGNUP_APPROVAL_MINUTES = 7 * 24 * 60;
 const ADMIN_APPROVAL_EMAIL = 'rdadvanceboutique@gmail.com';
 const DEFAULT_SECURITY_QUESTION = 'What is the registered admin email address?';
+const FALLBACK_PASSWORD_HASH = 'uninitialized-admin-password-hash';
 const BCRYPT_SALT_ROUNDS = 12;
 
 let cachedConfig = null;
@@ -38,7 +39,36 @@ const writeJsonFile = (filePath, data) => {
   fs.renameSync(temporaryPath, filePath);
 };
 
-const readConfigFile = () => readJsonFile(CONFIG_PATH);
+const createDefaultConfigFile = () => {
+  const defaultConfig = {
+    username: normalizeEmail(process.env.ADMIN_USERNAME || ADMIN_APPROVAL_EMAIL),
+    passwordHash: String(process.env.ADMIN_PASSWORD_HASH || FALLBACK_PASSWORD_HASH),
+    sessionSecret: crypto.randomBytes(64).toString('hex'),
+    sessionDurationMinutes: DEFAULT_SESSION_MINUTES,
+    rememberSessionDurationMinutes: REMEMBER_SESSION_MINUTES,
+    securityQuestion: DEFAULT_SECURITY_QUESTION,
+    securityAnswerHash: '',
+    pendingSignups: [],
+  };
+
+  writeJsonFile(CONFIG_PATH, defaultConfig);
+  console.info('Admin authentication JSON storage file was missing and has been created.', {
+    path: CONFIG_PATH,
+    username: defaultConfig.username,
+  });
+
+  return defaultConfig;
+};
+
+const ensureConfigFile = () => {
+  if (!fs.existsSync(CONFIG_PATH)) return createDefaultConfigFile();
+  return null;
+};
+
+const readConfigFile = () => {
+  const createdConfig = ensureConfigFile();
+  return createdConfig || readJsonFile(CONFIG_PATH);
+};
 
 const normalizeAdminUser = (user) => {
   const username = normalizeEmail(user?.username || user?.email);
@@ -145,6 +175,7 @@ const normalizeConfig = (parsedConfig) => {
 };
 
 const getAdminAuthConfig = () => {
+  ensureConfigFile();
   const stats = fs.statSync(CONFIG_PATH);
 
   if (!cachedConfig || stats.mtimeMs !== cachedConfigMtimeMs) {
@@ -187,6 +218,11 @@ const ensureUsersFile = () => {
     securityQuestion: user.securityQuestion || DEFAULT_SECURITY_QUESTION,
     securityAnswerHash: user.securityAnswerHash || '',
   }));
+
+  console.info('Admin users JSON storage file was missing and has been created.', {
+    path: USERS_PATH,
+    seededFromConfig: Boolean(legacyUsers.length),
+  });
 
   writeJsonFile(USERS_PATH, legacyUsers.length ? legacyUsers : [{
     username: config.username,
@@ -343,26 +379,35 @@ const createAdminSignupApprovalToken = async ({ email, password, name, securityQ
   const now = Date.now();
   const expiresAt = now + minutes * 60 * 1000;
 
-  writePendingSignups([
+  const pendingSignup = {
+    username,
+    name: String(name || '').trim(),
+    passwordHash: await hashPassword(password),
+    securityQuestion: String(securityQuestion || '').trim(),
+    securityAnswerHash: await hashSecurityAnswer(securityAnswer),
+    tokenHash: createTokenHash(token, currentConfig.sessionSecret),
+    requestedAt: now,
+    createdAt: now,
+    expiresAt,
+  };
+
+  const updatedConfig = writePendingSignups([
     ...currentConfig.pendingSignups,
-    {
-      username,
-      name: String(name || '').trim(),
-      passwordHash: await hashPassword(password),
-      securityQuestion: String(securityQuestion || '').trim(),
-      securityAnswerHash: await hashSecurityAnswer(securityAnswer),
-      tokenHash: createTokenHash(token, currentConfig.sessionSecret),
-      requestedAt: now,
-      createdAt: now,
-      expiresAt,
-    },
+    pendingSignup,
   ]);
+  const savedSignup = updatedConfig.pendingSignups.find((request) => request.username === username);
+
+  if (!savedSignup) {
+    throw new Error('Approval request could not be verified after saving to JSON storage.');
+  }
 
   return {
     token,
     username,
     expiresAt,
     expiresInMinutes: minutes,
+    saved: true,
+    pendingCount: updatedConfig.pendingSignups.length,
   };
 };
 
