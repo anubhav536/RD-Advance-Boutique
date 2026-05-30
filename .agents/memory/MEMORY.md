@@ -1,0 +1,2 @@
+- [CSS hidden override fix](css-hidden-fix.md) — `display:flex` in CSS overrides HTML `hidden` attr; always add `[hidden]{display:none!important}` at top of any CSS file that uses flex/grid on elements toggled with `hidden`.
+- [Checkout product type detection](checkout-type-detection.md) — `category` field is most reliable for type detection; check it before `productType`/`type` to avoid mismatch when productType="boutique" but category="Sarees".
