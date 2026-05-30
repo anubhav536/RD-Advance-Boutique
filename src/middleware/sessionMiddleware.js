@@ -81,36 +81,44 @@ const sessionMiddleware = (req, res, next) => {
     sessions.set(sessionId, session);
   }
 
-  req.sessionID = sessionId;
-  req.session = session;
-  req.session.regenerate = (callback) => {
-    sessions.delete(sessionId);
-    sessionId = crypto.randomBytes(32).toString('base64url');
-    session = createEmptySession(defaultMaxAgeMs);
+  const persistSession = () => {
+    if (!session) return;
+    session.cookie.expires = Date.now() + (session.cookie.maxAge || defaultMaxAgeMs);
     sessions.set(sessionId, session);
-    req.sessionID = sessionId;
-    req.session = session;
-    callback?.();
-  };
-  req.session.destroy = (callback) => {
-    sessions.delete(sessionId);
-    req.session = null;
-    res.setHeader('Set-Cookie', buildCookie(req, '', 0));
-    callback?.();
-  };
-  req.session.save = (callback) => {
-    if (req.session) {
-      req.session.cookie.expires = Date.now() + (req.session.cookie.maxAge || defaultMaxAgeMs);
-      sessions.set(sessionId, req.session);
-      res.setHeader('Set-Cookie', buildCookie(req, sessionId, req.session.cookie.maxAge || defaultMaxAgeMs));
-    }
-    callback?.();
   };
 
+  const bindSession = () => {
+    req.sessionID = sessionId;
+    req.session = session;
+    req.session.regenerate = (callback) => {
+      sessions.delete(sessionId);
+      sessionId = crypto.randomBytes(32).toString('base64url');
+      session = createEmptySession(defaultMaxAgeMs);
+      sessions.set(sessionId, session);
+      bindSession();
+      callback?.();
+    };
+    req.session.destroy = (callback) => {
+      sessions.delete(sessionId);
+      session = null;
+      req.session = null;
+      res.setHeader('Set-Cookie', buildCookie(req, '', 0));
+      callback?.();
+    };
+    req.session.save = (callback) => {
+      if (session) {
+        persistSession();
+        res.setHeader('Set-Cookie', buildCookie(req, sessionId, session.cookie.maxAge || defaultMaxAgeMs));
+      }
+      callback?.();
+    };
+  };
+
+  bindSession();
+
   res.on('finish', () => {
-    if (!req.session) return;
-    req.session.cookie.expires = Date.now() + (req.session.cookie.maxAge || defaultMaxAgeMs);
-    sessions.set(sessionId, req.session);
+    if (!session) return;
+    persistSession();
   });
 
   next();
