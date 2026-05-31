@@ -97,5 +97,89 @@
       "Teal Green & Purple"
     ],
     "whatsappMessage": "Hello RD Advance Boutique, I am interested in This Product. Please share availability, fitting, payment, and delivery details."
+  },
+  {
+    "id": "handloom-khadi-cotton-saree",
+    "title": "Handloom Khadi Cotton Saree",
+    "name": "Handloom Khadi Cotton Saree",
+    "categories": [
+      "Sarees"
+    ],
+    "category": "Sarees",
+    "productType": "readymade",
+    "type": "readymade",
+    "price": 349,
+    "status": "active",
+    "featured": false,
+    "shortDescription": "Experience effortless elegance with this beautifully crafted Handloom Khadi Cotton Saree. Designed with a graceful solid pattern and paired with a stylish printed blouse piece, it offers comfort, sophistication, and timeless charm for every occasion.",
+    "image": "assets/IMG_20260530_215224.jpg",
+    "images": [
+      "assets/IMG_20260530_215224.jpg",
+      "assets/IMG_20260530_215201.jpg",
+      "assets/IMG_20260530_215136.jpg",
+      "assets/IMG_20260530_215051.jpg",
+      "assets/IMG_20260530_215029.jpg",
+      "assets/IMG_20260530_215004.jpg",
+      "assets/IMG_20260530_214925.jpg",
+      "assets/IMG_20260530_214858.jpg",
+      "assets/IMG_20260530_214720.jpg"
+    ],
+    "colors": [
+      "Maroon with Grey Border",
+      "Black with Metallic Grey Border",
+      "Purple with Olive Green Combination",
+      "Rani Pink",
+      "Classic Red",
+      "Emerald Green",
+      "Royal Blue with Silver Border",
+      "Mustard Yellow with Silver Border",
+      "Olive Green with Beige Border"
+    ],
+    "sizes": [
+      "Free Size",
+      "Saree Length: 5.5 Meter",
+      "Blouse Length: 0.8 Meter"
+    ],
+    "features": [
+      "Premium Khadi Cotton Fabric",
+      "Authentic Handloom Weaving",
+      "Soft and Breathable Material",
+      "Elegant Solid Saree Design",
+      "Printed Blouse Piece Included",
+      "Lightweight and Comfortable",
+      "Easy to Drape and Carry",
+      "Skin-Friendly Fabric",
+      "Perfect for Daily Wear",
+      "Ideal for Office Wear",
+      "Suitable for Festive Occasions",
+      "Traditional Yet Modern Appeal",
+      "Durable and Long-Lasting Fabric",
+      "All-Season Wearability",
+      "Made in India"
+    ],
+    "tags": [
+      "Handloom Saree",
+      "Khadi Cotton Saree",
+      "Cotton Saree",
+      "Women's Saree",
+      "Traditional Saree",
+      "Ethnic Wear",
+      "Indian Saree",
+      "Office Wear Saree",
+      "Daily Wear Saree",
+      "Festival Saree",
+      "Casual Wear Saree",
+      "Handwoven Saree",
+      "Designer Saree",
+      "Elegant Saree",
+      "Lightweight Saree",
+      "Breathable Cotton Saree",
+      "Khadi Fashion",
+      "Sustainable Fashion",
+      "Classic Saree",
+      "Printed Blouse Saree"
+    ],
+    "createdAt": "2026-05-31T04:47:25.579Z",
+    "updatedAt": "2026-05-31T04:48:26.303Z"
   }
 ]
