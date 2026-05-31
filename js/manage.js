@@ -295,113 +295,194 @@
   }
 
   /* ─────────────────────────────────────────────
-     IMAGE PICKER HELPERS
+     IMAGE PICKER HELPERS  (server upload)
   ───────────────────────────────────────────── */
+
+  async function uploadFiles(files) {
+    const fd = new FormData();
+    Array.from(files).forEach(f => fd.append("files", f));
+    const res = await fetch("/upload", { method: "POST", body: fd });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || "Upload failed");
+    return json.paths;
+  }
+
+  function setPickerLoading(btn, loading) {
+    btn.disabled = loading;
+    btn.dataset.origText = btn.dataset.origText || btn.innerHTML;
+    btn.innerHTML = loading
+      ? `<span class="adm-upload-spin"></span> Uploading…`
+      : btn.dataset.origText;
+  }
+
+  /* Single image picker */
   function makeImgPicker(name, val, label, hint) {
     const hasVal = !!val;
     return `<div class="adm-img-picker">
       <label>${label}${hint ? ` <small>${hint}</small>` : ""}</label>
       <div class="adm-img-picker-row">
-        <input type="text" name="${name}" value="${esc(val || "")}" placeholder="assets/image.jpg ya https://...">
-        <label class="adm-upload-btn" title="File upload karein">
+        <input type="text" name="${name}" value="${esc(val || "")}" placeholder="assets/photo.jpg ya https://…">
+        <label class="adm-upload-btn adm-single-upload-btn" title="Upload karein">
           📁 Upload
-          <input type="file" accept="image/*" class="adm-file-input" data-target="${name}" hidden>
+          <input type="file" accept="image/*" class="adm-file-input-single" data-target="${name}" hidden>
         </label>
       </div>
       <img class="adm-img-preview" src="${esc(val || "")}" ${hasVal ? "" : "hidden"} onerror="this.hidden=true">
     </div>`;
   }
 
+  /* Multi image picker */
   function makeMultiImgPicker(images) {
-    const rows = (images && images.length ? images : [""]).map((src, i) => `
-      <div class="adm-multi-img-row">
-        <input type="text" name="images[]" value="${esc(src)}" placeholder="assets/img${i + 1}.jpg ya upload karein">
-        <label class="adm-upload-btn adm-upload-btn--sm" title="Upload">
-          📁
-          <input type="file" accept="image/*" class="adm-file-input adm-file-input--multi" hidden>
-        </label>
-        <img class="adm-multi-img-thumb" src="${esc(src)}" ${src ? "" : "hidden"} onerror="this.hidden=true">
-        <button type="button" class="adm-multi-img-del" title="Is row ko hatao">✕</button>
-      </div>`).join("");
+    const rows = (images && images.length ? images : []).map((src, i) => makeImgRow(src, i)).join("");
     return `<div class="adm-multi-img-picker" id="multiImgPicker">
-      ${rows}
-      <button type="button" class="adm-btn-ghost adm-multi-add-btn" id="btnAddImgRow">+ Aur Image Add Karein</button>
+      <label class="adm-bulk-upload-zone" id="bulkUploadZone" title="Ek saath kai photos select karein">
+        <input type="file" accept="image/*" multiple id="bulkFileInput" hidden>
+        <span class="adm-bulk-icon">🖼️</span>
+        <strong>Multiple Photos Upload</strong>
+        <small>Yahan click karo — ek saath kai photos select ho sakti hain</small>
+      </label>
+      <div class="adm-multi-img-rows" id="multiImgRows">${rows}</div>
+      <button type="button" class="adm-multi-add-btn" id="btnAddImgRow">+ URL se ek aur add karein</button>
+    </div>`;
+  }
+
+  function makeImgRow(src, i) {
+    const idx = typeof i === "number" ? i : Date.now();
+    return `<div class="adm-multi-img-row">
+      <img class="adm-multi-img-thumb" src="${esc(src || "")}" ${src ? "" : "hidden"} onerror="this.hidden=true">
+      <input type="text" name="images[]" value="${esc(src || "")}" placeholder="assets/img${idx + 1}.jpg">
+      <label class="adm-upload-btn adm-upload-btn--sm" title="Is photo ko replace karein">
+        📁
+        <input type="file" accept="image/*" class="adm-file-input-row" hidden>
+      </label>
+      <button type="button" class="adm-multi-img-del" title="Hatao">✕</button>
     </div>`;
   }
 
   function attachImgPickerListeners(container) {
-    // Single image pickers — file upload
-    container.querySelectorAll(".adm-file-input:not(.adm-file-input--multi)").forEach(inp => {
-      inp.addEventListener("change", () => {
-        const file = inp.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          const b64 = e.target.result;
-          const urlInput = container.querySelector(`[name="${inp.dataset.target}"]`);
-          if (urlInput) { urlInput.value = b64; urlInput.dispatchEvent(new Event("input")); }
-          const picker = inp.closest(".adm-img-picker");
-          if (picker) {
-            const prev = picker.querySelector(".adm-img-preview");
-            if (prev) { prev.src = b64; prev.hidden = false; }
-          }
-        };
-        reader.readAsDataURL(file);
+    /* ── Single pickers ── */
+    container.querySelectorAll(".adm-single-upload-btn").forEach(label => {
+      const fileInp = label.querySelector(".adm-file-input-single");
+      if (!fileInp) return;
+      fileInp.addEventListener("change", async () => {
+        if (!fileInp.files.length) return;
+        setPickerLoading(label, true);
+        try {
+          const paths = await uploadFiles(fileInp.files);
+          const urlInp = container.querySelector(`[name="${fileInp.dataset.target}"]`);
+          if (urlInp) { urlInp.value = paths[0]; urlInp.dispatchEvent(new Event("input")); }
+          const picker = label.closest(".adm-img-picker");
+          const prev = picker?.querySelector(".adm-img-preview");
+          if (prev) { prev.src = paths[0]; prev.hidden = false; }
+          showToast("✅ Image upload ho gayi: " + paths[0]);
+        } catch (err) { showToast("❌ Upload fail: " + err.message); }
+        setPickerLoading(label, false);
+        fileInp.value = "";
       });
     });
-    // Single image pickers — live URL preview
+
+    /* ── Single picker URL live preview ── */
     container.querySelectorAll(".adm-img-picker").forEach(picker => {
       const urlInp = picker.querySelector("input[type=text]");
       const prev   = picker.querySelector(".adm-img-preview");
       if (!urlInp || !prev) return;
       urlInp.addEventListener("input", () => {
-        if (urlInp.value.trim()) { prev.src = urlInp.value.trim(); prev.hidden = false; }
-        else prev.hidden = true;
+        const v = urlInp.value.trim();
+        if (v) { prev.src = v; prev.hidden = false; } else prev.hidden = true;
       });
     });
-    // Multi image picker
+
+    /* ── Multi picker ── */
     attachMultiImgListeners(container);
   }
 
   function attachMultiImgListeners(container) {
-    const picker = container.querySelector("#multiImgPicker");
+    const picker   = container.querySelector("#multiImgPicker");
+    const rowsWrap = container.querySelector("#multiImgRows");
+    const bulkInp  = container.querySelector("#bulkFileInput");
+    const addBtn   = container.querySelector("#btnAddImgRow");
+    const zone     = container.querySelector("#bulkUploadZone");
     if (!picker) return;
 
+    /* Bind a single row's upload + url-preview + delete */
     function bindRow(row) {
-      const fileInp = row.querySelector(".adm-file-input--multi");
-      const urlInp  = row.querySelector("input[type=text]");
-      const thumb   = row.querySelector(".adm-multi-img-thumb");
-      const delBtn  = row.querySelector(".adm-multi-img-del");
-      if (fileInp) fileInp.addEventListener("change", () => {
-        const file = fileInp.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          if (urlInp) urlInp.value = e.target.result;
-          if (thumb)  { thumb.src = e.target.result; thumb.hidden = false; }
-        };
-        reader.readAsDataURL(file);
-      });
+      const rowUploadInp = row.querySelector(".adm-file-input-row");
+      const urlInp       = row.querySelector("input[type=text]");
+      const thumb        = row.querySelector(".adm-multi-img-thumb");
+      const delBtn       = row.querySelector(".adm-multi-img-del");
+      const rowLabel     = row.querySelector(".adm-upload-btn--sm");
+
+      if (rowUploadInp && rowLabel) {
+        rowUploadInp.addEventListener("change", async () => {
+          if (!rowUploadInp.files.length) return;
+          setPickerLoading(rowLabel, true);
+          try {
+            const paths = await uploadFiles(rowUploadInp.files);
+            if (urlInp) urlInp.value = paths[0];
+            if (thumb)  { thumb.src = paths[0]; thumb.hidden = false; }
+            showToast("✅ " + paths[0]);
+          } catch (err) { showToast("❌ " + err.message); }
+          setPickerLoading(rowLabel, false);
+          rowUploadInp.value = "";
+        });
+      }
       if (urlInp && thumb) urlInp.addEventListener("input", () => {
-        if (urlInp.value.trim()) { thumb.src = urlInp.value.trim(); thumb.hidden = false; }
-        else thumb.hidden = true;
+        const v = urlInp.value.trim();
+        if (v) { thumb.src = v; thumb.hidden = false; } else thumb.hidden = true;
       });
-      if (delBtn) delBtn.addEventListener("click", () => { row.remove(); });
+      if (delBtn) delBtn.addEventListener("click", () => row.remove());
     }
 
-    picker.querySelectorAll(".adm-multi-img-row").forEach(bindRow);
+    rowsWrap?.querySelectorAll(".adm-multi-img-row").forEach(bindRow);
 
-    picker.querySelector("#btnAddImgRow")?.addEventListener("click", () => {
-      const idx = picker.querySelectorAll(".adm-multi-img-row").length;
+    /* Bulk upload — multiple files at once */
+    if (bulkInp && zone) {
+      bulkInp.addEventListener("change", async () => {
+        if (!bulkInp.files.length) return;
+        const count = bulkInp.files.length;
+        setPickerLoading(zone, true);
+        try {
+          const paths = await uploadFiles(bulkInp.files);
+          paths.forEach((p, i) => {
+            const existingInputs = rowsWrap.querySelectorAll("input[type=text]");
+            const emptyInp = Array.from(existingInputs).find(inp => !inp.value.trim());
+            if (emptyInp) {
+              emptyInp.value = p;
+              emptyInp.dispatchEvent(new Event("input"));
+            } else {
+              const idx = rowsWrap.querySelectorAll(".adm-multi-img-row").length;
+              const div = document.createElement("div");
+              div.className = "adm-multi-img-row";
+              div.innerHTML = makeImgRow(p, idx).replace(/^<div[^>]*>/, "").replace(/<\/div>$/, "");
+              const wrapper = document.createElement("div");
+              wrapper.className = "adm-multi-img-row";
+              wrapper.innerHTML = `
+                <img class="adm-multi-img-thumb" src="${esc(p)}">
+                <input type="text" name="images[]" value="${esc(p)}" placeholder="assets/…">
+                <label class="adm-upload-btn adm-upload-btn--sm" title="Replace">📁<input type="file" accept="image/*" class="adm-file-input-row" hidden></label>
+                <button type="button" class="adm-multi-img-del" title="Hatao">✕</button>`;
+              rowsWrap.appendChild(wrapper);
+              bindRow(wrapper);
+            }
+          });
+          showToast(`✅ ${count} photo${count > 1 ? "s" : ""} upload ho gayi — assets/ mein save`);
+        } catch (err) { showToast("❌ Upload fail: " + err.message); }
+        setPickerLoading(zone, false);
+        bulkInp.value = "";
+      });
+    }
+
+    /* Add empty row manually */
+    addBtn?.addEventListener("click", () => {
+      const idx = rowsWrap.querySelectorAll(".adm-multi-img-row").length;
       const div = document.createElement("div");
       div.className = "adm-multi-img-row";
       div.innerHTML = `
-        <input type="text" name="images[]" value="" placeholder="assets/img${idx + 1}.jpg ya upload karein">
-        <label class="adm-upload-btn adm-upload-btn--sm" title="Upload">
-          📁
-          <input type="file" accept="image/*" class="adm-file-input adm-file-input--multi" hidden>
-        </label>
         <img class="adm-multi-img-thumb" hidden>
+        <input type="text" name="images[]" value="" placeholder="assets/img${idx + 1}.jpg">
+        <label class="adm-upload-btn adm-upload-btn--sm" title="Upload">📁<input type="file" accept="image/*" class="adm-file-input-row" hidden></label>
         <button type="button" class="adm-multi-img-del" title="Hatao">✕</button>`;
-      picker.insertBefore(div, picker.querySelector("#btnAddImgRow"));
+      rowsWrap.appendChild(div);
       bindRow(div);
     });
   }
