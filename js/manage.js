@@ -8,6 +8,7 @@
     config: {}, settings: {}, products: [], categories: [],
     gallery: [], notifications: [], orders: [],
     activeFilter: "all", editType: null, editItem: null, editIdx: -1,
+    pendingFiles: new Map(), // path → File object for ZIP download
   };
 
   /* ─────────────────────────────────────────────
@@ -356,7 +357,7 @@
   }
 
   function attachImgPickerListeners(container) {
-    /* Single pickers — FileReader preview, assets/ path stored */
+    /* Single pickers — objectURL preview, assets/ path + File stored */
     container.querySelectorAll(".adm-single-upload-btn").forEach(label => {
       const fileInp = label.querySelector(".adm-file-input-single");
       if (!fileInp) return;
@@ -365,6 +366,8 @@
         if (!file) return;
         const path   = fileToPath(file);
         const objURL = URL.createObjectURL(file);
+        S.pendingFiles.set(path, file);
+        updateZipBtn();
         const urlInp = container.querySelector(`[name="${fileInp.dataset.target}"]`);
         if (urlInp) { urlInp.value = path; }
         const picker = label.closest(".adm-img-picker");
@@ -407,6 +410,8 @@
           if (!file) return;
           const path   = fileToPath(file);
           const objURL = URL.createObjectURL(file);
+          S.pendingFiles.set(path, file);
+          updateZipBtn();
           if (urlInp) urlInp.value = path;
           if (thumb)  { thumb.src = objURL; thumb.hidden = false; }
           rowFile.value = "";
@@ -427,7 +432,7 @@
         Array.from(bulkInp.files).forEach(file => {
           const path   = fileToPath(file);
           const objURL = URL.createObjectURL(file);
-          // Fill an empty existing row first, else add new row
+          S.pendingFiles.set(path, file);
           const emptyInp = Array.from(rowsWrap.querySelectorAll("input[type=text]"))
             .find(inp => !inp.value.trim());
           if (emptyInp) {
@@ -449,6 +454,7 @@
             bindRow(div);
           }
         });
+        updateZipBtn();
         showToast("✅ " + bulkInp.files.length + " photo(s) ready — Save karo phir Generate Code");
         bulkInp.value = "";
       });
@@ -469,6 +475,44 @@
       rowsWrap.appendChild(div);
       bindRow(div);
     });
+  }
+
+  /* ─────────────────────────────────────────────
+     ZIP DOWNLOAD
+  ───────────────────────────────────────────── */
+  function updateZipBtn() {
+    const btn = el("admZipDownload");
+    if (!btn) return;
+    const count = S.pendingFiles.size;
+    if (count > 0) {
+      btn.hidden = false;
+      btn.textContent = `📥 Download ${count} Photo${count > 1 ? "s" : ""} (ZIP)`;
+    } else {
+      btn.hidden = true;
+    }
+  }
+
+  async function downloadImagesZip() {
+    if (!S.pendingFiles.size) return;
+    const btn = el("admZipDownload");
+    if (btn) { btn.textContent = "⏳ Zip ban rahi hai…"; btn.disabled = true; }
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder("assets");
+      S.pendingFiles.forEach((file, path) => {
+        const filename = path.replace(/^assets\//, "");
+        folder.file(filename, file);
+      });
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "boutique-assets.zip";
+      a.click();
+      showToast("✅ ZIP download shuru — assets/ folder mein extract karo aur GitHub par commit karo");
+    } catch (err) {
+      showToast("❌ ZIP error: " + err.message, "error");
+    }
+    if (btn) { btn.disabled = false; updateZipBtn(); }
   }
 
   /* ─────────────────────────────────────────────
@@ -509,6 +553,7 @@
   }
 
   function openProductForm(idx) {
+    S.pendingFiles.clear(); updateZipBtn();
     S.editType = "product"; S.editItem = idx >= 0 ? S.products[idx] : null; S.editIdx = idx;
     const item = S.editItem || {};
     const currentType = item.productType || item.type || "readymade";
@@ -1005,6 +1050,7 @@
     el("admModalClose")?.addEventListener("click",  () => { el("admEditModal").hidden = true; });
     el("admModalCancel")?.addEventListener("click", () => { el("admEditModal").hidden = true; });
     el("admModalSave")?.addEventListener("click",   handleModalSave);
+    el("admZipDownload")?.addEventListener("click", downloadImagesZip);
     el("admEditModal")?.addEventListener("click",   e => { if (e.target === el("admEditModal")) el("admEditModal").hidden = true; });
 
     // Code modal
