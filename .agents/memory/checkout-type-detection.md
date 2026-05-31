@@ -1,17 +1,21 @@
 ---
 name: Checkout product type detection priority
-description: Category field must be checked before productType/type to correctly detect product schemas.
+description: readymade productType/type must be checked FIRST before category to avoid wrong schema for ready-made products.
 ---
 
-In products.json, a product may have `productType: "boutique"` (a fallback value) but `category: "Sarees"` (the real type). The detection function must prioritize `category` over `productType`/`type`.
+Ready-made products must always use the simple `readymade` schema (size, color, qty only) — no customization fields like Fall/Pico, measurements, etc.
 
-**The rule:** Always check `category → productType → type` in that order when detecting schema type.
+**The rule:** Check if `productType` or `type` equals `"readymade"` FIRST, before any category matching. Only fall through to category-based detection for non-readymade products.
 
-**Why:** Vendors tend to set accurate `category` but may use generic values like "boutique" for `productType`.
+**Why:** A product can have `category: "Sarees"` but `productType: "readymade"` — without the early readymade check, the saree schema (which includes Fall/Pico) is applied incorrectly. Ready-made products are sold as-is like normal e-commerce, no stitching customization needed.
 
 **How to apply:**
 ```javascript
 function detectType(product) {
+  const pt = norm(product.productType || "");
+  const tp = norm(product.type || "");
+  if (pt === "readymade" || tp === "readymade") return "readymade";
+
   function match(s) { /* maps keywords to type */ }
   return match(product.category) || match(product.productType) || match(product.type) || "readymade";
 }

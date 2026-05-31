@@ -98,6 +98,10 @@
      PRODUCT TYPE DETECTION
   ───────────────────────────────────────────── */
   function detectType(product) {
+    const pt = norm(product.productType || "");
+    const tp = norm(product.type || "");
+    if (pt === "readymade" || tp === "readymade") return "readymade";
+
     function match(s) {
       if (!s) return null;
       const v = norm(s);
