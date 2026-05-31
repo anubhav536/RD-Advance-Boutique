@@ -94,9 +94,9 @@
     "ctaUrl": "https://wa.me/917693849472",
     "startAt": "",
     "endAt": "",
-    "showAsPopup": true,
+    "showAsPopup": false,
     "dismissible": true,
     "createdAt": "2026-05-29T00:00:00.000Z",
-    "updatedAt": "2026-05-29T00:00:00.000Z"
+    "updatedAt": "2026-05-31T01:38:01.174Z"
   }
 ]
