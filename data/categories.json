@@ -28,6 +28,20 @@
     "slug": "suits-salwar"
   },
   {
+    "id": "plazo-suits",
+    "name": "Plazo Suits",
+    "description": "Stylish plazo suit sets — straight kurta with wide-leg plazo pants.",
+    "status": "active",
+    "slug": "plazo-suits"
+  },
+  {
+    "id": "sharara-sets",
+    "name": "Sharara Sets",
+    "description": "Traditional and designer sharara sets for parties and occasions.",
+    "status": "active",
+    "slug": "sharara-sets"
+  },
+  {
     "id": "lehengas",
     "name": "Lehengas",
     "description": "Bridal lehengas, party lehengas, designer chaniya choli.",
@@ -42,11 +56,46 @@
     "slug": "gowns"
   },
   {
+    "id": "coord-sets",
+    "name": "Co-ord Sets",
+    "description": "Matching top and bottom sets — ethnic, fusion, and casual styles.",
+    "status": "active",
+    "slug": "coord-sets"
+  },
+  {
     "id": "indo-western",
     "name": "Indo-Western",
     "description": "Fusion wear — sharara, dhoti pants, crop tops, co-ord sets.",
     "status": "active",
     "slug": "indo-western"
+  },
+  {
+    "id": "tops-tunics",
+    "name": "Tops & Tunics",
+    "description": "Casual and ethnic tops, printed tunics, and short kurtis.",
+    "status": "active",
+    "slug": "tops-tunics"
+  },
+  {
+    "id": "maxi-dresses",
+    "name": "Maxi Dresses",
+    "description": "Flowy maxi dresses and long casual ethnic dresses.",
+    "status": "active",
+    "slug": "maxi-dresses"
+  },
+  {
+    "id": "jumpsuits",
+    "name": "Jumpsuits & Playsuits",
+    "description": "Ethnic and fusion jumpsuits, playsuits for modern women.",
+    "status": "active",
+    "slug": "jumpsuits"
+  },
+  {
+    "id": "ethnic-jackets",
+    "name": "Ethnic Jackets & Shrugs",
+    "description": "Embroidered jackets, printed shrugs, and long koti styles.",
+    "status": "active",
+    "slug": "ethnic-jackets"
   },
   {
     "id": "bridal",
@@ -56,11 +105,25 @@
     "slug": "bridal"
   },
   {
+    "id": "festive-wear",
+    "name": "Festive Wear",
+    "description": "Special outfits for Diwali, Navratri, Eid, and all celebrations.",
+    "status": "active",
+    "slug": "festive-wear"
+  },
+  {
     "id": "dupattas",
     "name": "Dupattas",
     "description": "Designer dupattas, embroidered and printed styles.",
     "status": "active",
     "slug": "dupattas"
+  },
+  {
+    "id": "nightwear",
+    "name": "Nightwear & Loungewear",
+    "description": "Comfortable cotton nightsuits, pyjama sets, and loungewear.",
+    "status": "active",
+    "slug": "nightwear"
   },
   {
     "id": "kids-wear",
@@ -75,6 +138,13 @@
     "description": "Printed and embroidered kaftans for casual and beach wear.",
     "status": "active",
     "slug": "kaftans"
+  },
+  {
+    "id": "skirts",
+    "name": "Skirts",
+    "description": "Ethnic and casual skirts — tiered, flared, and pleated styles.",
+    "status": "active",
+    "slug": "skirts"
   },
   {
     "id": "accessories",
