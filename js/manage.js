@@ -296,7 +296,7 @@
   }
 
   /* ─────────────────────────────────────────────
-     IMAGE PICKER HELPERS  (server upload)
+     IMAGE PICKER HELPERS
   ───────────────────────────────────────────── */
 
   /* ── Pure client-side image helpers — no server needed ──
