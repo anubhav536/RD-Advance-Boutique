@@ -56,13 +56,6 @@
     "slug": "patiala-suits"
   },
   {
-    "id": "pakistani-suits",
-    "name": "Pakistani Suits",
-    "description": "Designer Pakistani-style straight suits with embroidery and dupatta.",
-    "status": "active",
-    "slug": "pakistani-suits"
-  },
-  {
     "id": "churidar-sets",
     "name": "Churidar Sets",
     "description": "Classic churidar kameez sets in cotton, silk, and georgette.",
@@ -241,6 +234,13 @@
     "id": "kurti-and-suit-sets",
     "name": "Kurti And Suit Sets",
     "slug": "kurti-and-suit-sets",
+    "description": "",
+    "status": "active"
+  },
+  {
+    "id": "kurta-pant-set",
+    "name": "Kurta-Pant set",
+    "slug": "kurta-pant-set",
     "description": "",
     "status": "active"
   }
