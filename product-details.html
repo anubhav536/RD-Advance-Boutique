@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/compare.css">
 </head>
 <body class="detail-page product-detail-page">
   <header class="site-header" aria-label="Main navigation">
@@ -24,6 +25,7 @@
       <a href="learn.html" class="nav__link" data-i18n="nav.course">Course</a>
       <a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a>
       <a href="wishlist.html" class="nav__link nav-wl-link" aria-label="Wishlist">♡ <span class="wl-badge" hidden>0</span></a>
+      <a href="compare.html" class="nav__link nav-cmp-link" aria-label="Compare products">⊞ <span class="cmp-badge" hidden>0</span></a>
     </nav>
     <div class="header-right">
       <button class="lang-btn" type="button" aria-label="हिंदी में बदलें">हिं</button>
@@ -64,6 +66,7 @@
           <a id="productWhatsapp" class="btn btn--ghost" href="https://wa.me/917693849472" target="_blank" rel="noopener" data-no-transition="true" data-i18n="btn.whatsapp">WhatsApp</a>
           <button id="productShare" class="btn btn--ghost" type="button" data-i18n="btn.share">Share</button>
           <button id="productWishlistBtn" class="wishlist-btn wishlist-btn--detail" type="button" aria-label="Save to wishlist">♡</button>
+          <button id="productCompareBtn" class="cmp-detail-btn" type="button" hidden>⊞ Compare</button>
         </div>
         <p id="productShareStatus" class="share-status" aria-live="polite"></p>
       </div>
@@ -216,6 +219,35 @@
           tab.classList.add("active"); tab.setAttribute("aria-selected", "true");
           modal.querySelector(`.sg-panel[data-panel="${tab.dataset.tab}"]`)?.classList.add("active");
         });
+      });
+    })();
+  </script>
+  <script src="js/compare.js"></script>
+  <script>
+    (function () {
+      var pid = new URLSearchParams(location.search).get("id");
+      if (!pid || !window.RDCompare) return;
+      var btn = document.getElementById("productCompareBtn");
+      if (!btn) return;
+      btn.dataset.cmpId = pid;
+      function refresh() {
+        var active = window.RDCompare.has(pid);
+        btn.classList.toggle("cmp-btn--active", active);
+        btn.setAttribute("aria-pressed", String(active));
+        btn.textContent = active ? "✓ Comparing" : "⊞ Compare";
+        btn.hidden = false;
+      }
+      refresh();
+      btn.addEventListener("click", function () {
+        var result = window.RDCompare.toggle(pid);
+        if (result === "max") {
+          window.RDCompare.showToast("Maximum 4 products compare kar sakte hain!");
+        } else if (result === "added") {
+          window.RDCompare.showToast("Compare mein add hua! (" + window.RDCompare.getCount() + "/4)");
+        } else if (result === "removed") {
+          window.RDCompare.showToast("Compare list se remove hua.");
+        }
+        refresh();
       });
     })();
   </script>

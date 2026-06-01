@@ -428,9 +428,30 @@
       heartBtn.innerHTML = isSaved ? "♥" : "♡";
       heartBtn.setAttribute("aria-label", isSaved ? "Remove from wishlist" : "Add to wishlist");
 
+      const cmpBtn = doc.createElement("button");
+      cmpBtn.type = "button";
+      cmpBtn.className = "cmp-card-btn";
+      cmpBtn.dataset.cmpId = pid;
+      const cmpActive = window.RDCompare ? window.RDCompare.has(pid) : false;
+      cmpBtn.classList.toggle("cmp-btn--active", cmpActive);
+      cmpBtn.setAttribute("aria-pressed", String(cmpActive));
+      cmpBtn.textContent = cmpActive ? "✓ Comparing" : "⊞ Compare";
+      cmpBtn.addEventListener("click", e => {
+        e.preventDefault();
+        if (!window.RDCompare) return;
+        const result = window.RDCompare.toggle(pid);
+        if (result === "max") {
+          window.RDCompare.showToast("Maximum 4 products compare kar sakte hain!");
+        } else if (result === "added") {
+          window.RDCompare.showToast("Compare mein add hua! (" + window.RDCompare.getCount() + "/4)");
+        } else if (result === "removed") {
+          window.RDCompare.showToast("Compare list se remove hua.");
+        }
+      });
+
       const media = doc.createElement("div");
       media.className = "product-card__media";
-      media.append(img, badge, heartBtn);
+      media.append(img, badge, heartBtn, cmpBtn);
 
       // Content
       const detailUrl = new URL(

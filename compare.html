@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Compare boutique products side-by-side at RD Advance Boutique. View prices, sizes, colors, and features together.">
+  <title>Compare Products | RD Advance Boutique</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/compare.css">
+</head>
+<body>
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text"><strong>RD Advance</strong><span>Boutique</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link" data-i18n="nav.home">Home</a>
+      <a href="shop.html" class="nav__link" data-i18n="nav.shop">Shop</a>
+      <a href="gallery.html" class="nav__link" data-i18n="nav.gallery">Gallery</a>
+      <a href="learn.html" class="nav__link" data-i18n="nav.course">Course</a>
+      <a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a>
+      <a href="wishlist.html" class="nav__link nav-wl-link" aria-label="Wishlist">♡ <span class="wl-badge" hidden>0</span></a>
+      <a href="compare.html" class="nav__link nav-cmp-link nav__link--active" aria-label="Compare products">⊞ <span class="cmp-badge" hidden>0</span></a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-btn" type="button" aria-label="हिंदी में बदलें">हिं</button>
+      <a href="https://wa.me/917693849472" class="header-cta" data-i18n="nav.book">Book a Fitting</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Page Header -->
+    <div class="cmp-page-hero">
+      <div class="cmp-page-hero__left">
+        <p class="eyebrow">Product Comparison</p>
+        <h1>Compare Products</h1>
+        <p class="cmp-subtitle" id="cmpSubtitle">Loading comparison…</p>
+      </div>
+      <div class="cmp-page-hero__actions" id="cmpActions" hidden>
+        <button class="cmp-share-btn" id="cmpShareBtn" type="button">🔗 Share Comparison</button>
+        <button class="cmp-clear-btn" id="cmpClearBtn" type="button">🗑 Clear All</button>
+        <span class="cmp-share-status" id="cmpShareStatus" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="cmp-empty-state" id="cmpEmpty">
+      <img src="assets/logo.png" alt="RD Advance Boutique">
+      <h2>Koi product compare list mein nahi</h2>
+      <p>Shop browse karein aur products ke compare button dabao — phir yahan side-by-side compare karein.</p>
+      <a href="shop.html" class="btn btn--primary">Browse Shop →</a>
+    </div>
+
+    <!-- Minimum products needed -->
+    <div class="cmp-empty-state" id="cmpNeedMore" hidden>
+      <img src="assets/logo.png" alt="RD Advance Boutique">
+      <h2>Kam se kam 2 products chahiye</h2>
+      <p>Compare karne ke liye minimum 2 products choose karein.</p>
+      <a href="shop.html" class="btn btn--primary">More Products Add Karein →</a>
+    </div>
+
+    <!-- Comparison Table -->
+    <section class="cmp-section" id="cmpSection" hidden aria-label="Product comparison table">
+      <div class="cmp-table-wrap" id="cmpTableWrap" role="region" aria-label="Scrollable comparison table">
+        <!-- Table rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="cmp-related" id="cmpRelated" hidden aria-labelledby="cmpRelatedTitle">
+      <div class="section__intro">
+        <p class="eyebrow">Explore more</p>
+        <h2 id="cmpRelatedTitle">You May Also Like</h2>
+      </div>
+      <div class="product-grid" id="cmpRelatedGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo">
+      <h2>RD Advance Boutique</h2>
+    </div>
+    <div class="footer__links">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="learn.html">Course</a>
+    </div>
+    <div class="footer__contact">
+      <a href="https://wa.me/917693849472">WhatsApp</a>
+      <span>Damoh, Madhya Pradesh</span>
+    </div>
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
+  </footer>
+
+  <script src="js/compare.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/site-settings.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script>
+  (function () {
+    "use strict";
+
+    /* ── Field definitions ──────────────────────────── */
+    const FIELDS = [
+      { key: "image",            label: "Image",            type: "image" },
+      { key: "name",             label: "Product Name",     type: "text" },
+      { key: "category",         label: "Category",         type: "text" },
+      { key: "price",            label: "Price",            type: "price" },
+      { key: "discountPrice",    label: "Discount Price",   type: "price" },
+      { key: "shortDescription", label: "Description",      type: "desc",  noHighlight: true },
+      { key: "longDescription",  label: "Full Details",     type: "desc",  noHighlight: true },
+      { key: "colors",           label: "Colors",           type: "list" },
+      { key: "sizes",            label: "Sizes",            type: "list" },
+      { key: "features",         label: "Features",         type: "list" },
+      { key: "productType",      label: "Product Type",     type: "badge" },
+      { key: "stockStatus",      label: "Stock",            type: "stock" },
+    ];
+
+    /* ── Utilities ──────────────────────────────────── */
+    const normalize = v =>
+      String(v || "").trim().toLowerCase()
+        .replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    const esc = s => String(s || "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+    const formatPrice = n => {
+      n = Number(n);
+      if (!n || !isFinite(n) || n <= 0) return null;
+      return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
+    };
+
+    const getPid = p =>
+      String(p.slug || p.id || normalize(p.title || p.name || ""));
+
+    /* ── Get field value from product ────────────────── */
+    function getVal(p, key) {
+      switch (key) {
+        case "image":         return p.image || (p.images && p.images[0]) || "";
+        case "name":          return p.title || p.name || "";
+        case "discountPrice": return Number(p.discountPrice || p.oldPrice || 0);
+        case "productType":   return p.productType || p.type || "readymade";
+        case "longDescription": return p.longDescription || p.details || p.description || "";
+        case "shortDescription": return p.shortDescription || p.description || "";
+        case "stockStatus":   return Number(p.stockQuantity != null ? p.stockQuantity : (p.stock != null ? p.stock : 1));
+        case "colors":        return Array.isArray(p.colors) ? p.colors : [];
+        case "sizes":         return Array.isArray(p.sizes) ? p.sizes : [];
+        case "features":      return Array.isArray(p.features) ? p.features : [];
+        default:              return p[key] != null ? p[key] : "";
+      }
+    }
+
+    /* ── Render a single cell ─────────────────────────── */
+    function renderCell(p, field) {
+      const v = getVal(p, field.key);
+      switch (field.type) {
+        case "image": {
+          const pid = getPid(p);
+          const detailUrl = `product-details.html?id=${encodeURIComponent(pid)}`;
+          return `<a href="${esc(detailUrl)}">
+            <img class="cmp-cell-img" src="${esc(v || "assets/logo.png")}" alt="${esc(p.title || p.name || "")}">
+          </a>
+          <a class="cmp-detail-link" href="${esc(detailUrl)}">View Full Details →</a>`;
+        }
+        case "text":
+          return v ? esc(v) : `<span class="cmp-na">—</span>`;
+        case "price": {
+          const fp = formatPrice(v);
+          return fp
+            ? `<strong class="cmp-price">${esc(fp)}</strong>`
+            : `<span class="cmp-na">—</span>`;
+        }
+        case "desc":
+          return v
+            ? `<p class="cmp-cell-desc">${esc(String(v))}</p>`
+            : `<span class="cmp-na">—</span>`;
+        case "list": {
+          if (!Array.isArray(v) || !v.length) return `<span class="cmp-na">—</span>`;
+          return `<ul class="cmp-list">${v.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`;
+        }
+        case "badge": {
+          const t = String(v).toLowerCase();
+          return `<span class="cmp-badge-type cmp-badge-type--${esc(t)}">
+            ${t === "boutique" ? "✂️ Boutique" : "🛍️ Ready-Made"}
+          </span>`;
+        }
+        case "stock": {
+          const n = Number(v);
+          return n > 0
+            ? `<span class="cmp-in-stock">✓ In Stock (${n})</span>`
+            : `<span class="cmp-confirm-stock">⚠ Confirm Availability</span>`;
+        }
+        default:
+          return v ? esc(String(v)) : `<span class="cmp-na">—</span>`;
+      }
+    }
+
+    /* ── Check if all products have same value for a field ─ */
+    function allSame(products, field) {
+      const stringify = v => {
+        if (Array.isArray(v)) return v.join("||").trim().toLowerCase();
+        return String(v || "").trim().toLowerCase();
+      };
+      const vals = products.map(p => stringify(getVal(p, field.key)));
+      if (vals.every(v => !v || v === "0")) return true; // all empty
+      return vals.every(v => v === vals[0]);
+    }
+
+    /* ── Render the full comparison table ───────────────── */
+    function renderTable(products) {
+      const cols = products.length;
+
+      /* Header row */
+      const prodCols = products.map(p => {
+        const pid = getPid(p);
+        const img = esc(p.image || (p.images && p.images[0]) || "assets/logo.png");
+        return `<th class="cmp-prod-col" scope="col">
+          <div class="cmp-prod-header">
+            <img class="cmp-prod-thumb" src="${img}" alt="${esc(p.title || p.name || "")}">
+            <span class="cmp-prod-name">${esc(p.title || p.name || "Product")}</span>
+            <button class="cmp-remove-btn" type="button"
+              data-remove-id="${esc(pid)}"
+              aria-label="Remove ${esc(p.title || "product")} from comparison">✕ Remove</button>
+          </div>
+        </th>`;
+      }).join("");
+
+      /* Body rows */
+      const rows = FIELDS.map(field => {
+        const isDiff = !field.noHighlight && !allSame(products, field);
+        const cells = products.map(p =>
+          `<td class="cmp-cell${isDiff ? " cmp-cell--diff" : ""}">${renderCell(p, field)}</td>`
+        ).join("");
+
+        return `<tr class="${isDiff ? "cmp-row--diff" : ""}">
+          <th class="cmp-label-col" scope="row">${esc(field.label)}</th>
+          ${cells}
+        </tr>`;
+      }).join("");
+
+      return `<table class="cmp-table" role="table" aria-label="Product comparison">
+        <thead>
+          <tr class="cmp-head-row">
+            <th class="cmp-label-col cmp-label-col--head" scope="col">
+              ${cols} Product${cols !== 1 ? "s" : ""}
+            </th>
+            ${prodCols}
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    /* ── Render related products (4 from same category, excluding compared) ─ */
+    function renderRelated(allProducts, compareIds, category) {
+      const related = allProducts
+        .filter(p => {
+          const pid = getPid(p);
+          if (compareIds.includes(pid)) return false;
+          if (p.status === "inactive") return false;
+          return normalize(p.category || "") === normalize(category || "");
+        })
+        .slice(0, 4);
+
+      if (!related.length) return false;
+
+      const grid = document.getElementById("cmpRelatedGrid");
+      const section = document.getElementById("cmpRelated");
+      if (!grid || !section) return false;
+
+      grid.innerHTML = related.map(p => {
+        const pid = getPid(p);
+        const img = esc(p.image || (p.images && p.images[0]) || "assets/logo.png");
+        const title = esc(p.title || p.name || "Product");
+        const cat   = esc(p.category || "");
+        const price = formatPrice(p.price);
+        const stock = Number(p.stockQuantity != null ? p.stockQuantity : (p.stock != null ? p.stock : 1));
+        const detailUrl = `product-details.html?id=${encodeURIComponent(pid)}`;
+        return `<article class="product-card">
+          <div class="product-card__media">
+            <img src="${img}" alt="${title}" loading="lazy">
+            <span class="product-card__section-badge product-card__section-badge--readymade">🛍️ Ready-Made</span>
+          </div>
+          <div class="product-content">
+            <span class="product-category">${cat}</span>
+            <h3>${title}</h3>
+            <p class="product-price">${price ? price : "Price on request"}</p>
+            <span class="${stock > 0 ? "stock-status" : "stock-status status-inactive"}">
+              ${stock > 0 ? stock + " available" : "Confirm availability"}
+            </span>
+            <a class="product-card__action" href="${esc(detailUrl)}">View Details</a>
+          </div>
+        </article>`;
+      }).join("");
+
+      section.hidden = false;
+      return true;
+    }
+
+    /* ── Share comparison ─────────────────────────────── */
+    function shareComparison(ids) {
+      const url = `${location.origin}${location.pathname}?ids=${encodeURIComponent(ids.join(","))}`;
+      const statusEl = document.getElementById("cmpShareStatus");
+
+      const doShare = () => {
+        if (navigator.share) {
+          navigator.share({
+            title: "RD Advance Boutique — Product Comparison",
+            text: `Compare ${ids.length} products at RD Advance Boutique`,
+            url
+          }).catch(err => {
+            if (err.name !== "AbortError") copyLink(url, statusEl);
+          });
+        } else {
+          copyLink(url, statusEl);
+        }
+      };
+      doShare();
+    }
+
+    function copyLink(url, statusEl) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+          if (statusEl) { statusEl.textContent = "✓ Link copied!"; setTimeout(() => statusEl.textContent = "", 2500); }
+        });
+      } else {
+        const el = document.createElement("textarea");
+        el.value = url;
+        el.style.position = "fixed"; el.style.opacity = "0";
+        document.body.appendChild(el);
+        el.select(); document.execCommand("copy");
+        document.body.removeChild(el);
+        if (statusEl) { statusEl.textContent = "✓ Link copied!"; setTimeout(() => statusEl.textContent = "", 2500); }
+      }
+    }
+
+    /* ── Main render ──────────────────────────────────── */
+    function render(products, allProducts) {
+      const ids = products.map(getPid);
+      const subtitle = document.getElementById("cmpSubtitle");
+      const actions  = document.getElementById("cmpActions");
+      const empty    = document.getElementById("cmpEmpty");
+      const needMore = document.getElementById("cmpNeedMore");
+      const section  = document.getElementById("cmpSection");
+      const wrap     = document.getElementById("cmpTableWrap");
+
+      // Determine state
+      const count = ids.length;
+
+      empty.hidden    = count > 0;
+      needMore.hidden = count === 0 || count >= 2;
+      section.hidden  = count < 2;
+      actions.hidden  = count < 2;
+
+      if (subtitle) {
+        if (count === 0) subtitle.textContent = "Koi product compare list mein nahi hai.";
+        else if (count === 1) subtitle.textContent = "1 product selected — 1 aur add karein comparison ke liye.";
+        else subtitle.textContent = `${count} product${count !== 1 ? "s" : ""} compare ho rahe hain`;
+      }
+
+      if (count < 2) return;
+
+      // Render table
+      wrap.innerHTML = renderTable(products);
+
+      // Remove product buttons
+      wrap.querySelectorAll(".cmp-remove-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (window.RDCompare) window.RDCompare.remove(btn.dataset.removeId);
+          location.reload();
+        });
+      });
+
+      // Related products
+      const cat = products[0] && (products[0].category || "");
+      renderRelated(allProducts, ids, cat);
+
+      // Action buttons
+      const shareBtn = document.getElementById("cmpShareBtn");
+      const clearBtn = document.getElementById("cmpClearBtn");
+      if (shareBtn) shareBtn.onclick = () => shareComparison(ids);
+      if (clearBtn) clearBtn.onclick = () => {
+        if (window.RDCompare) window.RDCompare.clear();
+        location.reload();
+      };
+    }
+
+    /* ── Bootstrap ────────────────────────────────────── */
+    async function init() {
+      // Check for shared link ?ids=
+      const urlParams = new URLSearchParams(location.search);
+      const sharedIds = urlParams.get("ids");
+      let ids;
+
+      if (sharedIds) {
+        ids = sharedIds.split(",").map(s => s.trim()).filter(Boolean).slice(0, 4);
+        // Persist shared IDs to localStorage
+        if (window.RDCompare && ids.length) {
+          localStorage.setItem("rd_compare_list", JSON.stringify(ids));
+          if (window.RDCompare.refresh) window.RDCompare.refresh();
+        }
+      } else {
+        ids = window.RDCompare ? window.RDCompare.getList() : [];
+      }
+
+      const subtitle = document.getElementById("cmpSubtitle");
+      if (subtitle && ids.length === 0) subtitle.textContent = "Koi product compare list mein nahi hai.";
+
+      // Fetch products
+      let allProducts = [];
+      try {
+        const res = await fetch("data/products.json", { cache: "no-store" });
+        allProducts = await res.json();
+      } catch (e) {
+        console.warn("Could not load products.json", e);
+      }
+
+      // Match products by ID
+      const products = ids.map(id =>
+        allProducts.find(p => getPid(p) === id)
+      ).filter(Boolean);
+
+      render(products, allProducts);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  })();
+  </script>
+</body>
+</html>
