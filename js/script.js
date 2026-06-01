@@ -512,6 +512,26 @@
       renderCategoryChips("all");
       renderProductGrid();
     });
+
+    // Allow external category clicks (from browse grid) to set filter
+    doc.addEventListener("catBrowseSelect", e => {
+      const catSlug = e.detail?.slug;
+      if (!catSlug) return;
+      // Switch to "all" tab first
+      typeTabs.forEach(t => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+      const allTab = typeTabs.find(t => t.dataset.type === "all");
+      if (allTab) { allTab.classList.add("active"); allTab.setAttribute("aria-selected", "true"); }
+      activeType = "all";
+      renderCategoryChips("all");
+      // Activate matching chip
+      activeCategory = catSlug;
+      const chips = categoryFilter?.querySelectorAll(".filter-btn") || [];
+      chips.forEach(b => {
+        b.classList.toggle("active", b.dataset.category === catSlug || (catSlug === "all" && b.dataset.category === "all"));
+      });
+      renderProductGrid();
+      doc.getElementById("shop-products")?.scrollIntoView({ behavior: "smooth" });
+    });
   };
 
   const readUploadFile = (file, { label = "Upload", maxFileSize = 4 * 1024 * 1024, required = false } = {}) => new Promise((resolve, reject) => {
@@ -651,11 +671,53 @@
     });
   };
 
+  const CAT_ICONS = {
+    "sarees": "🥻", "blouses": "👗", "kurtis": "👘", "kurta-pant-dupatta": "🩱",
+    "suits-salwar": "👔", "plazo-suits": "🧣", "anarkali-suits": "✨", "patiala-suits": "🎀",
+    "pakistani-suits": "🌸", "churidar-sets": "🧵", "sharara-sets": "💃", "dhoti-sets": "🪬",
+    "lehengas": "👰", "gowns": "🌟", "coord-sets": "🎽", "indo-western": "🔮",
+    "tops-tunics": "👚", "maxi-dresses": "🌺", "jumpsuits": "🎯", "ethnic-jackets": "🧥",
+    "bridal": "💍", "festive-wear": "🪔", "chikankari": "🌿", "banarasi": "🏅",
+    "embroidery-work": "🪡", "printed-collection": "🎨", "bandhani": "🌈",
+    "dupattas": "🧤", "nightwear": "🌙", "maternity-wear": "🤱", "kids-wear": "🧒",
+    "kaftans": "🌴", "skirts": "💫", "accessories": "💎"
+  };
+
+  const setupCategoryBrowse = () => {
+    const grid = doc.getElementById("catBrowseGrid");
+    if (!grid) return;
+
+    grid.innerHTML = '<p class="shop-loading">Loading categories…</p>';
+
+    loadStaticJson("data/categories.json", []).then(cats => {
+      const active = cats.filter(c => c.status !== "inactive");
+      if (!active.length) { grid.closest(".cat-browse-section").hidden = true; return; }
+
+      grid.innerHTML = active.map(c => `
+        <button class="cat-browse-card" type="button" data-slug="${c.slug || c.id}" aria-label="Browse ${c.name}">
+          <span class="cat-browse-card__icon">${CAT_ICONS[c.id] || CAT_ICONS[c.slug] || "🛍️"}</span>
+          <span class="cat-browse-card__name">${c.name}</span>
+        </button>
+      `).join("");
+
+      grid.querySelectorAll(".cat-browse-card").forEach(btn => {
+        btn.addEventListener("click", () => {
+          grid.querySelectorAll(".cat-browse-card").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const normalize = v => String(v || "").trim().toLowerCase()
+            .replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+          doc.dispatchEvent(new CustomEvent("catBrowseSelect", { detail: { slug: normalize(btn.dataset.slug) } }));
+        });
+      });
+    });
+  };
+
   const init = () => {
     markPageReady();
     setupPageTransitions();
     setupResponsiveNavigation();
     setupSecretAdminShortcut();
+    setupCategoryBrowse();
     setupFashionShop();
     setupCourseWhatsappLinks();
     setupContactAppointmentForm();
