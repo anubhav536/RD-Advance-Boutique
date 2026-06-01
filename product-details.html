@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/compare.css">
+  <link rel="stylesheet" href="css/outfit-builder.css">
 </head>
 <body class="detail-page product-detail-page">
   <header class="site-header" aria-label="Main navigation">
@@ -24,6 +25,7 @@
       <a href="gallery.html" class="nav__link" data-i18n="nav.gallery">Gallery</a>
       <a href="learn.html" class="nav__link" data-i18n="nav.course">Course</a>
       <a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a>
+      <a href="outfit-builder.html" class="nav__link">✨ Outfits</a>
       <a href="wishlist.html" class="nav__link nav-wl-link" aria-label="Wishlist">♡ <span class="wl-badge" hidden>0</span></a>
       <a href="compare.html" class="nav__link nav-cmp-link" aria-label="Compare products">⊞ <span class="cmp-badge" hidden>0</span></a>
     </nav>
@@ -78,6 +80,19 @@
         <h2 id="related-products-title">Related products</h2>
       </div>
       <div class="product-grid" id="relatedProducts"></div>
+    </section>
+
+    <!-- COMPLETE THE LOOK -->
+    <section class="detail-complete-look" id="completeLookSection" hidden aria-labelledby="ctl-title">
+      <div class="section__intro">
+        <p class="eyebrow">Style Together</p>
+        <h2 id="ctl-title">Complete The Look</h2>
+        <p style="font-size:.9rem;color:#6b5a52;margin-top:.5rem">Pair these with your current selection for a perfect outfit.</p>
+      </div>
+      <div class="detail-complete-look__grid" id="completeLookGrid"></div>
+      <div class="detail-complete-look__cta" style="text-align:center;margin-top:1.5rem">
+        <a id="outfitBuilderLink" href="outfit-builder.html" class="btn btn--ghost">✨ Build Complete Outfit in Outfit Builder →</a>
+      </div>
     </section>
   </main>
 
@@ -221,6 +236,76 @@
         });
       });
     })();
+  </script>
+  <!-- COMPLETE THE LOOK — script -->
+  <script>
+  (function () {
+    async function initCompleteLook() {
+      var pid = new URLSearchParams(location.search).get("id");
+      if (!pid) return;
+
+      var products;
+      try { products = await (await fetch("data/products.json", { cache: "no-store" })).json(); }
+      catch (_) { return; }
+
+      var current = products.find(function (p) { return p.id === pid; });
+      if (!current) return;
+
+      var section = document.getElementById("completeLookSection");
+      var grid    = document.getElementById("completeLookGrid");
+      var link    = document.getElementById("outfitBuilderLink");
+      if (!section || !grid) return;
+
+      /* Update outfit builder link with ?start=id so it pre-loads this product */
+      if (link) link.href = "outfit-builder.html?start=" + encodeURIComponent(pid);
+
+      /* Collect suggested product objects */
+      var suggestedIds = current.suggestedProducts || [];
+      var look = suggestedIds
+        .map(function (id) { return products.find(function (p) { return p.id === id; }); })
+        .filter(Boolean);
+
+      /* Fallback: show same-occasion products if no explicit suggestions */
+      if (!look.length && (current.occasions || []).length) {
+        look = products.filter(function (p) {
+          if (p.id === pid || p.status === "inactive") return false;
+          return (p.occasions || []).some(function (occ) {
+            return (current.occasions || []).indexOf(occ) > -1;
+          });
+        }).slice(0, 4);
+      }
+
+      /* Fallback: show products from same outfit category */
+      if (!look.length) {
+        look = products.filter(function (p) {
+          return p.id !== pid && p.status !== "inactive";
+        }).slice(0, 4);
+      }
+
+      if (!look.length) return;
+
+      grid.innerHTML = look.map(function (p) {
+        var img   = p.image || (p.images && p.images[0]) || "assets/logo.png";
+        var title = p.title || p.name || "Product";
+        var price = p.price ? ("₹" + Number(p.price).toLocaleString("en-IN")) : "Price on request";
+        return '<a class="ctl-card" href="product-details.html?id=' + encodeURIComponent(p.id) + '">'
+          + '<div class="ctl-card__img"><img src="' + img + '" alt="' + title + '" loading="lazy" onerror="this.src=\'assets/logo.png\'"></div>'
+          + '<div class="ctl-card__body">'
+          + '<span class="ctl-card__cat">' + (p.category || "") + '</span>'
+          + '<p class="ctl-card__name">' + title + '</p>'
+          + '<span class="ctl-card__price">' + price + '</span>'
+          + '</div></a>';
+      }).join("");
+
+      section.hidden = false;
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initCompleteLook, { once: true });
+    } else {
+      initCompleteLook();
+    }
+  })();
   </script>
   <script src="js/compare.js"></script>
   <script>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Build your perfect complete outfit with RD Advance Boutique — mix and match sarees, kurtis, dupattas, accessories and order the full look in one click.">
+  <title>Outfit Builder | RD Advance Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/outfit-builder.css">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+
+  <!-- ── HEADER ─────────────────────────────────── -->
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text"><strong>RD Advance</strong><span>Boutique</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link" data-i18n="nav.home">Home</a>
+      <a href="shop.html" class="nav__link" data-i18n="nav.shop">Shop</a>
+      <a href="outfit-builder.html" class="nav__link nav__link--active">✨ Outfits</a>
+      <a href="gallery.html" class="nav__link" data-i18n="nav.gallery">Gallery</a>
+      <a href="learn.html" class="nav__link" data-i18n="nav.course">Course</a>
+      <a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a>
+      <a href="wishlist.html" class="nav__link nav-wl-link" aria-label="Wishlist">♡ <span class="wl-badge" hidden>0</span></a>
+      <a href="compare.html" class="nav__link nav-cmp-link" aria-label="Compare products">⊞ <span class="cmp-badge" hidden>0</span></a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-btn" type="button" aria-label="हिंदी में बदलें">हिं</button>
+      <a href="https://wa.me/917693849472" class="header-cta" data-no-transition="true" data-i18n="nav.whatsapp">WhatsApp</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── HERO ───────────────────────────────────── -->
+    <section class="ob-hero" aria-labelledby="obHeroTitle">
+      <p class="eyebrow">Style Studio</p>
+      <h1 id="obHeroTitle">Build Your Perfect Look</h1>
+      <p>Mix and match sarees, kurtis, dupattas & accessories. See your complete outfit — then order it all in one message.</p>
+    </section>
+
+    <!-- ── OCCASION FILTER BAR ────────────────────── -->
+    <div class="ob-occasion-section" role="navigation" aria-label="Filter by occasion">
+      <div class="ob-occasion-bar" id="obOccasionBar" role="list" aria-label="Occasions"></div>
+    </div>
+
+    <!-- ── THREE-PANEL LAYOUT ─────────────────────── -->
+    <div class="ob-layout">
+
+      <!-- LEFT: Browse Products -->
+      <aside class="ob-panel ob-panel--browse" aria-label="Browse products">
+        <div class="ob-panel__head">
+          <h2>Browse Products</h2>
+          <div class="ob-search-wrap">
+            <input type="search" id="obSearch" placeholder="🔍 Search sarees, kurtis..." aria-label="Search products">
+          </div>
+        </div>
+        <div class="ob-cat-tabs" id="obCatTabs" role="tablist" aria-label="Product categories"></div>
+        <div class="ob-product-grid" id="obProductGrid" aria-label="Product list"></div>
+      </aside>
+
+      <!-- CENTER: Outfit Preview Board -->
+      <div class="ob-panel ob-panel--preview" aria-label="Outfit preview board">
+        <div class="ob-panel__head">
+          <h2>Your Outfit Board</h2>
+          <div class="ob-outfit-name-row">
+            <input type="text" id="obOutfitName" class="ob-name-input" placeholder="Name your look…" value="My Custom Look" aria-label="Outfit name" maxlength="60">
+            <button id="obClearBtn" class="ob-clear-btn" type="button" aria-label="Clear outfit">Clear</button>
+          </div>
+        </div>
+        <div class="ob-outfit-board" id="obOutfitBoard" aria-label="Selected outfit items"></div>
+      </div>
+
+      <!-- RIGHT: Outfit Summary + Order -->
+      <aside class="ob-panel ob-panel--summary" aria-label="Outfit summary">
+        <div class="ob-panel__head">
+          <h2>Outfit Summary</h2>
+        </div>
+
+        <div class="ob-summary-items" id="obSummaryList" aria-label="Selected items"></div>
+
+        <p class="ob-summary-empty" id="obSummaryEmpty">
+          No items added yet.<br>
+          Browse products on the left and click<br>
+          <strong>"+ Add to Outfit"</strong> to start.
+        </p>
+
+        <div class="ob-total" id="obSummaryTotal" aria-live="polite"></div>
+
+        <div class="ob-summary-actions">
+          <button id="obOrderBtn" class="ob-order-btn" type="button" disabled aria-label="Order complete outfit via WhatsApp">
+            🛍️ Order Complete Outfit
+          </button>
+          <button id="obShareBtn" class="ob-share-btn" type="button" hidden aria-label="Share this look">
+            🔗 Share This Look
+          </button>
+          <a href="shop.html" class="ob-builder-link">← Back to Shop</a>
+        </div>
+      </aside>
+
+    </div><!-- /.ob-layout -->
+
+    <!-- ── OCCASION GUIDE (below fold) ────────────── -->
+    <section class="ob-guide-section" aria-labelledby="obGuideTitle" style="background:var(--cream,#fff8ee);padding:3rem 1.5rem;text-align:center;border-top:1px solid #ede8e0">
+      <p class="eyebrow" style="color:#be6b72;font-family:'Montserrat',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;margin:0 0 .75rem">How it works</p>
+      <h2 id="obGuideTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;margin:0 0 2.5rem">3 Steps to Your Perfect Outfit</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;max-width:800px;margin:0 auto">
+        <div style="text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:.75rem">🪔</div>
+          <h3 style="font-family:'Montserrat',sans-serif;font-size:.9rem;font-weight:700;margin:0 0 .4rem">1. Choose Occasion</h3>
+          <p style="font-size:.82rem;color:#6b5a52;font-family:'Montserrat',sans-serif;margin:0">Select Wedding, Festival, Casual or any occasion to filter relevant products.</p>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:.75rem">👗</div>
+          <h3 style="font-family:'Montserrat',sans-serif;font-size:.9rem;font-weight:700;margin:0 0 .4rem">2. Build Your Outfit</h3>
+          <p style="font-size:.82rem;color:#6b5a52;font-family:'Montserrat',sans-serif;margin:0">Add sarees, kurtis, dupattas & accessories to your outfit board one by one.</p>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:.75rem">📱</div>
+          <h3 style="font-family:'Montserrat',sans-serif;font-size:.9rem;font-weight:700;margin:0 0 .4rem">3. Order in One Click</h3>
+          <p style="font-size:.82rem;color:#6b5a52;font-family:'Montserrat',sans-serif;margin:0">Click "Order Complete Outfit" — all items are sent to WhatsApp in one message.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── MOBILE STICKY DRAWER ──────────────────────── -->
+  <div class="ob-mobile-drawer" id="obMobileDrawer" hidden role="status" aria-live="polite">
+    <div class="ob-mobile-drawer__info">
+      <span id="obMobileCount">0</span> item(s) &nbsp;·&nbsp; <strong id="obMobileTotal">₹0</strong>
+    </div>
+    <button id="obMobileOrderBtn" class="ob-mobile-order-btn" type="button">Order Outfit →</button>
+  </div>
+
+  <!-- ── ORDER MODAL ────────────────────────────────── -->
+  <div class="ob-modal-overlay" id="obOrderModal" hidden role="dialog" aria-modal="true" aria-labelledby="obModalTitle">
+    <div class="ob-modal">
+      <div class="ob-modal__head">
+        <h2 id="obModalTitle">Complete Your Outfit Order</h2>
+        <button id="obModalClose" class="ob-modal-close" type="button" aria-label="Close modal">✕</button>
+      </div>
+      <div class="ob-modal__body">
+
+        <!-- Outfit summary inside modal -->
+        <div id="obModalSummary"></div>
+
+        <!-- Customer details form -->
+        <form id="obOrderForm" novalidate>
+          <div class="ob-form-group">
+            <label for="obOrderName">Your Name *</label>
+            <input type="text" id="obOrderName" placeholder="Apna naam likhein" required autocomplete="name">
+          </div>
+          <div class="ob-form-group">
+            <label for="obOrderPhone">WhatsApp Number *</label>
+            <input type="tel" id="obOrderPhone" placeholder="+91 XXXXX XXXXX" required autocomplete="tel">
+          </div>
+          <div class="ob-form-group">
+            <label for="obModalOccasion">Occasion (optional)</label>
+            <select id="obModalOccasion">
+              <option value="">— Select Occasion —</option>
+              <option value="wedding">👰 Wedding</option>
+              <option value="reception">🎉 Reception</option>
+              <option value="festival">🪔 Festival</option>
+              <option value="party">🎊 Party</option>
+              <option value="casual">☕ Casual</option>
+              <option value="office">💼 Office</option>
+            </select>
+          </div>
+          <button type="submit" class="ob-submit-btn">
+            <span>📱</span> Send Outfit Order via WhatsApp
+          </button>
+          <p style="text-align:center;font-size:.72rem;color:#9e8a7a;margin-top:.75rem;font-family:'Montserrat',sans-serif">
+            WhatsApp par order details aur confirmation milega. Hum 24 hours mein respond karte hain.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST NOTIFICATION ─────────────────────────── -->
+  <div class="ob-toast" id="obToast" role="status" aria-live="polite"></div>
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__brand"><img src="assets/logo.png" alt="RD Advance Boutique logo"><h2>RD Advance Boutique</h2></div>
+    <div class="footer__links">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="outfit-builder.html">Outfit Builder</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="learn.html">Course</a>
+    </div>
+    <div class="footer__contact"><a href="https://wa.me/917693849472">WhatsApp</a><span>Damoh, Madhya Pradesh</span></div>
+    <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
+  </footer>
+
+  <script src="js/script.js" defer></script>
+  <script src="js/site-settings.js" defer></script>
+  <script src="js/outfit-builder.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+</body>
+</html>

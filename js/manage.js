@@ -596,6 +596,36 @@
       <div class="adm-fg adm-fg--full"><label>Available Sizes <small>(one per line)</small></label><textarea name="sizes" rows="3" placeholder="S&#10;M&#10;L&#10;XL">${(item.sizes || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Features <small>(one per line, start with ✔)</small></label><textarea name="features" rows="4" placeholder="✔ Premium quality&#10;✔ Comfortable fit">${(item.features || []).join("\n")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Tags <small>(one per line)</small></label><textarea name="tags" rows="3" placeholder="Saree&#10;Handloom">${(item.tags || []).join("\n")}</textarea></div>
+
+      <div class="adm-fg adm-fg--full" style="border-top:2px solid #f0ebe3;padding-top:1.25rem;margin-top:.25rem">
+        <label style="font-weight:700;color:#be6b72;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase">✨ Outfit Builder Fields</label>
+        <p style="font-size:.72rem;color:#9e8a7a;margin:.25rem 0 0;font-family:'Montserrat',sans-serif">Ye fields outfit-builder.html aur "Complete The Look" section ke liye hain.</p>
+      </div>
+      <div class="adm-fg">
+        <label>Outfit Category <small>(outfit slot)</small></label>
+        <select name="outfitCategory">
+          <option value="">— Select —</option>
+          <option value="sarees"      ${item.outfitCategory === "sarees"      ? "selected" : ""}>👘 Sarees</option>
+          <option value="blouses"     ${item.outfitCategory === "blouses"     ? "selected" : ""}>👚 Blouses</option>
+          <option value="kurtis"      ${item.outfitCategory === "kurtis"      ? "selected" : ""}>👗 Kurtis / Sets</option>
+          <option value="lehengas"    ${item.outfitCategory === "lehengas"    ? "selected" : ""}>💃 Lehengas</option>
+          <option value="dupattas"    ${item.outfitCategory === "dupattas"    ? "selected" : ""}>🧣 Dupattas</option>
+          <option value="accessories" ${item.outfitCategory === "accessories" ? "selected" : ""}>💍 Accessories</option>
+          <option value="kids"        ${item.outfitCategory === "kids"        ? "selected" : ""}>👧 Kids Wear</option>
+        </select>
+      </div>
+      <div class="adm-fg">
+        <label>Occasions <small>(one per line: wedding, reception, festival, party, casual, office)</small></label>
+        <textarea name="occasions" rows="3" placeholder="festival&#10;casual&#10;office">${(item.occasions || []).join("\n")}</textarea>
+      </div>
+      <div class="adm-fg">
+        <label>Suggested Products <small>(product IDs for "Complete The Look", one per line)</small></label>
+        <textarea name="suggestedProducts" rows="2" placeholder="product-id-1&#10;product-id-2">${(item.suggestedProducts || []).join("\n")}</textarea>
+      </div>
+      <div class="adm-fg">
+        <label>Compatible With <small>(product IDs that pair well, one per line)</small></label>
+        <textarea name="compatibleWith" rows="2" placeholder="product-id-1">${(item.compatibleWith || []).join("\n")}</textarea>
+      </div>
     </div>`;
     el("admEditModal").hidden = false;
     attachImgPickerListeners(el("admModalBody"));
@@ -622,6 +652,10 @@
       image: v("image") || multiImgs[0] || "",
       images: multiImgs, colors: ls("colors"), sizes: ls("sizes"),
       features: ls("features"), tags: ls("tags"),
+      outfitCategory: v("outfitCategory"),
+      occasions: ls("occasions"),
+      suggestedProducts: ls("suggestedProducts"),
+      compatibleWith: ls("compatibleWith"),
       createdAt: ex.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
