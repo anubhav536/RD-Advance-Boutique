@@ -236,5 +236,12 @@
     "description": "Curated boutique accessories and styling additions.",
     "status": "active",
     "slug": "accessories"
+  },
+  {
+    "id": "kurti-and-suit-sets",
+    "name": "Kurti And Suit Sets",
+    "slug": "kurti-and-suit-sets",
+    "description": "",
+    "status": "active"
   }
 ]
