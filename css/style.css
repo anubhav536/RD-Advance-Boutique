@@ -217,6 +217,56 @@ h3 {
   max-width: 610px;
 }
 
+.hero-search {
+  display: flex;
+  align-items: center;
+  margin-top: 1.6rem;
+  background: rgba(255,253,248,.12);
+  border: 1.5px solid rgba(255,253,248,.35);
+  border-radius: 3rem;
+  overflow: hidden;
+  max-width: 480px;
+  backdrop-filter: blur(8px);
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.hero-search:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,164,92,.25);
+}
+
+.hero-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: .75rem 1.2rem;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: .95rem;
+}
+
+.hero-search input::placeholder {
+  color: rgba(255,253,248,.6);
+}
+
+.hero-search button {
+  background: var(--gold);
+  border: none;
+  color: var(--black);
+  padding: .75rem 1.3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+  line-height: 1;
+}
+
+.hero-search button:hover {
+  background: #b8922a;
+  color: #fff;
+}
+
 .hero__actions {
   display: flex;
   flex-wrap: wrap;

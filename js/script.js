@@ -505,6 +505,14 @@
       renderProductGrid();
     });
 
+    // Pre-fill search from URL ?q= param (homepage search bar)
+    const urlQ = new URLSearchParams(window.location.search).get("q") || "";
+    if (urlQ && productSearch) {
+      productSearch.value = urlQ;
+      searchTerm = normalize(urlQ);
+      doc.getElementById("shop-products")?.scrollIntoView({ behavior: "smooth" });
+    }
+
     // Load products
     productGrid.innerHTML = '<p class="shop-loading">Loading products…</p>';
     loadStaticJson("data/products.json", []).then(data => {
