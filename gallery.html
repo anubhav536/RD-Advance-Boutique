@@ -22,14 +22,17 @@
     </a>
 
     <nav class="nav" aria-label="Primary navigation">
-      <a class="nav__link" href="index.html">Home</a>
-      <a class="nav__link" href="shop.html">Shop</a>
-      <a class="nav__link nav__link--active" href="gallery.html">Gallery</a>
-      <a class="nav__link" href="learn.html">Course</a>
-      <a class="nav__link" href="contact.html">Contact</a>
+      <a class="nav__link" href="index.html" data-i18n="nav.home">Home</a>
+      <a class="nav__link" href="shop.html" data-i18n="nav.shop">Shop</a>
+      <a class="nav__link nav__link--active" href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a class="nav__link" href="learn.html" data-i18n="nav.course">Course</a>
+      <a class="nav__link" href="contact.html" data-i18n="nav.contact">Contact</a>
+      <a href="wishlist.html" class="nav__link nav-wl-link" aria-label="Wishlist">♡ <span class="wl-badge" hidden>0</span></a>
     </nav>
-
-    <a href="https://wa.me/917693849472" class="header-cta">WhatsApp</a>
+    <div class="header-right">
+      <button class="lang-btn" type="button" aria-label="हिंदी में बदलें">हिं</button>
+      <a href="https://wa.me/917693849472" class="header-cta" data-i18n="nav.whatsapp">WhatsApp</a>
+    </div>
   </header>
 
   <main>
@@ -123,6 +126,8 @@
   <footer class="footer gallery-footer">
     <p>© 2026 RD Advance Boutique. All Rights Reserved.</p>
   </footer>
+  <script src="js/i18n.js"></script>
+  <script src="js/wishlist.js"></script>
   <script src="js/script.js" defer></script>
   <script src="js/site-settings.js" defer></script>
 </body>

@@ -418,9 +418,19 @@
         badge.textContent = "🛍️ Ready-Made";
       }
 
+      const heartBtn = doc.createElement("button");
+      heartBtn.type = "button";
+      heartBtn.className = "wishlist-btn";
+      const pid = String(product.slug || product.id || normalize(title));
+      heartBtn.dataset.wlId = pid;
+      const isSaved = window.RDWishlist ? window.RDWishlist.has(pid) : false;
+      heartBtn.classList.toggle("wl-saved", isSaved);
+      heartBtn.innerHTML = isSaved ? "♥" : "♡";
+      heartBtn.setAttribute("aria-label", isSaved ? "Remove from wishlist" : "Add to wishlist");
+
       const media = doc.createElement("div");
       media.className = "product-card__media";
-      media.append(img, badge);
+      media.append(img, badge, heartBtn);
 
       // Content
       const detailUrl = new URL(

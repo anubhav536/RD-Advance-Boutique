@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your saved products from RD Advance Boutique wishlist.">
+  <title>My Wishlist | RD Advance Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <header class="site-header" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="RD Advance Boutique home">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo" class="brand__logo">
+      <span class="brand__text"><strong>RD Advance</strong><span>Boutique</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav__link" data-i18n="nav.home">Home</a>
+      <a href="shop.html" class="nav__link" data-i18n="nav.shop">Shop</a>
+      <a href="gallery.html" class="nav__link" data-i18n="nav.gallery">Gallery</a>
+      <a href="learn.html" class="nav__link" data-i18n="nav.course">Course</a>
+      <a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a>
+      <a href="wishlist.html" class="nav__link nav__link--active nav-wl-link" aria-label="Wishlist">
+        ♡ <span class="wl-badge" hidden>0</span>
+      </a>
+    </nav>
+    <div class="header-right">
+      <button class="lang-btn" type="button" aria-label="हिंदी में बदलें">हिं</button>
+      <a href="https://wa.me/917693849472" class="header-cta" data-i18n="nav.book">Book a Fitting</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ── WISHLIST HEADER ──────────────────── -->
+    <section class="wl-hero">
+      <div class="wl-hero__inner">
+        <p class="eyebrow" data-i18n="wl.eyebrow">Saved items</p>
+        <h1 data-i18n="wl.title">My Wishlist <span class="wl-hero__count">(<span id="wlCounter">0</span>)</span></h1>
+        <div class="wl-hero__actions">
+          <button class="btn btn--ghost" id="wlShareBtn" type="button" data-i18n="wl.share">Share Wishlist</button>
+          <button class="btn btn--ghost wl-danger" id="wlClearAll" type="button" hidden data-i18n="wl.clearAll">Clear All</button>
+        </div>
+        <span id="wlShareStatus" class="wl-share-status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <!-- ── PRODUCT GRID ─────────────────────── -->
+    <section class="wl-section">
+      <div class="wl-grid" id="wlGrid"></div>
+
+      <!-- EMPTY STATE -->
+      <div class="wl-empty" id="wlEmpty" hidden>
+        <div class="wl-empty__box">
+          <span class="wl-empty__icon">♡</span>
+          <h2 data-i18n="wl.empty.h">No products saved yet.</h2>
+          <p data-i18n="wl.empty.p">Tap the ♡ on any product to save it here.</p>
+          <a href="shop.html" class="btn btn--primary" data-i18n="wl.continue">Continue Shopping</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RELATED PRODUCTS ─────────────────── -->
+    <section class="detail-related" id="wlRelatedSection" hidden>
+      <div class="section__intro">
+        <p class="eyebrow" data-i18n="wl.related.ey">Based on your wishlist</p>
+        <h2 data-i18n="wl.related.h2">You May Also Like</h2>
+      </div>
+      <div class="product-grid" id="wlRelated"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img src="assets/logo.png" alt="RD Advance Boutique logo">
+      <h2>RD Advance Boutique</h2>
+    </div>
+    <div class="footer__links">
+      <a href="index.html" data-i18n="nav.home">Home</a>
+      <a href="shop.html" data-i18n="nav.shop">Shop</a>
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="learn.html" data-i18n="nav.course">Course</a>
+    </div>
+    <div class="footer__contact">
+      <a href="https://wa.me/917693849472">WhatsApp</a>
+      <span>Damoh, Madhya Pradesh</span>
+    </div>
+    <p class="footer__bottom" data-i18n="footer.rights">© 2026 RD Advance Boutique. All Rights Reserved.</p>
+  </footer>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/notifications.js" defer></script>
+  <script src="js/site-settings.js" defer></script>
+</body>
+</html>

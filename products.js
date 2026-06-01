@@ -152,7 +152,12 @@
 
     const wishlistButton = createElement("button", "wishlist-btn", "♡");
     wishlistButton.type = "button";
-    wishlistButton.setAttribute("aria-label", `Add ${title} to wishlist`);
+    const _pid = String(product.slug || product.id || normalize(title));
+    wishlistButton.dataset.wlId = _pid;
+    const _saved = window.RDWishlist ? window.RDWishlist.has(_pid) : false;
+    wishlistButton.classList.toggle("wl-saved", _saved);
+    wishlistButton.innerHTML = _saved ? "♥" : "♡";
+    wishlistButton.setAttribute("aria-label", _saved ? "Remove from wishlist" : "Add to wishlist");
 
     const quickView = createElement("a", "quick-view-btn", "View Details");
     quickView.href = link;
@@ -428,6 +433,17 @@
     shareButton.addEventListener("click", async () => {
       shareStatus.textContent = await shareCurrentPage(title, product.shortDescription || "RD Advance Boutique product");
     });
+
+    // Wire detail-page heart button
+    const detailHeart = document.getElementById("productWishlistBtn");
+    if (detailHeart && window.RDWishlist) {
+      const dpid = String(product.slug || product.id || normalize(title));
+      detailHeart.dataset.wlId = dpid;
+      const _ds = window.RDWishlist.has(dpid);
+      detailHeart.classList.toggle("wl-saved", _ds);
+      detailHeart.innerHTML = _ds ? "♥" : "♡";
+      detailHeart.setAttribute("aria-label", _ds ? "Remove from wishlist" : "Add to wishlist");
+    }
 
     const related = (Array.isArray(products) ? products : []).filter(item => item.id !== product.id && item.category === product.category).slice(0, 3);
     document.getElementById("relatedProducts").replaceChildren(...related.map(renderProductCard));
