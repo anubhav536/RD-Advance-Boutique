@@ -21,6 +21,13 @@
     "slug": "kurtis"
   },
   {
+    "id": "kurta-pant-dupatta",
+    "name": "Kurta Pant Dupatta Sets",
+    "description": "Complete 3-piece kurta pant dupatta sets — casual, formal and festive.",
+    "status": "active",
+    "slug": "kurta-pant-dupatta"
+  },
+  {
     "id": "suits-salwar",
     "name": "Suits & Salwar",
     "description": "Designer salwar kameez, Punjabi suits, palazzo sets.",
@@ -35,11 +42,46 @@
     "slug": "plazo-suits"
   },
   {
+    "id": "anarkali-suits",
+    "name": "Anarkali Suits",
+    "description": "Floor-length and mid-length Anarkali suits for parties and festivals.",
+    "status": "active",
+    "slug": "anarkali-suits"
+  },
+  {
+    "id": "patiala-suits",
+    "name": "Patiala Suits",
+    "description": "Bright and flowy Patiala salwar kameez sets.",
+    "status": "active",
+    "slug": "patiala-suits"
+  },
+  {
+    "id": "pakistani-suits",
+    "name": "Pakistani Suits",
+    "description": "Designer Pakistani-style straight suits with embroidery and dupatta.",
+    "status": "active",
+    "slug": "pakistani-suits"
+  },
+  {
+    "id": "churidar-sets",
+    "name": "Churidar Sets",
+    "description": "Classic churidar kameez sets in cotton, silk, and georgette.",
+    "status": "active",
+    "slug": "churidar-sets"
+  },
+  {
     "id": "sharara-sets",
     "name": "Sharara Sets",
     "description": "Traditional and designer sharara sets for parties and occasions.",
     "status": "active",
     "slug": "sharara-sets"
+  },
+  {
+    "id": "dhoti-sets",
+    "name": "Dhoti Sets",
+    "description": "Trendy dhoti pants paired with kurti or crop top sets.",
+    "status": "active",
+    "slug": "dhoti-sets"
   },
   {
     "id": "lehengas",
@@ -112,6 +154,41 @@
     "slug": "festive-wear"
   },
   {
+    "id": "chikankari",
+    "name": "Chikankari",
+    "description": "Authentic Lucknowi chikankari embroidery kurtis, suits and sarees.",
+    "status": "active",
+    "slug": "chikankari"
+  },
+  {
+    "id": "banarasi",
+    "name": "Banarasi",
+    "description": "Banarasi silk sarees, suits and dupatta with zari work.",
+    "status": "active",
+    "slug": "banarasi"
+  },
+  {
+    "id": "embroidery-work",
+    "name": "Embroidery Work",
+    "description": "Handcrafted embroidered outfits — mirror work, thread work, gota patti.",
+    "status": "active",
+    "slug": "embroidery-work"
+  },
+  {
+    "id": "printed-collection",
+    "name": "Printed Collection",
+    "description": "Block prints, digital prints, floral and geometric pattern wear.",
+    "status": "active",
+    "slug": "printed-collection"
+  },
+  {
+    "id": "bandhani",
+    "name": "Bandhani & Tie-Dye",
+    "description": "Traditional bandhani, laheria and tie-dye pattern clothing.",
+    "status": "active",
+    "slug": "bandhani"
+  },
+  {
     "id": "dupattas",
     "name": "Dupattas",
     "description": "Designer dupattas, embroidered and printed styles.",
@@ -124,6 +201,13 @@
     "description": "Comfortable cotton nightsuits, pyjama sets, and loungewear.",
     "status": "active",
     "slug": "nightwear"
+  },
+  {
+    "id": "maternity-wear",
+    "name": "Maternity Wear",
+    "description": "Comfortable and stylish outfits designed for expecting mothers.",
+    "status": "active",
+    "slug": "maternity-wear"
   },
   {
     "id": "kids-wear",
