@@ -4365,3 +4365,178 @@ iframe {
   .boutique-cta-actions { flex-direction: column; align-items: center; }
   .boutique-cta-actions .btn { width: 100%; max-width: 280px; text-align: center; }
 }
+
+/* ═══════════════════════════════════════════════════
+   SIZE GUIDE BUTTON + MODAL
+═══════════════════════════════════════════════════ */
+.detail-size-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: .5rem;
+}
+.detail-size-header h2 { margin: 0; }
+
+.size-guide-btn {
+  background: none;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-sans);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: .3rem .85rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.size-guide-btn:hover {
+  background: var(--gold);
+  color: #fff;
+}
+
+/* Overlay */
+.sg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,10,5,.55);
+  backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.sg-overlay[hidden] { display: none; }
+
+/* Modal box */
+.sg-modal {
+  background: #fffdf8;
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.22);
+  display: flex;
+  flex-direction: column;
+}
+
+.sg-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: #fffdf8;
+  z-index: 1;
+}
+.sg-modal__head h2 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin: 0;
+}
+.sg-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: .3rem .5rem;
+  border-radius: .5rem;
+  transition: color .2s, background .2s;
+}
+.sg-close:hover { color: var(--ink); background: var(--line); }
+
+/* Tabs */
+.sg-tabs {
+  display: flex;
+  gap: .4rem;
+  padding: 1rem 1.5rem .5rem;
+  flex-wrap: wrap;
+}
+.sg-tab {
+  background: none;
+  border: 1.5px solid var(--line);
+  border-radius: 2rem;
+  padding: .4rem 1rem;
+  font-family: var(--font-sans);
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color .2s, color .2s, background .2s;
+}
+.sg-tab.active, .sg-tab:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+  background: #fdf5e0;
+}
+
+/* Panels */
+.sg-panel { display: none; padding: .75rem 1.5rem 0; }
+.sg-panel.active { display: block; }
+
+.sg-note {
+  font-size: .82rem;
+  color: var(--muted);
+  margin-bottom: .75rem;
+}
+
+/* Table */
+.sg-table-wrap { overflow-x: auto; }
+.sg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  font-family: var(--font-sans);
+}
+.sg-table th {
+  background: #f7f0e8;
+  color: var(--ink);
+  font-weight: 700;
+  padding: .55rem .8rem;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--line);
+}
+.sg-table td {
+  padding: .5rem .8rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.sg-table tbody tr:hover { background: #fdf8f0; }
+
+/* Tip box */
+.sg-measure-tip {
+  margin: 1.25rem 1.5rem 1.5rem;
+  background: #fdf5e0;
+  border-left: 3px solid var(--gold);
+  border-radius: .75rem;
+  padding: 1rem 1.1rem;
+  font-size: .82rem;
+  color: var(--ink);
+}
+.sg-measure-tip strong { display: block; margin-bottom: .5rem; font-size: .88rem; }
+.sg-measure-tip ul { margin: 0 0 .75rem 1.1rem; padding: 0; }
+.sg-measure-tip li { margin-bottom: .3rem; }
+.sg-wa-link {
+  color: #128c7e;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: .82rem;
+}
+.sg-wa-link:hover { text-decoration: underline; }
+
+@media (max-width: 540px) {
+  .sg-modal { border-radius: 1rem 1rem 0 0; align-self: flex-end; max-height: 92vh; }
+  .sg-overlay { align-items: flex-end; padding: 0; }
+  .sg-table { font-size: .75rem; }
+  .sg-table th, .sg-table td { padding: .4rem .55rem; }
+}

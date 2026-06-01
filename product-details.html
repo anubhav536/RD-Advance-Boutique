@@ -44,7 +44,10 @@
         <p id="productLongDescription" class="detail-description">Please wait while the product details load.</p>
         <div class="detail-options" aria-label="Available product options">
           <div>
-            <h2>Available sizes</h2>
+            <div class="detail-size-header">
+              <h2>Available sizes</h2>
+              <button class="size-guide-btn" id="openSizeGuide" type="button">📏 Size Guide</button>
+            </div>
             <div class="detail-chip-list" id="productSizes"></div>
           </div>
           <div>
@@ -77,8 +80,139 @@
     <p class="footer__bottom">© 2026 RD Advance Boutique. All Rights Reserved.</p>
   </footer>
 
+  <!-- SIZE GUIDE MODAL -->
+  <div class="sg-overlay" id="sizeGuideModal" role="dialog" aria-modal="true" aria-labelledby="sgTitle" hidden>
+    <div class="sg-modal">
+      <div class="sg-modal__head">
+        <h2 id="sgTitle">📏 Size Guide</h2>
+        <button class="sg-close" id="closeSizeGuide" type="button" aria-label="Close size guide">✕</button>
+      </div>
+
+      <div class="sg-tabs" role="tablist">
+        <button class="sg-tab active" data-tab="tops" role="tab" aria-selected="true">Tops / Kurtis</button>
+        <button class="sg-tab" data-tab="bottoms" role="tab" aria-selected="false">Bottoms</button>
+        <button class="sg-tab" data-tab="blouse" role="tab" aria-selected="false">Blouse</button>
+        <button class="sg-tab" data-tab="kids" role="tab" aria-selected="false">Kids</button>
+      </div>
+
+      <!-- TOPS / KURTIS -->
+      <div class="sg-panel active" data-panel="tops">
+        <p class="sg-note">Measurements in <strong>inches</strong>. Loose fit recommended — add 1–2" to your body measurement.</p>
+        <div class="sg-table-wrap">
+          <table class="sg-table">
+            <thead><tr><th>Size</th><th>Bust</th><th>Waist</th><th>Hip</th><th>Shoulder</th><th>Length</th></tr></thead>
+            <tbody>
+              <tr><td><strong>XS</strong></td><td>32</td><td>26</td><td>34</td><td>13.5</td><td>40–42</td></tr>
+              <tr><td><strong>S</strong></td><td>34</td><td>28</td><td>36</td><td>14</td><td>42–44</td></tr>
+              <tr><td><strong>M</strong></td><td>36</td><td>30</td><td>38</td><td>14.5</td><td>42–44</td></tr>
+              <tr><td><strong>L</strong></td><td>38</td><td>32</td><td>40</td><td>15</td><td>44–46</td></tr>
+              <tr><td><strong>XL</strong></td><td>40</td><td>34</td><td>42</td><td>15.5</td><td>44–46</td></tr>
+              <tr><td><strong>XXL</strong></td><td>42</td><td>36</td><td>44</td><td>16</td><td>46–48</td></tr>
+              <tr><td><strong>3XL</strong></td><td>44</td><td>38</td><td>46</td><td>16.5</td><td>46–48</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOTTOMS (Salwar / Plazo / Skirts) -->
+      <div class="sg-panel" data-panel="bottoms">
+        <p class="sg-note">Measurements in <strong>inches</strong>. For plazo/palazzo, hip measurement is most important.</p>
+        <div class="sg-table-wrap">
+          <table class="sg-table">
+            <thead><tr><th>Size</th><th>Waist</th><th>Hip</th><th>Length (Salwar)</th><th>Length (Plazo)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>XS</strong></td><td>24–26</td><td>34</td><td>38</td><td>40</td></tr>
+              <tr><td><strong>S</strong></td><td>26–28</td><td>36</td><td>38</td><td>40</td></tr>
+              <tr><td><strong>M</strong></td><td>28–30</td><td>38</td><td>39</td><td>41</td></tr>
+              <tr><td><strong>L</strong></td><td>30–32</td><td>40</td><td>39</td><td>41</td></tr>
+              <tr><td><strong>XL</strong></td><td>32–34</td><td>42</td><td>40</td><td>42</td></tr>
+              <tr><td><strong>XXL</strong></td><td>34–36</td><td>44</td><td>40</td><td>42</td></tr>
+              <tr><td><strong>3XL</strong></td><td>36–38</td><td>46</td><td>41</td><td>43</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BLOUSE -->
+      <div class="sg-panel" data-panel="blouse">
+        <p class="sg-note">Measurements in <strong>inches</strong>. For custom stitching, please share exact body measurements via WhatsApp.</p>
+        <div class="sg-table-wrap">
+          <table class="sg-table">
+            <thead><tr><th>Size</th><th>Bust</th><th>Waist</th><th>Length</th><th>Sleeve</th></tr></thead>
+            <tbody>
+              <tr><td><strong>30</strong></td><td>30</td><td>26</td><td>14–15</td><td>5–22</td></tr>
+              <tr><td><strong>32</strong></td><td>32</td><td>28</td><td>14–15</td><td>5–22</td></tr>
+              <tr><td><strong>34</strong></td><td>34</td><td>30</td><td>15–16</td><td>5–22</td></tr>
+              <tr><td><strong>36</strong></td><td>36</td><td>32</td><td>15–16</td><td>5–22</td></tr>
+              <tr><td><strong>38</strong></td><td>38</td><td>34</td><td>15–16</td><td>5–22</td></tr>
+              <tr><td><strong>40</strong></td><td>40</td><td>36</td><td>16–17</td><td>5–22</td></tr>
+              <tr><td><strong>42</strong></td><td>42</td><td>38</td><td>16–17</td><td>5–22</td></tr>
+              <tr><td><strong>44</strong></td><td>44</td><td>40</td><td>16–17</td><td>5–22</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="sg-note" style="margin-top:.75rem">💡 Custom blouse stitching available — <a href="https://wa.me/917693849472?text=Custom%20blouse%20stitching%20ke%20liye%20measurements%20share%20karna%20chahti%20hoon" target="_blank" rel="noopener">share measurements on WhatsApp →</a></p>
+      </div>
+
+      <!-- KIDS -->
+      <div class="sg-panel" data-panel="kids">
+        <p class="sg-note">Measurements in <strong>inches</strong>.</p>
+        <div class="sg-table-wrap">
+          <table class="sg-table">
+            <thead><tr><th>Age</th><th>Height (cm)</th><th>Chest</th><th>Waist</th><th>Length</th></tr></thead>
+            <tbody>
+              <tr><td><strong>0–2 yrs</strong></td><td>70–90</td><td>18–20</td><td>17–19</td><td>14–18</td></tr>
+              <tr><td><strong>2–4 yrs</strong></td><td>90–105</td><td>20–22</td><td>19–21</td><td>18–22</td></tr>
+              <tr><td><strong>4–6 yrs</strong></td><td>105–115</td><td>22–24</td><td>21–23</td><td>22–26</td></tr>
+              <tr><td><strong>6–8 yrs</strong></td><td>115–128</td><td>24–26</td><td>23–25</td><td>26–30</td></tr>
+              <tr><td><strong>8–10 yrs</strong></td><td>128–138</td><td>26–28</td><td>25–27</td><td>30–34</td></tr>
+              <tr><td><strong>10–12 yrs</strong></td><td>138–150</td><td>28–30</td><td>27–29</td><td>34–38</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sg-measure-tip">
+        <strong>📐 Apna size kaise measure karein?</strong>
+        <ul>
+          <li><strong>Bust/Chest:</strong> Seene ke sabse chaude hisse ke around tape measure karein.</li>
+          <li><strong>Waist:</strong> Kamar ke sabse patli jagah measure karein.</li>
+          <li><strong>Hip:</strong> Hips ke sabse chaude hisse ke around measure karein.</li>
+          <li><strong>Length:</strong> Shoulder se neeche tak jitna aap chahein.</li>
+        </ul>
+        <a class="sg-wa-link" href="https://wa.me/917693849472?text=Size%20guide%20mein%20help%20chahiye" target="_blank" rel="noopener">Size samajh nahi aayi? WhatsApp karein →</a>
+      </div>
+    </div>
+  </div>
+
   <script src="products.js" defer></script>
   <script src="js/script.js" defer></script>
   <script src="js/site-settings.js" defer></script>
+  <script>
+    (function () {
+      const modal  = document.getElementById("sizeGuideModal");
+      const openBtn  = document.getElementById("openSizeGuide");
+      const closeBtn = document.getElementById("closeSizeGuide");
+      const tabs   = modal.querySelectorAll(".sg-tab");
+      const panels = modal.querySelectorAll(".sg-panel");
+
+      function openModal() { modal.hidden = false; document.body.style.overflow = "hidden"; }
+      function closeModal() { modal.hidden = true; document.body.style.overflow = ""; }
+
+      openBtn?.addEventListener("click", openModal);
+      closeBtn?.addEventListener("click", closeModal);
+      modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+      document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+          panels.forEach(p => p.classList.remove("active"));
+          tab.classList.add("active"); tab.setAttribute("aria-selected", "true");
+          modal.querySelector(`.sg-panel[data-panel="${tab.dataset.tab}"]`)?.classList.add("active");
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
