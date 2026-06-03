@@ -445,8 +445,11 @@
       detailHeart.setAttribute("aria-label", _ds ? "Remove from wishlist" : "Add to wishlist");
     }
 
-    const related = (Array.isArray(products) ? products : []).filter(item => item.id !== product.id && item.category === product.category).slice(0, 3);
-    document.getElementById("relatedProducts").replaceChildren(...related.map(renderProductCard));
+    const relatedGrid = document.getElementById("relatedProducts");
+    if (relatedGrid) {
+      const related = (Array.isArray(products) ? products : []).filter(item => item.id !== product.id && item.category === product.category).slice(0, 3);
+      relatedGrid.replaceChildren(...related.map(renderProductCard));
+    }
   }
 
   async function initGalleryDetails() {

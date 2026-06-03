@@ -19,7 +19,39 @@
       "Boutique finishing",
       "Custom fit guidance"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Designer Blouse design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Designer Blouse design. Please share stitching details and price.",
+    "occasion": [
+      "wedding",
+      "festival",
+      "party"
+    ],
+    "style": [
+      "designer",
+      "embroidered",
+      "traditional"
+    ],
+    "audience": [
+      "women",
+      "bridal"
+    ],
+    "colors": [
+      "gold",
+      "maroon",
+      "black"
+    ],
+    "matchWith": [
+      "sarees",
+      "handloom-khadi-cotton-saree",
+      "royal-lotus-zari-banarasi-silk-saree",
+      "design5"
+    ],
+    "recommendedProducts": [
+      "royal-lotus-zari-banarasi-silk-saree",
+      "sarees",
+      "handloom-khadi-cotton-saree"
+    ],
+    "trending": true,
+    "recommendationPriority": 98
   },
   {
     "id": "design2",
@@ -41,7 +73,37 @@
       "Elegant everyday finish",
       "Occasion-ready styling"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Boutique Kurti design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Boutique Kurti design. Please share stitching details and price.",
+    "occasion": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "style": [
+      "kurti",
+      "ethnic",
+      "minimal"
+    ],
+    "audience": [
+      "women"
+    ],
+    "colors": [
+      "pink",
+      "green",
+      "blue"
+    ],
+    "matchWith": [
+      "anarkali-rayon-kurti",
+      "pure-cotton-embroidered-kurti-pant-set",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "recommendedProducts": [
+      "anarkali-rayon-kurti",
+      "pure-cotton-embroidered-kurti-pant-set",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "trending": false,
+    "recommendationPriority": 84
   },
   {
     "id": "design3",
@@ -63,7 +125,37 @@
       "Statement design inspiration",
       "Personalized consultation"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Bridal Collection design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Bridal Collection design. Please share stitching details and price.",
+    "occasion": [
+      "wedding",
+      "festival"
+    ],
+    "style": [
+      "bridal",
+      "luxury",
+      "statement"
+    ],
+    "audience": [
+      "bridal",
+      "women"
+    ],
+    "colors": [
+      "red",
+      "gold",
+      "maroon"
+    ],
+    "matchWith": [
+      "royal-lotus-zari-banarasi-silk-saree",
+      "design1",
+      "design5"
+    ],
+    "recommendedProducts": [
+      "royal-lotus-zari-banarasi-silk-saree",
+      "sarees",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 100
   },
   {
     "id": "design4",
@@ -85,7 +177,30 @@
       "Celebration-ready look",
       "Child-friendly styling"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Little Occasion Wear design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Little Occasion Wear design. Please share stitching details and price.",
+    "occasion": [
+      "festival",
+      "party",
+      "birthday"
+    ],
+    "style": [
+      "kids",
+      "occasion-wear",
+      "playful"
+    ],
+    "audience": [
+      "kids"
+    ],
+    "colors": [
+      "pink",
+      "pastel"
+    ],
+    "matchWith": [
+      "course2"
+    ],
+    "recommendedProducts": [],
+    "trending": false,
+    "recommendationPriority": 72
   },
   {
     "id": "design5",
@@ -107,7 +222,39 @@
       "Boutique finishing",
       "Custom fit guidance"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Custom Stitching design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Custom Stitching design. Please share stitching details and price.",
+    "occasion": [
+      "wedding",
+      "festival",
+      "party"
+    ],
+    "style": [
+      "custom",
+      "designer",
+      "blouse"
+    ],
+    "audience": [
+      "women",
+      "bridal"
+    ],
+    "colors": [
+      "gold",
+      "black",
+      "maroon"
+    ],
+    "matchWith": [
+      "sarees",
+      "handloom-khadi-cotton-saree",
+      "royal-lotus-zari-banarasi-silk-saree",
+      "design1"
+    ],
+    "recommendedProducts": [
+      "royal-lotus-zari-banarasi-silk-saree",
+      "sarees",
+      "handloom-khadi-cotton-saree"
+    ],
+    "trending": true,
+    "recommendationPriority": 95
   },
   {
     "id": "design6",
@@ -129,7 +276,37 @@
       "Elegant everyday finish",
       "Occasion-ready styling"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Modern Patterns design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Modern Patterns design. Please share stitching details and price.",
+    "occasion": [
+      "casual",
+      "office",
+      "party"
+    ],
+    "style": [
+      "modern",
+      "kurti",
+      "pattern"
+    ],
+    "audience": [
+      "women"
+    ],
+    "colors": [
+      "blue",
+      "purple",
+      "green"
+    ],
+    "matchWith": [
+      "anarkali-rayon-kurti",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set",
+      "pure-cotton-embroidered-kurti-pant-set"
+    ],
+    "recommendedProducts": [
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set",
+      "anarkali-rayon-kurti",
+      "pure-cotton-embroidered-kurti-pant-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 87
   },
   {
     "id": "course1",
@@ -138,7 +315,7 @@
     "image": "assets/coursedesign1.jpg",
     "alt": "Bridal-inspired course design with refined tailoring",
     "layout": "default",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Celebration Detail inspiration for refined bridal boutique styling.",
     "longDescription": "Celebration Detail is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
     "tags": [
@@ -151,7 +328,35 @@
       "Statement design inspiration",
       "Personalized consultation"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Celebration Detail design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Celebration Detail design. Please share stitching details and price.",
+    "occasion": [
+      "wedding",
+      "festival"
+    ],
+    "style": [
+      "bridal",
+      "tailoring",
+      "detail"
+    ],
+    "audience": [
+      "bridal",
+      "women",
+      "students"
+    ],
+    "colors": [
+      "gold",
+      "red"
+    ],
+    "matchWith": [
+      "design3",
+      "royal-lotus-zari-banarasi-silk-saree"
+    ],
+    "recommendedProducts": [
+      "royal-lotus-zari-banarasi-silk-saree",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "trending": false,
+    "recommendationPriority": 80
   },
   {
     "id": "course2",
@@ -160,7 +365,7 @@
     "image": "assets/coursedesign2.jpg",
     "alt": "Kids boutique sample with polished sewing detail",
     "layout": "default",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Playful Couture inspiration for refined kids wear boutique styling.",
     "longDescription": "Playful Couture is a curated RD Advance Boutique design reference with premium finishing, graceful proportions, and personalized stitching possibilities for your preferred fabric, occasion, and fit.",
     "tags": [
@@ -173,6 +378,30 @@
       "Celebration-ready look",
       "Child-friendly styling"
     ],
-    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Playful Couture design. Please share stitching details and price."
+    "whatsappMessage": "Hello RD Advance Boutique, I am interested in the Playful Couture design. Please share stitching details and price.",
+    "occasion": [
+      "festival",
+      "party",
+      "birthday"
+    ],
+    "style": [
+      "kids",
+      "couture",
+      "playful"
+    ],
+    "audience": [
+      "kids",
+      "students"
+    ],
+    "colors": [
+      "pastel",
+      "pink"
+    ],
+    "matchWith": [
+      "design4"
+    ],
+    "recommendedProducts": [],
+    "trending": false,
+    "recommendationPriority": 74
   }
 ]

@@ -98,9 +98,42 @@
     ],
     "whatsappMessage": "Hello RD Advance Boutique, I am interested in This Product. Please share availability, fitting, payment, and delivery details.",
     "outfitCategory": "sarees",
-    "occasions": ["casual", "office", "festival"],
-    "suggestedProducts": ["handloom-khadi-cotton-saree"],
-    "compatibleWith": ["handloom-khadi-cotton-saree"]
+    "occasions": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "suggestedProducts": [
+      "handloom-khadi-cotton-saree"
+    ],
+    "compatibleWith": [
+      "handloom-khadi-cotton-saree"
+    ],
+    "occasion": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "style": [
+      "handloom",
+      "traditional",
+      "minimal"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design1",
+      "design5",
+      "handloom-khadi-cotton-saree"
+    ],
+    "recommendedProducts": [
+      "handloom-khadi-cotton-saree",
+      "royal-lotus-zari-banarasi-silk-saree",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 96
   },
   {
     "id": "handloom-khadi-cotton-saree",
@@ -186,9 +219,42 @@
     "createdAt": "2026-05-31T04:47:25.579Z",
     "updatedAt": "2026-05-31T04:48:26.303Z",
     "outfitCategory": "sarees",
-    "occasions": ["casual", "office", "festival"],
-    "suggestedProducts": ["sarees"],
-    "compatibleWith": ["sarees"]
+    "occasions": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "suggestedProducts": [
+      "sarees"
+    ],
+    "compatibleWith": [
+      "sarees"
+    ],
+    "occasion": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "style": [
+      "handloom",
+      "traditional",
+      "minimal"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design1",
+      "design5",
+      "sarees"
+    ],
+    "recommendedProducts": [
+      "sarees",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set",
+      "pure-cotton-embroidered-kurti-pant-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 91
   },
   {
     "id": "anarkali-rayon-kurti",
@@ -202,7 +268,7 @@
     "type": "readymade",
     "price": 349,
     "status": "active",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Step into effortless elegance with this beautifully designed Rayon Anarkali Kurti. Featuring a soft dyed finish, comfortable three-quarter sleeves, and a flowy silhouette, this kurti brings together comfort, fashion, and timeless style for every occasion.",
     "image": "assets/IMG_20260531_184239.jpg",
     "images": [
@@ -278,9 +344,41 @@
     "createdAt": "2026-05-31T13:30:01.909Z",
     "updatedAt": "2026-05-31T13:30:01.921Z",
     "outfitCategory": "kurtis",
-    "occasions": ["casual", "office", "party"],
-    "suggestedProducts": ["women-s-rayon-neck-embroidered-3-piece-suit-set", "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"],
-    "compatibleWith": []
+    "occasions": [
+      "casual",
+      "office",
+      "party"
+    ],
+    "suggestedProducts": [
+      "women-s-rayon-neck-embroidered-3-piece-suit-set",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "compatibleWith": [],
+    "occasion": [
+      "casual",
+      "office",
+      "party"
+    ],
+    "style": [
+      "anarkali",
+      "tie-dye",
+      "ethnic"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design2",
+      "design6",
+      "pure-cotton-embroidered-kurti-pant-set"
+    ],
+    "recommendedProducts": [
+      "pure-cotton-embroidered-kurti-pant-set",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 88
   },
   {
     "id": "women-s-rayon-neck-embroidered-3-piece-suit-set",
@@ -295,7 +393,7 @@
     "type": "readymade",
     "price": 449,
     "status": "active",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Grace your ethnic wardrobe with this elegant Rayon Neck Embroidered 3 Piece Suit Set. Featuring beautiful neck embroidery, a printed rayon kurta, matching bottomwear, and a soft flowing dupatta, this outfit blends comfort, sophistication, and timeless style for every occasion.",
     "image": "assets/IMG_20260601_075407.jpg",
     "images": [
@@ -364,9 +462,43 @@
     "createdAt": "2026-06-01T02:39:00.580Z",
     "updatedAt": "2026-06-01T02:39:00.588Z",
     "outfitCategory": "kurtis",
-    "occasions": ["casual", "office", "festival", "party"],
-    "suggestedProducts": ["anarkali-rayon-kurti", "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"],
-    "compatibleWith": []
+    "occasions": [
+      "casual",
+      "office",
+      "festival",
+      "party"
+    ],
+    "suggestedProducts": [
+      "anarkali-rayon-kurti",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "compatibleWith": [],
+    "occasion": [
+      "casual",
+      "office",
+      "festival",
+      "party"
+    ],
+    "style": [
+      "embroidered",
+      "ethnic",
+      "coordinated"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design2",
+      "design6",
+      "anarkali-rayon-kurti"
+    ],
+    "recommendedProducts": [
+      "anarkali-rayon-kurti",
+      "pure-cotton-embroidered-kurti-pant-set",
+      "royal-lotus-zari-banarasi-silk-saree"
+    ],
+    "trending": true,
+    "recommendationPriority": 94
   },
   {
     "id": "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set",
@@ -452,9 +584,39 @@
     "createdAt": "2026-06-01T09:18:34.915Z",
     "updatedAt": "2026-06-01T09:18:34.921Z",
     "outfitCategory": "kurtis",
-    "occasions": ["casual", "office"],
-    "suggestedProducts": ["anarkali-rayon-kurti", "women-s-rayon-neck-embroidered-3-piece-suit-set"],
-    "compatibleWith": []
+    "occasions": [
+      "casual",
+      "office"
+    ],
+    "suggestedProducts": [
+      "anarkali-rayon-kurti",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "compatibleWith": [],
+    "occasion": [
+      "casual",
+      "office"
+    ],
+    "style": [
+      "floral",
+      "co-ord",
+      "modern"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design2",
+      "design6",
+      "anarkali-rayon-kurti"
+    ],
+    "recommendedProducts": [
+      "anarkali-rayon-kurti",
+      "pure-cotton-embroidered-kurti-pant-set",
+      "handloom-khadi-cotton-saree"
+    ],
+    "trending": false,
+    "recommendationPriority": 82
   },
   {
     "id": "royal-lotus-zari-banarasi-silk-saree",
@@ -468,7 +630,7 @@
     "type": "readymade",
     "price": 279,
     "status": "active",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Saree Fabric: Banarasi Silk\nBlouse Fabric: Banarasi Silk\nBlouse Type: Running Blouse\nPattern: Zari Woven\nBlouse Pattern: Same as Saree\nSaree Length: 5.5 Meter\nBlouse Piece Length: 0.9 Meter\nGrace your special moments with this elegant Banarasi Silk Saree featuring exquisite zari woven lotus motifs and a luxurious woven pallu. Designed for weddings, festivals, parties, and family celebrations, this saree offers a timeless blend of tradition and sophistication.",
     "image": "assets/IMG_20260602_060958.jpg",
     "images": [
@@ -546,7 +708,40 @@
       "Banarasi Collection"
     ],
     "createdAt": "2026-06-02T01:02:05.176Z",
-    "updatedAt": "2026-06-02T01:02:05.195Z"
+    "updatedAt": "2026-06-02T01:02:05.195Z",
+    "occasion": [
+      "wedding",
+      "festival",
+      "party"
+    ],
+    "style": [
+      "banarasi",
+      "zari",
+      "traditional",
+      "luxury"
+    ],
+    "audience": [
+      "women",
+      "bridal"
+    ],
+    "matchWith": [
+      "design1",
+      "design3",
+      "design5",
+      "sarees"
+    ],
+    "recommendedProducts": [
+      "sarees",
+      "handloom-khadi-cotton-saree",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "trending": true,
+    "recommendationPriority": 99,
+    "occasions": [
+      "wedding",
+      "festival",
+      "party"
+    ]
   },
   {
     "id": "pure-cotton-embroidered-kurti-pant-set",
@@ -562,7 +757,7 @@
     "type": "readymade",
     "price": 529,
     "status": "active",
-    "featured": false,
+    "featured": true,
     "shortDescription": "Upgrade your ethnic wardrobe with this elegant Pure Cotton Kurti Pant Set featuring beautiful embroidery detailing, soft breathable fabric, and a comfortable straight-fit design. Perfect for festive celebrations, office wear, daily wear, and family gatherings.\nPackage Contents\n• 1 Embroidered Cotton Kurti\n• 1 Matching Cotton Pant\nS (36 Inch Bust)\n• M (38 Inch Bust)\n• L (40 Inch Bust)\n• XL (42 Inch Bust)\n• XXL (44 Inch Bust)\n• XXXL (44 Inch Bust)\nKurti Length: 42 Inches\nFabric: Pure Cotton\nPattern: Checked with Embroidered Neck\nSleeves: Three-Quarter Sleeves\nFit Type: Regular Fit\nCombo: Single Set\nOccasion: Casual, Festive, Office, Daily Wear\n Gentle Machine Wash\n✔ Hand Wash Recommended\n✔ Do Not Bleach\n✔ Dry In Shade\n✔ Iron At Medium Temperature",
     "image": "assets/IMG_20260602_174124.jpg",
     "images": [
@@ -631,6 +826,36 @@
       "Festive Wear Collection"
     ],
     "createdAt": "2026-06-02T12:38:47.262Z",
-    "updatedAt": "2026-06-02T12:38:47.269Z"
+    "updatedAt": "2026-06-02T12:38:47.269Z",
+    "occasion": [
+      "casual",
+      "office",
+      "festival"
+    ],
+    "style": [
+      "embroidered",
+      "cotton",
+      "ethnic"
+    ],
+    "audience": [
+      "women"
+    ],
+    "matchWith": [
+      "design2",
+      "design6",
+      "women-s-rayon-neck-embroidered-3-piece-suit-set"
+    ],
+    "recommendedProducts": [
+      "women-s-rayon-neck-embroidered-3-piece-suit-set",
+      "anarkali-rayon-kurti",
+      "women-s-floral-printed-american-crepe-kurta-pant-co-ord-set"
+    ],
+    "trending": false,
+    "recommendationPriority": 86,
+    "occasions": [
+      "casual",
+      "office",
+      "festival"
+    ]
   }
 ]
