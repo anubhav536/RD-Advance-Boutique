@@ -298,7 +298,17 @@
 .adm-toast--error { background: #c0392b; }
 
 /* ── ORDERS (inside section) ────────────────────────────────── */
-.adm-orders-toolbar { padding: .5rem 0 1rem; }
+.adm-orders-toolbar { padding: .5rem 0 1rem; display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+.mg-connection-badge {
+  font-size: .72rem; font-weight: 600; padding: .25rem .65rem; border-radius: 999px;
+  letter-spacing: .04em; white-space: nowrap; cursor: default;
+}
+.mg-connection-badge--live  { background: #d4edda; color: #155724; }
+.mg-connection-badge--local { background: #fff3cd; color: #856404; }
+/* ── Info box step list ─────────────────────────────────────── */
+.adm-info-box--steps { margin-top: 12px; }
+.adm-info-box--steps ol { padding-left: 1.25rem; margin: .5rem 0 0; }
+.adm-info-box--steps li { margin-bottom: .4rem; line-height: 1.5; }
 .mg-stats-bar {
   display: flex; gap: .75rem; flex-wrap: wrap; padding: 0 0 1rem; margin-bottom: .25rem;
 }

@@ -174,8 +174,54 @@
   };
   const ALL_STATUSES = Object.keys(STATUS_CONFIG);
 
-  function renderOrders() {
-    S.orders = loadLocalOrders();
+  /* ─────────────────────────────────────────────
+     CONNECTION STATUS
+  ───────────────────────────────────────────── */
+  function gasUrl() {
+    const u = S.config.appsScriptUrl || "";
+    return (!u || u.includes("PASTE_")) ? null : u;
+  }
+
+  function updateConnectionStatus(connected) {
+    const badge = el("mgConnectionBadge");
+    if (!badge) return;
+    badge.textContent = connected ? "🟢 Google Sheets" : "⚡ Local Only";
+    badge.className   = "mg-connection-badge " +
+      (connected ? "mg-connection-badge--live" : "mg-connection-badge--local");
+    badge.title = connected
+      ? "Orders are synced with your Google Sheet"
+      : "Google Sheets not connected — showing this device's orders only";
+  }
+
+  async function renderOrders() {
+    el("mgLoadingState").hidden  = false;
+    el("mgEmptyState").hidden    = true;
+    el("mgErrorState").hidden    = true;
+    el("mgOrdersList").innerHTML = "";
+
+    const url       = gasUrl();
+    const connected = !!url;
+    updateConnectionStatus(connected);
+
+    if (connected) {
+      try {
+        const res  = await fetch(url + "?action=getOrders", { cache: "no-store" });
+        const data = await res.json();
+        if (data.ok) {
+          S.orders = data.orders || [];
+        } else {
+          throw new Error(data.error || "Unknown error from Apps Script");
+        }
+      } catch (err) {
+        S.orders = loadLocalOrders();
+        el("mgErrorMsg").textContent = "Google Sheets sync failed: " + err.message + ". Showing local orders.";
+        el("mgErrorState").hidden = false;
+      }
+    } else {
+      S.orders = loadLocalOrders();
+    }
+
+    el("mgLoadingState").hidden = true;
     updateOrderStats();
     renderOrderList();
   }
@@ -287,12 +333,37 @@
 </div>`;
   }
 
-  function updateOrderStatus(orderId, newStatus) {
+  async function updateOrderStatus(orderId, newStatus) {
     const idx = S.orders.findIndex(o => o["Order ID"] === orderId);
     if (idx >= 0) S.orders[idx]["Status"] = newStatus;
     updateOrderStats();
     renderOrderList();
-    showToast("Status updated to: " + newStatus);
+
+    const url = gasUrl();
+    if (url) {
+      try {
+        const res  = await fetch(url, {
+          method : "POST",
+          headers: { "Content-Type": "text/plain" },
+          body   : JSON.stringify({
+            action  : "updateStatus",
+            orderId,
+            status  : newStatus,
+            pin     : String(S.config.managerPin || "1234"),
+          }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("Status updated in Google Sheets ✅");
+        } else {
+          showToast("Local update done. Sheets error: " + (data.error || "Unknown"), "error");
+        }
+      } catch (err) {
+        showToast("Local update done. Sheets sync failed.", "error");
+      }
+    } else {
+      showToast("Status updated to: " + newStatus);
+    }
   }
 
   /* ─────────────────────────────────────────────
@@ -943,6 +1014,8 @@
      SETTINGS / CONFIG SECTION
   ───────────────────────────────────────────── */
   function renderConfigSection() {
+    const url = S.config.appsScriptUrl || "";
+    const connected = url && !url.includes("PASTE_");
     el("admConfigForm").innerHTML = `
       <div class="adm-settings-section">
         <h3>🔐 Admin PIN</h3>
@@ -954,10 +1027,39 @@
         </div>
         <p class="adm-hint-text">⚠️ After changing the PIN and generating code, paste the new <code>data/config.json</code> into your repository. Your next login will use the new PIN.</p>
       </div>
+
+      <div class="adm-settings-section">
+        <h3>🔗 Google Sheets Integration</h3>
+        <div class="adm-info-box" style="margin-bottom:14px">
+          <p><strong>Status:</strong> <span style="color:${connected ? "#27ae60" : "#c0392b"};font-weight:700">${connected ? "🟢 Connected" : "⚡ Not Connected"}</span></p>
+          <br>
+          <p>When connected, every customer order is automatically saved to your Google Sheet and you receive an email notification. Payment screenshots are stored in Google Drive.</p>
+        </div>
+        <div class="adm-form-grid">
+          <div class="adm-fg" style="grid-column:1/-1">
+            <label>Apps Script Web App URL</label>
+            <input type="url" name="appsScriptUrl" value="${esc(url.includes("PASTE_") ? "" : url)}" placeholder="https://script.google.com/macros/s/…/exec">
+            <p class="adm-hint-text">Paste the URL after deploying <code>apps-script/Code.gs</code> as a Google Apps Script Web App.</p>
+          </div>
+        </div>
+        <div class="adm-info-box adm-info-box--steps">
+          <p><strong>📋 Setup Steps (one time):</strong></p>
+          <ol>
+            <li>Open <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → New Project</li>
+            <li>Copy the entire content of <code>apps-script/Code.gs</code> into the editor</li>
+            <li>Fill in <code>SHEET_ID</code> (from your Google Sheet URL) and <code>OWNER_EMAIL</code></li>
+            <li>Click <strong>Deploy → New deployment → Web App</strong></li>
+            <li>Set "Execute as" = <strong>Me</strong> and "Who has access" = <strong>Anyone</strong></li>
+            <li>Copy the Web App URL and paste it above</li>
+            <li>Click <strong>Save Changes</strong> then <strong>📋 Generate Code</strong> and update <code>data/config.json</code></li>
+          </ol>
+        </div>
+      </div>
+
       <div class="adm-settings-section">
         <h3>📋 How This Panel Works</h3>
         <div class="adm-info-box">
-          <p>This admin panel loads your website data and lets you manage everything from one place. Since your site is hosted as static files on GitHub, changes don't save automatically.</p>
+          <p>This admin panel loads your website data and lets you manage everything from one place. Since your site is hosted as static files, changes don't save automatically.</p>
           <br>
           <p><strong>To apply any change:</strong></p>
           <ol>
@@ -965,9 +1067,9 @@
             <li>Click <strong>"Save Changes"</strong> (saves in memory for this session)</li>
             <li>Click <strong>"📋 Generate Code"</strong></li>
             <li>Copy the code shown in the popup</li>
-            <li>Open the matching <code>data/</code> file in your GitHub repository</li>
+            <li>Open the matching <code>data/</code> file in your project</li>
             <li>Replace its entire content with your copied code</li>
-            <li>Commit and push — your site updates automatically</li>
+            <li>Restart the server — changes go live immediately</li>
           </ol>
         </div>
       </div>`;
@@ -1131,18 +1233,27 @@
 
     // Config / Settings
     el("btnSaveConfig")?.addEventListener("click", () => {
-      const f = el("admConfigForm");
-      S.config = { ...S.config, managerPin: fv(f, "managerPin") };
-      showToast("Settings saved!");
+      const f   = el("admConfigForm");
+      const url = fv(f, "appsScriptUrl");
+      S.config  = { ...S.config,
+        managerPin    : fv(f, "managerPin"),
+        appsScriptUrl : url || S.config.appsScriptUrl || "",
+      };
+      showToast("Settings saved! Click Generate Code to apply.");
     });
     el("btnGenConfig")?.addEventListener("click", () => {
-      const f = el("admConfigForm");
-      showCodeModal([{ name: "data/config.json", data: { ...S.config, managerPin: fv(f, "managerPin") } }]);
+      const f   = el("admConfigForm");
+      const url = fv(f, "appsScriptUrl");
+      showCodeModal([{ name: "data/config.json", data: {
+        ...S.config,
+        managerPin    : fv(f, "managerPin"),
+        appsScriptUrl : url || S.config.appsScriptUrl || "",
+      } }]);
     });
 
     // Orders
-    el("mgRefreshBtn")?.addEventListener("click", () => { S.orders = loadLocalOrders(); updateOrderStats(); renderOrderList(); showToast("Orders refreshed."); });
-    el("mgRetryBtn")?.addEventListener("click",   () => { S.orders = loadLocalOrders(); updateOrderStats(); renderOrderList(); });
+    el("mgRefreshBtn")?.addEventListener("click", () => { renderOrders(); showToast("Refreshing orders…"); });
+    el("mgRetryBtn")?.addEventListener("click",   () => { renderOrders(); });
     setupOrderTabs();
   }
 

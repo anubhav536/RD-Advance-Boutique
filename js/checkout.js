@@ -543,6 +543,40 @@ Please confirm this order. 🙏`;
   }
 
   /* ─────────────────────────────────────────────
+     GOOGLE APPS SCRIPT — SUBMIT ORDER
+  ───────────────────────────────────────────── */
+  function submitToAppsScript(order, screenshot) {
+    const url = appConfig.appsScriptUrl;
+    if (!url || url.includes("PASTE_")) return;
+    const payload = {
+      action          : "submitOrder",
+      orderId         : order.orderId,
+      createdAt       : order.createdAt,
+      productId       : order.productId,
+      productName     : order.productName,
+      productUrl      : order.productUrl,
+      quantity        : order.quantity,
+      selectedOptions : order.selectedOptions,
+      customerName    : order.customerName,
+      phone           : order.phone,
+      address         : order.address,
+      city            : order.city,
+      state           : order.state,
+      pincode         : order.pincode,
+      paymentMethod   : order.paymentMethod,
+      utrNumber       : order.utrNumber,
+      amountPaid      : order.amountPaid,
+      notes           : order.notes,
+      screenshotBase64: screenshot || "",
+    };
+    fetch(url, {
+      method : "POST",
+      headers: { "Content-Type": "text/plain" },
+      body   : JSON.stringify(payload),
+    }).catch(() => {});
+  }
+
+  /* ─────────────────────────────────────────────
      STEP INDICATOR
   ───────────────────────────────────────────── */
   function setStep(n) {
@@ -574,6 +608,7 @@ Please confirm this order. 🙏`;
 
     try {
       storeLocally(pendingOrder);
+      submitToAppsScript(pendingOrder, screenshotData);
       const waMessage = buildWAMessage(pendingOrder);
       const waUrl = "https://wa.me/" + (appConfig.ownerPhone || "917693849472") +
                     "?text=" + encodeURIComponent(waMessage);
