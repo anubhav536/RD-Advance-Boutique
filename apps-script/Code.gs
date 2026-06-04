@@ -5,13 +5,13 @@
 
 // ─── STEP 1: FILL IN THESE VALUES ───────────────────────────────
 const CONFIG = {
-  SHEET_ID       : "YOUR_GOOGLE_SHEET_ID",        // From sheet URL: /d/SHEET_ID/edit
+  SHEET_ID       : "125LTGCl9VJ-Gp4nGxv1Kh8sUek7rzNFeyO64RqB9QJA",        // From sheet URL: /d/SHEET_ID/edit
   SHEET_NAME     : "Orders",                       // Tab name inside the sheet
-  OWNER_EMAIL    : "your@email.com",               // Email for order notifications
+  OWNER_EMAIL    : "rdadvanceboutique@gmail.com",               // Email for order notifications
   DRIVE_FOLDER_ID: "",                             // Optional: Google Drive folder for screenshots
   STORE_NAME     : "RD Advance Boutique",
-  MANAGER_PIN    : "1234",                         // PIN for manage.html access (change this!)
-  SITE_URL       : "https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME",
+  MANAGER_PIN    : "Rajdeep@7123",                         // PIN for manage.html access (change this!)
+  SITE_URL       : "https://anubhav536.github.io/RD-Advance-Boutique/",
 };
 
 // ─── CORS HELPER ─────────────────────────────────────────────────
