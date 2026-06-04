@@ -24,7 +24,7 @@
 // Optional Script Properties (can also be set here):
 //   DRIVE_FOLDER_ID — Google Drive folder ID for payment screenshots
 //   SITE_URL        — Your site's public URL (used in email links)
-const CONFIG = {
+const CONFIG =
   SHEET_NAME          : "Orders",
   AUDIT_SHEET_NAME    : "AuditLog",
   STORE_NAME          : "RD Advance Boutique",
@@ -34,6 +34,7 @@ const CONFIG = {
   MAX_FAILED_AUTH     : 10,               // lock auth after N consecutive failures
   AUTH_LOCK_WINDOW_MS : 60 * 60 * 1000,  // 1-hour brute-force window
   LOCK_TIMEOUT_MS     : 30000,           // 30 s LockService wait
+
 };
 
 // ─── SCRIPT PROPERTIES ─────────────────────────────────────────────────────
