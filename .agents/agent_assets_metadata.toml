@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "VXMW__ViOwV2mRKPu-Isa"
+uri = "file://BACKEND_ARCHITECTURE_AUDIT.md"
+type = "text"
+title = "RD Advance Boutique — Backend Architecture Audit Report"
