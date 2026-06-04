@@ -304,15 +304,49 @@
 }
 .co-copy-btn:hover { background: var(--gold); color: #fff; }
 
-/* ── COD BOX ─────────────────────────────────── */
-.co-cod-box {
-  display: flex; align-items: flex-start; gap: 1rem;
-  background: rgba(255,248,238,0.7); border: 1px solid rgba(201,164,92,0.22);
-  border-radius: 1rem; padding: 1.2rem;
+/* ── COD PANEL ───────────────────────────────── */
+.co-cod-header {
+  display: flex; align-items: flex-start; gap: 0.9rem;
+  background: rgba(230,255,240,0.7); border: 1.5px solid rgba(34,197,94,0.28);
+  border-radius: 1rem; padding: 1.1rem 1.3rem; margin-bottom: 1.1rem;
 }
-.co-cod-icon { font-size: 2rem; flex-shrink: 0; }
-.co-cod-box strong { display: block; font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
-.co-cod-box p { font-size: 0.85rem; color: rgba(40,28,24,0.6); line-height: 1.6; }
+.co-cod-header-icon { font-size: 2rem; flex-shrink: 0; line-height: 1; }
+.co-cod-header strong { display: block; font-size: 1rem; font-weight: 700; color: #166534; margin-bottom: 0.2rem; }
+.co-cod-header p { font-size: 0.83rem; color: #15803d; line-height: 1.5; margin: 0; }
+
+.co-cod-steps {
+  list-style: none; padding: 0; margin: 0 0 1rem;
+  display: flex; flex-direction: column; gap: 0.7rem;
+}
+.co-cod-steps li {
+  display: flex; align-items: flex-start; gap: 0.9rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(201,164,92,0.18);
+  border-radius: 0.85rem;
+}
+.co-cod-step-num {
+  flex-shrink: 0;
+  width: 1.8rem; height: 1.8rem;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.8rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 0.05rem;
+}
+.co-cod-steps li div { display: flex; flex-direction: column; gap: 0.1rem; }
+.co-cod-steps li div strong { font-size: 0.88rem; font-weight: 700; color: var(--black); }
+.co-cod-steps li div span { font-size: 0.78rem; color: rgba(40,28,24,0.55); }
+
+.co-cod-note {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  font-size: 0.78rem; color: rgba(40,28,24,0.55);
+  background: rgba(255,248,238,0.6);
+  border: 1px dashed rgba(201,164,92,0.35);
+  border-radius: 0.7rem; padding: 0.65rem 0.9rem;
+  line-height: 1.5;
+}
 
 /* ── FORM ACTIONS ────────────────────────────── */
 .co-actions { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }

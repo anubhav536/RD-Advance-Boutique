@@ -470,9 +470,12 @@
         <h3>${title}</h3>
         <p class="product-description">${product.shortDescription || product.description || "Premium boutique product."}</p>
         <p class="product-price">${formatPrice(product.price)}</p>
-        <span class="${stock > 0 ? "stock-status" : "stock-status status-inactive"}">
-          ${stock > 0 ? stock + " available" : "Confirm availability"}
-        </span>
+        <div class="product-card-meta">
+          <span class="${stock > 0 ? "stock-status" : "stock-status status-inactive"}">
+            ${stock > 0 ? stock + " available" : "Confirm availability"}
+          </span>
+          <span class="cod-tag">💵 COD</span>
+        </div>
       `;
       content.append(action);
       card.append(media, content);
