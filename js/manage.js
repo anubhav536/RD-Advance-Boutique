@@ -205,7 +205,8 @@
 
     if (connected) {
       try {
-        const res  = await fetch(url + "?action=getOrders", { cache: "no-store" });
+        const pin  = encodeURIComponent(S.config.managerPin || "");
+        const res  = await fetch(url + "?action=getOrders&pin=" + pin, { cache: "no-store" });
         const data = await res.json();
         if (data.ok) {
           S.orders = data.orders || [];
