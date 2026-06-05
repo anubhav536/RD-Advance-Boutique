@@ -88,31 +88,51 @@
   /* ─────────────────────────────────────────────
      LOGIN / LOGOUT
   ───────────────────────────────────────────── */
-  async function handleLogin(e) {
-    e.preventDefault();
-    const pin = el("mgPin").value.trim();
-    if (!pin) return;
-    try {
-      const res = await fetch("/api/admin/verify-pin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        sessionStorage.setItem("rdAdminPin", pin);
-        el("mgLoginScreen").hidden = true;
-        el("mgApp").hidden = false;
-        showSection("dashboard");
-      } else {
-        el("mgLoginErr").hidden = false;
-        el("mgPin").select();
-      }
-    } catch (_) {
+ async function handleLogin(e) {
+  e.preventDefault();
+
+  const pin = el("mgPin").value.trim();
+  if (!pin) return;
+
+  try {
+    const url = gasUrl();
+
+    if (!url) {
+      throw new Error("Apps Script URL missing");
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify({
+        action: "verifyPin",
+        pin: pin
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      sessionStorage.setItem("rdAdminPin", pin);
+
+      el("mgLoginScreen").hidden = true;
+      el("mgApp").hidden = false;
+      el("mgLoginErr").hidden = true;
+
+      showSection("dashboard");
+    } else {
       el("mgLoginErr").hidden = false;
       el("mgPin").select();
     }
+
+  } catch (err) {
+    console.error(err);
+    el("mgLoginErr").hidden = false;
+    el("mgPin").select();
   }
+}
 
   function handleLogout() {
     sessionStorage.removeItem("rdAdminPin");
