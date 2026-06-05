@@ -56,27 +56,6 @@
     "slug": "patiala-suits"
   },
   {
-    "id": "churidar-sets",
-    "name": "Churidar Sets",
-    "description": "Classic churidar kameez sets in cotton, silk, and georgette.",
-    "status": "active",
-    "slug": "churidar-sets"
-  },
-  {
-    "id": "sharara-sets",
-    "name": "Sharara Sets",
-    "description": "Traditional and designer sharara sets for parties and occasions.",
-    "status": "active",
-    "slug": "sharara-sets"
-  },
-  {
-    "id": "dhoti-sets",
-    "name": "Dhoti Sets",
-    "description": "Trendy dhoti pants paired with kurti or crop top sets.",
-    "status": "active",
-    "slug": "dhoti-sets"
-  },
-  {
     "id": "lehengas",
     "name": "Lehengas",
     "description": "Bridal lehengas, party lehengas, designer chaniya choli.",
@@ -98,53 +77,11 @@
     "slug": "coord-sets"
   },
   {
-    "id": "indo-western",
-    "name": "Indo-Western",
-    "description": "Fusion wear — sharara, dhoti pants, crop tops, co-ord sets.",
-    "status": "active",
-    "slug": "indo-western"
-  },
-  {
-    "id": "tops-tunics",
-    "name": "Tops & Tunics",
-    "description": "Casual and ethnic tops, printed tunics, and short kurtis.",
-    "status": "active",
-    "slug": "tops-tunics"
-  },
-  {
-    "id": "maxi-dresses",
-    "name": "Maxi Dresses",
-    "description": "Flowy maxi dresses and long casual ethnic dresses.",
-    "status": "active",
-    "slug": "maxi-dresses"
-  },
-  {
-    "id": "jumpsuits",
-    "name": "Jumpsuits & Playsuits",
-    "description": "Ethnic and fusion jumpsuits, playsuits for modern women.",
-    "status": "active",
-    "slug": "jumpsuits"
-  },
-  {
-    "id": "ethnic-jackets",
-    "name": "Ethnic Jackets & Shrugs",
-    "description": "Embroidered jackets, printed shrugs, and long koti styles.",
-    "status": "active",
-    "slug": "ethnic-jackets"
-  },
-  {
     "id": "bridal",
     "name": "Bridal",
     "description": "Bridal and occasion-wear boutique designs.",
     "status": "active",
     "slug": "bridal"
-  },
-  {
-    "id": "festive-wear",
-    "name": "Festive Wear",
-    "description": "Special outfits for Diwali, Navratri, Eid, and all celebrations.",
-    "status": "active",
-    "slug": "festive-wear"
   },
   {
     "id": "chikankari",
@@ -168,67 +105,11 @@
     "slug": "embroidery-work"
   },
   {
-    "id": "printed-collection",
-    "name": "Printed Collection",
-    "description": "Block prints, digital prints, floral and geometric pattern wear.",
-    "status": "active",
-    "slug": "printed-collection"
-  },
-  {
     "id": "bandhani",
     "name": "Bandhani & Tie-Dye",
     "description": "Traditional bandhani, laheria and tie-dye pattern clothing.",
     "status": "active",
     "slug": "bandhani"
-  },
-  {
-    "id": "dupattas",
-    "name": "Dupattas",
-    "description": "Designer dupattas, embroidered and printed styles.",
-    "status": "active",
-    "slug": "dupattas"
-  },
-  {
-    "id": "nightwear",
-    "name": "Nightwear & Loungewear",
-    "description": "Comfortable cotton nightsuits, pyjama sets, and loungewear.",
-    "status": "active",
-    "slug": "nightwear"
-  },
-  {
-    "id": "maternity-wear",
-    "name": "Maternity Wear",
-    "description": "Comfortable and stylish outfits designed for expecting mothers.",
-    "status": "active",
-    "slug": "maternity-wear"
-  },
-  {
-    "id": "kids-wear",
-    "name": "Kids Wear",
-    "description": "Boutique outfits for children and celebrations.",
-    "status": "active",
-    "slug": "kids-wear"
-  },
-  {
-    "id": "kaftans",
-    "name": "Kaftans",
-    "description": "Printed and embroidered kaftans for casual and beach wear.",
-    "status": "active",
-    "slug": "kaftans"
-  },
-  {
-    "id": "skirts",
-    "name": "Skirts",
-    "description": "Ethnic and casual skirts — tiered, flared, and pleated styles.",
-    "status": "active",
-    "slug": "skirts"
-  },
-  {
-    "id": "accessories",
-    "name": "Accessories",
-    "description": "Curated boutique accessories and styling additions.",
-    "status": "active",
-    "slug": "accessories"
   },
   {
     "id": "kurti-and-suit-sets",
