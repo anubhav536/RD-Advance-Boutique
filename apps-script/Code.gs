@@ -904,11 +904,11 @@ function handleDeleteCategory(body) {
 
 function setupProperties() {
   PropertiesService.getScriptProperties().setProperties({
-    MANAGER_PIN    : "CHANGE_THIS_TO_YOUR_PIN",
-    SHEET_ID       : "YOUR_GOOGLE_SHEET_ID",
-    OWNER_EMAIL    : "your@email.com",
+    MANAGER_PIN    : "Rajdeep@7123",
+    SHEET_ID       : "125LTGCl9VJ-Gp4nGxv1Kh8sUek7rzNFeyO64RqB9QJA",
+    OWNER_EMAIL    : "anubhav7123@gmail.com",
     DRIVE_FOLDER_ID: "",
-    SITE_URL       : "",
+    SITE_URL       : "https://anubhav536.github.io/RD-Advance-Boutique/",
   });
   Logger.log("Script Properties set successfully.");
 }
