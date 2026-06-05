@@ -701,7 +701,7 @@ Please confirm this order. 🙏`;
   ───────────────────────────────────────────── */
   async function loadConfig() {
     try {
-      const res = await fetch("data/config.json", { cache: "no-store" });
+      const res = await fetch("/api/config/public", { cache: "no-store" });
       appConfig = await res.json();
       if (appConfig.upiId) {
         const upiEl = el("cfgUpiId");

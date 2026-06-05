@@ -45,7 +45,7 @@
   ───────────────────────────────────────────── */
   async function loadAll() {
     const [cfg, set, pro, cat, gal, notif] = await Promise.all([
-      fetchJ("data/config.json"), fetchJ("data/settings.json"),
+      fetchJ("/api/config/public"), fetchJ("data/settings.json"),
       fetchJ("data/products.json"), fetchJ("data/categories.json"),
       fetchJ("data/gallery.json"), fetchJ("data/notifications.json"),
     ]);
@@ -91,11 +91,22 @@
     e.preventDefault();
     const pin = el("mgPin").value.trim();
     if (!pin) return;
-    if (pin === String(S.config.managerPin || "1234")) {
-      el("mgLoginScreen").hidden = true;
-      el("mgApp").hidden = false;
-      showSection("dashboard");
-    } else {
+    try {
+      const res = await fetch("/api/admin/verify-pin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        el("mgLoginScreen").hidden = true;
+        el("mgApp").hidden = false;
+        showSection("dashboard");
+      } else {
+        el("mgLoginErr").hidden = false;
+        el("mgPin").select();
+      }
+    } catch (_) {
       el("mgLoginErr").hidden = false;
       el("mgPin").select();
     }

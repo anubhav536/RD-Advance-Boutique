@@ -4,7 +4,9 @@ const path    = require('path');
 const fs      = require('fs');
 
 const app  = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
 
 if (!fs.existsSync('assets')) fs.mkdirSync('assets');
 
@@ -29,7 +31,41 @@ const upload = multer({
   },
 });
 
-app.use(express.static('.', { dotfiles: 'ignore' }));
+function readConfig() {
+  try {
+    return JSON.parse(fs.readFileSync('data/config.json', 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+app.get('/api/config/public', (req, res) => {
+  const cfg = readConfig();
+  const { managerPin, ...publicCfg } = cfg;
+  res.json(publicCfg);
+});
+
+app.post('/api/admin/verify-pin', (req, res) => {
+  const { pin } = req.body;
+  const cfg = readConfig();
+  const correct = String(cfg.managerPin || '1234');
+  if (pin === correct) {
+    res.json({ ok: true });
+  } else {
+    res.status(401).json({ ok: false, error: 'Incorrect PIN' });
+  }
+});
+
+app.use(express.static('.', {
+  dotfiles: 'ignore',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('config.json') && filePath.includes('data/')) {
+      res.status(403).end();
+    }
+  }
+}));
+
+app.use('/data/config.json', (req, res) => res.status(403).json({ error: 'Forbidden' }));
 
 app.post('/upload', upload.array('files', 50), (req, res) => {
   if (!req.files || !req.files.length)
