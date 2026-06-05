@@ -419,7 +419,7 @@
       // Fetch products
       let allProducts = [];
       try {
-        const res = await fetch("data/products.json", { cache: "no-store" });
+        const res = await fetch("/api/products", { cache: "no-store" });
         allProducts = await res.json();
       } catch (e) {
         console.warn("Could not load products.json", e);

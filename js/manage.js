@@ -8,7 +8,8 @@
     config: {}, settings: {}, products: [], categories: [],
     gallery: [], notifications: [], orders: [],
     activeFilter: "all", editType: null, editItem: null, editIdx: -1,
-    pendingFiles: new Map(), // path → File object for ZIP download
+    pendingFiles: new Map(), // kept for gallery/notifications zip flow
+    productSearch: "", productFilter: "all",
   };
 
   /* ─────────────────────────────────────────────
@@ -46,15 +47,15 @@
   async function loadAll() {
     const [cfg, set, pro, cat, gal, notif] = await Promise.all([
       fetchJ("/api/config/public"), fetchJ("data/settings.json"),
-      fetchJ("data/products.json"), fetchJ("data/categories.json"),
-      fetchJ("data/gallery.json"), fetchJ("data/notifications.json"),
+      fetchJ("/api/products"),      fetchJ("/api/categories"),
+      fetchJ("data/gallery.json"),  fetchJ("data/notifications.json"),
     ]);
     S.config        = cfg   || {};
     S.settings      = set   || {};
-    S.products      = pro   || [];
-    S.categories    = cat   || [];
-    S.gallery       = gal   || [];
-    S.notifications = notif || [];
+    S.products      = Array.isArray(pro)   ? pro   : [];
+    S.categories    = Array.isArray(cat)   ? cat   : [];
+    S.gallery       = Array.isArray(gal)   ? gal   : [];
+    S.notifications = Array.isArray(notif) ? notif : [];
     S.orders        = loadLocalOrders();
   }
 
@@ -99,6 +100,7 @@
       });
       const data = await res.json();
       if (data.ok) {
+        sessionStorage.setItem("rdAdminPin", pin);
         el("mgLoginScreen").hidden = true;
         el("mgApp").hidden = false;
         showSection("dashboard");
@@ -113,6 +115,7 @@
   }
 
   function handleLogout() {
+    sessionStorage.removeItem("rdAdminPin");
     el("mgApp").hidden = true;
     el("mgLoginScreen").hidden = false;
     el("mgPin").value = "";
@@ -190,7 +193,64 @@
   ───────────────────────────────────────────── */
   function gasUrl() {
     const u = S.config.appsScriptUrl || "";
-    return (!u || u.includes("PASTE_")) ? null : u;
+    return (!u || u.includes("PASTE_") || u.includes("YOUR_")) ? null : u;
+  }
+
+  function getAdminPin() {
+    return sessionStorage.getItem("rdAdminPin") || "";
+  }
+
+  /* Call the Apps Script web app — POST for writes, GET for reads */
+  async function gasApi(action, payload) {
+    const url = gasUrl();
+    if (!url) throw new Error("Apps Script URL not configured. Go to Settings and add the URL.");
+    const pin = getAdminPin();
+    if (payload !== undefined) {
+      const res = await fetch(url, {
+        method : "POST",
+        headers: { "Content-Type": "text/plain" },
+        body   : JSON.stringify({ action, pin, ...payload }),
+      });
+      return await res.json();
+    } else {
+      const params = new URLSearchParams({ action, pin });
+      const res = await fetch(url + "?" + params, { cache: "no-store" });
+      return await res.json();
+    }
+  }
+
+  /* Upload image: Cloudinary unsigned (preferred) or server /upload */
+  async function uploadImage(file) {
+    const cloudName   = S.config.cloudinaryCloudName   || "";
+    const uploadPreset = S.config.cloudinaryUploadPreset || "";
+
+    if (cloudName && uploadPreset) {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("upload_preset", uploadPreset);
+      const r = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST", body: fd,
+      });
+      const d = await r.json();
+      if (d.secure_url) return d.secure_url;
+      throw new Error(d.error?.message || "Cloudinary upload failed");
+    }
+
+    /* Fallback: local server */
+    const fd = new FormData();
+    fd.append("files", file);
+    const r = await fetch("/upload", { method: "POST", body: fd });
+    const d = await r.json();
+    if (d.success && d.paths?.length) return d.paths[0];
+    throw new Error(d.error || "Server upload failed");
+  }
+
+  /* Bust server-side and client-side caches after catalog changes */
+  async function bustCatalogCaches() {
+    const pin = getAdminPin();
+    try { await fetch("/api/admin/cache-bust", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin }) }); }
+    catch (_) {}
+    if (window.RDApi) { window.RDApi.bustProducts(); window.RDApi.bustCategories(); }
   }
 
   function updateConnectionStatus(connected) {
@@ -216,7 +276,7 @@
 
     if (connected) {
       try {
-        const pin  = encodeURIComponent(S.config.managerPin || "");
+        const pin  = encodeURIComponent(getAdminPin());
         const res  = await fetch(url + "?action=getOrders&pin=" + pin, { cache: "no-store" });
         const data = await res.json();
         if (data.ok) {
@@ -361,7 +421,7 @@
             action  : "updateStatus",
             orderId,
             status  : newStatus,
-            pin     : String(S.config.managerPin || "1234"),
+            pin     : getAdminPin(),
           }),
         });
         const data = await res.json();
@@ -382,26 +442,13 @@
      IMAGE PICKER HELPERS
   ───────────────────────────────────────────── */
 
-  /* ── Pure client-side image helpers — no server needed ──
-     File select → preview via objectURL → path "assets/filename.jpg" stored
-     Generate Code outputs JSON with these paths → paste to GitHub         */
-
-  function fileToPath(file) {
-    // Sanitise the filename the same way the old server did
-    const ext  = file.name.lastIndexOf(".") >= 0 ? file.name.slice(file.name.lastIndexOf(".")) : "";
-    const base = file.name.slice(0, file.name.length - ext.length)
-      .replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "") || ("img_" + Date.now());
-    return "assets/" + base + ext;
-  }
-
-  /* Single image picker */
   function makeImgPicker(name, val, label, hint) {
     return `<div class="adm-img-picker">
       <label>${label}${hint ? ` <small>${hint}</small>` : ""}</label>
       <div class="adm-img-picker-row">
-        <input type="text" name="${name}" value="${esc(val || "")}" placeholder="assets/photo.jpg ya https://…">
+        <input type="text" name="${name}" value="${esc(val || "")}" placeholder="URL type karo ya photo choose karo →">
         <label class="adm-upload-btn adm-single-upload-btn">
-          📁 Photo Choose Karo
+          📁 Photo
           <input type="file" accept="image/*" class="adm-file-input-single" data-target="${name}" hidden>
         </label>
       </div>
@@ -409,7 +456,6 @@
     </div>`;
   }
 
-  /* Multi image picker */
   function makeMultiImgPicker(images) {
     const rows = (images && images.length ? images : []).map((src, i) => makeImgRow(src, i)).join("");
     return `<div class="adm-multi-img-picker" id="multiImgPicker">
@@ -418,7 +464,7 @@
         <div class="adm-bulk-content">
           <span class="adm-bulk-icon">🖼️</span>
           <strong>Photos Choose Karein</strong>
-          <small>Click karo — ek saath kai photos select kar sakte ho</small>
+          <small>Click karo — ek saath kai photos upload hoti hain</small>
         </div>
       </label>
       <div class="adm-multi-img-rows" id="multiImgRows">${rows}</div>
@@ -430,7 +476,7 @@
     const idx = typeof i === "number" ? i : Date.now();
     return `<div class="adm-multi-img-row">
       <img class="adm-multi-img-thumb" src="${esc(src || "")}" ${src ? "" : "hidden"} onerror="this.hidden=true">
-      <input type="text" name="images[]" value="${esc(src || "")}" placeholder="assets/img${idx + 1}.jpg">
+      <input type="text" name="images[]" value="${esc(src || "")}" placeholder="img${idx + 1} URL">
       <label class="adm-upload-btn adm-upload-btn--sm adm-row-upload-label">
         📁
         <input type="file" accept="image/*" class="adm-file-input-row" hidden>
@@ -439,23 +485,56 @@
     </div>`;
   }
 
+  /* Upload single file and update the target input + preview */
+  async function handleFileUpload(file, targetName, container) {
+    const urlInp = container.querySelector(`[name="${targetName}"]`);
+    const picker = urlInp?.closest(".adm-img-picker");
+    const prev   = picker?.querySelector(".adm-img-preview");
+
+    // Show optimistic preview via objectURL immediately
+    const objURL = URL.createObjectURL(file);
+    if (urlInp) urlInp.value = "⏳ Uploading…";
+    if (prev)   { prev.src = objURL; prev.hidden = false; }
+
+    try {
+      const url = await uploadImage(file);
+      if (urlInp) urlInp.value = url;
+      if (prev)   prev.src = url;
+    } catch (err) {
+      // Fallback: keep objectURL (works for current session preview)
+      if (urlInp) urlInp.value = objURL;
+      showToast("Photo local mein saved — cloud upload failed: " + err.message, "error");
+    }
+  }
+
+  /* Upload a file into a multi-image row */
+  async function handleRowFileUpload(file, row) {
+    const urlInp = row.querySelector("input[type=text]");
+    const thumb  = row.querySelector(".adm-multi-img-thumb");
+    const objURL = URL.createObjectURL(file);
+
+    if (urlInp) urlInp.value = "⏳ Uploading…";
+    if (thumb)  { thumb.src = objURL; thumb.hidden = false; }
+
+    try {
+      const url = await uploadImage(file);
+      if (urlInp) urlInp.value = url;
+      if (thumb)  thumb.src = url;
+    } catch (err) {
+      if (urlInp) urlInp.value = objURL;
+      showToast("Photo local mein saved — cloud upload failed: " + err.message, "error");
+    }
+  }
+
   function attachImgPickerListeners(container) {
-    /* Single pickers — objectURL preview, assets/ path + File stored */
+    /* Single pickers — upload on select */
     container.querySelectorAll(".adm-single-upload-btn").forEach(label => {
       const fileInp = label.querySelector(".adm-file-input-single");
       if (!fileInp) return;
       fileInp.addEventListener("change", () => {
         const file = fileInp.files[0];
         if (!file) return;
-        const path   = fileToPath(file);
-        const objURL = URL.createObjectURL(file);
-        S.pendingFiles.set(path, file);
-        updateZipBtn();
-        const urlInp = container.querySelector(`[name="${fileInp.dataset.target}"]`);
-        if (urlInp) { urlInp.value = path; }
-        const picker = label.closest(".adm-img-picker");
-        const prev   = picker?.querySelector(".adm-img-preview");
-        if (prev) { prev.src = objURL; prev.hidden = false; }
+        handleFileUpload(file, fileInp.dataset.target, container);
         fileInp.value = "";
       });
     });
@@ -467,7 +546,7 @@
       if (!urlInp || !prev) return;
       urlInp.addEventListener("input", () => {
         const v = urlInp.value.trim();
-        if (v) { prev.src = v; prev.hidden = false; } else prev.hidden = true;
+        if (v && !v.startsWith("⏳")) { prev.src = v; prev.hidden = false; } else prev.hidden = true;
       });
     });
 
@@ -491,54 +570,47 @@
         rowFile.addEventListener("change", () => {
           const file = rowFile.files[0];
           if (!file) return;
-          const path   = fileToPath(file);
-          const objURL = URL.createObjectURL(file);
-          S.pendingFiles.set(path, file);
-          updateZipBtn();
-          if (urlInp) urlInp.value = path;
-          if (thumb)  { thumb.src = objURL; thumb.hidden = false; }
+          handleRowFileUpload(file, row);
           rowFile.value = "";
         });
       }
       if (urlInp && thumb) urlInp.addEventListener("input", () => {
         const v = urlInp.value.trim();
-        if (v) { thumb.src = v; thumb.hidden = false; } else thumb.hidden = true;
+        if (v && !v.startsWith("⏳")) { thumb.src = v; thumb.hidden = false; } else thumb.hidden = true;
       });
       if (delBtn) delBtn.addEventListener("click", () => row.remove());
     }
 
     rowsWrap?.querySelectorAll(".adm-multi-img-row").forEach(bindRow);
 
-    /* Bulk select — multiple files at once */
+    /* Bulk select — multiple files */
     if (bulkInp) {
-      bulkInp.addEventListener("change", () => {
-        Array.from(bulkInp.files).forEach(file => {
-          const path   = fileToPath(file);
-          const objURL = URL.createObjectURL(file);
-          S.pendingFiles.set(path, file);
+      bulkInp.addEventListener("change", async () => {
+        const files = Array.from(bulkInp.files);
+        if (!files.length) return;
+        showToast("⏳ Uploading " + files.length + " photo(s)…");
+        for (const file of files) {
           const emptyInp = Array.from(rowsWrap.querySelectorAll("input[type=text]"))
             .find(inp => !inp.value.trim());
           if (emptyInp) {
-            emptyInp.value = path;
-            const row   = emptyInp.closest(".adm-multi-img-row");
-            const thumb = row?.querySelector(".adm-multi-img-thumb");
-            if (thumb) { thumb.src = objURL; thumb.hidden = false; }
+            const row = emptyInp.closest(".adm-multi-img-row");
+            await handleRowFileUpload(file, row);
           } else {
             const div = document.createElement("div");
             div.className = "adm-multi-img-row";
             div.innerHTML = `
-              <img class="adm-multi-img-thumb" src="${esc(objURL)}">
-              <input type="text" name="images[]" value="${esc(path)}" placeholder="assets/…">
+              <img class="adm-multi-img-thumb" hidden>
+              <input type="text" name="images[]" value="" placeholder="…">
               <label class="adm-upload-btn adm-upload-btn--sm adm-row-upload-label">
                 📁<input type="file" accept="image/*" class="adm-file-input-row" hidden>
               </label>
               <button type="button" class="adm-multi-img-del" title="Hatao">✕</button>`;
             rowsWrap.appendChild(div);
             bindRow(div);
+            await handleRowFileUpload(file, div);
           }
-        });
-        updateZipBtn();
-        showToast("✅ " + bulkInp.files.length + " photo(s) ready — Save karo phir Generate Code");
+        }
+        showToast("✅ " + files.length + " photo(s) uploaded!");
         bulkInp.value = "";
       });
     }
@@ -560,9 +632,7 @@
     });
   }
 
-  /* ─────────────────────────────────────────────
-     ZIP DOWNLOAD
-  ───────────────────────────────────────────── */
+  /* ZIP download — kept for gallery/notifications only */
   function updateZipBtn() {
     const btn = el("admZipDownload");
     if (!btn) return;
@@ -601,42 +671,142 @@
   /* ─────────────────────────────────────────────
      PRODUCTS
   ───────────────────────────────────────────── */
+
+  function sheetsConnectedBanner() {
+    const connected = !!gasUrl();
+    return `<div class="adm-api-status ${connected ? "adm-api-status--live" : "adm-api-status--warn"}">
+      ${connected
+        ? "🟢 <strong>Google Sheets mein save hota hai</strong> — Changes direct Sheets mein jaate hain. Refresh karne par automatically load honge."
+        : "⚠️ <strong>Apps Script connected nahi hai.</strong> Changes abhi sirf is session mein save honge. Settings mein jaake Apps Script URL add karein."
+      }
+    </div>`;
+  }
+
   function renderProducts() {
     const list = el("admProductsList");
+    if (!list) return;
+
+    const q   = S.productSearch.toLowerCase();
+    const flt = S.productFilter;
+
+    let visible = S.products.filter(p => {
+      if (flt === "active"    && p.status === "inactive")  return false;
+      if (flt === "inactive"  && p.status !== "inactive")  return false;
+      if (flt === "boutique"  && (p.productType || p.type || "readymade").toLowerCase() !== "boutique") return false;
+      if (flt === "readymade" && (p.productType || p.type || "readymade").toLowerCase() === "boutique") return false;
+      if (q) {
+        const title = (p.title || p.name || "").toLowerCase();
+        const tags  = (p.tags || []).join(" ").toLowerCase();
+        const cats  = (Array.isArray(p.categories) ? p.categories : [p.category || ""]).join(" ").toLowerCase();
+        if (!title.includes(q) && !tags.includes(q) && !cats.includes(q)) return false;
+      }
+      return true;
+    });
+
     if (!S.products.length) {
-      list.innerHTML = '<div class="adm-empty">No products yet. Click "+ Add Product" to create one.</div>';
+      list.innerHTML = sheetsConnectedBanner() + '<div class="adm-empty">No products yet. Click "+ Add Product" to create the first one.</div>';
       return;
     }
-    list.innerHTML = `<table class="adm-table">
-      <thead><tr><th>Image</th><th>Title</th><th>Type</th><th>Categories</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${S.products.map((p, i) => {
-        const pt = (p.productType || p.type || "readymade").toLowerCase();
-        const isBoutique = pt === "boutique";
-        const cats = Array.isArray(p.categories) && p.categories.length ? p.categories : (p.category ? [p.category] : []);
-        const catHtml = cats.length ? cats.map(c => `<span class="adm-tag">${esc(c)}</span>`).join(" ") : "<span style='color:#aaa'>—</span>";
-        return `
-        <tr>
-          <td><img src="${esc(p.image || (p.images && p.images[0]) || "")}" class="adm-table-img" onerror="this.style.display='none'"></td>
-          <td><strong>${esc(p.title || p.name || "—")}</strong></td>
-          <td><span class="adm-badge ${isBoutique ? "adm-badge--boutique" : "adm-badge--readymade"}">${isBoutique ? "✂️ Boutique" : "🛍️ Ready-Made"}</span></td>
-          <td class="adm-cat-tags-cell">${catHtml}</td>
-          <td>${p.price ? "₹" + p.price : "—"}</td>
-          <td><span class="adm-badge ${p.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${p.status || "active"}</span></td>
-          <td class="adm-actions">
-            <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
-            <button class="adm-btn-sm adm-btn-del" data-idx="${i}">🗑️</button>
-          </td>
-        </tr>`;
-      }).join("")}
-      </tbody></table>`;
+
+    const tableRows = visible.map((p, i) => {
+      const origIdx = S.products.indexOf(p);
+      const pt = (p.productType || p.type || "readymade").toLowerCase();
+      const isBoutique = pt === "boutique";
+      const cats = Array.isArray(p.categories) && p.categories.length ? p.categories : (p.category ? [p.category] : []);
+      const catHtml = cats.length ? cats.map(c => `<span class="adm-tag">${esc(c)}</span>`).join(" ") : "<span style='color:#aaa'>—</span>";
+      const stock = p.stock > 0 ? `<span style="color:#27ae60">${p.stock}</span>` : (p.stock === 0 && p.stock !== "" && p.stock !== undefined ? `<span style="color:#e74c3c">0</span>` : "—");
+      return `
+      <tr>
+        <td><img src="${esc(p.image || (p.images && p.images[0]) || "")}" class="adm-table-img" onerror="this.style.display='none'"></td>
+        <td><strong>${esc(p.title || p.name || "—")}</strong>${p.featured ? ' <span title="Featured" style="color:#c9a45c">★</span>' : ''}</td>
+        <td><span class="adm-badge ${isBoutique ? "adm-badge--boutique" : "adm-badge--readymade"}">${isBoutique ? "✂️ Boutique" : "🛍️ Ready-Made"}</span></td>
+        <td class="adm-cat-tags-cell">${catHtml}</td>
+        <td>${p.price ? "₹" + p.price : "—"}</td>
+        <td>${stock}</td>
+        <td><span class="adm-badge ${p.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${p.status || "active"}</span></td>
+        <td class="adm-actions">
+          <button class="adm-btn-sm adm-btn-edit"  data-idx="${origIdx}">✏️</button>
+          <button class="adm-btn-sm adm-btn-dup"   data-idx="${origIdx}" title="Duplicate">⧉</button>
+          <button class="adm-btn-sm adm-btn-del"   data-idx="${origIdx}">🗑️</button>
+        </td>
+      </tr>`;
+    }).join("");
+
+    list.innerHTML = sheetsConnectedBanner() + `
+    <div class="adm-list-toolbar">
+      <input type="search" id="productSearchInp" class="adm-search-inp" placeholder="🔍 Search by title, tag, category…" value="${esc(S.productSearch)}">
+      <select id="productFilterSel" class="adm-filter-sel">
+        <option value="all"       ${S.productFilter==="all"       ? "selected":""}>All (${S.products.length})</option>
+        <option value="active"    ${S.productFilter==="active"    ? "selected":""}>Active</option>
+        <option value="inactive"  ${S.productFilter==="inactive"  ? "selected":""}>Inactive</option>
+        <option value="readymade" ${S.productFilter==="readymade" ? "selected":""}>Ready-Made</option>
+        <option value="boutique"  ${S.productFilter==="boutique"  ? "selected":""}>Boutique</option>
+      </select>
+      <span class="adm-result-count">${visible.length} product${visible.length !== 1 ? "s" : ""}</span>
+    </div>
+    ${visible.length ? `<table class="adm-table">
+      <thead><tr><th>Image</th><th>Title</th><th>Type</th><th>Categories</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${tableRows}</tbody></table>` : '<div class="adm-empty">No products match your search / filter.</div>'}`;
+
+    // Bind toolbar
+    list.querySelector("#productSearchInp")?.addEventListener("input", e => {
+      S.productSearch = e.target.value;
+      renderProducts();
+    });
+    list.querySelector("#productFilterSel")?.addEventListener("change", e => {
+      S.productFilter = e.target.value;
+      renderProducts();
+    });
+
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openProductForm(+b.dataset.idx)));
-    list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => {
-      if (confirm("Delete this product?")) { S.products.splice(+b.dataset.idx, 1); renderProducts(); showToast("Product deleted. Generate code to apply."); }
-    }));
+    list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => deleteProduct(+b.dataset.idx)));
+    list.querySelectorAll(".adm-btn-dup").forEach(b => b.addEventListener("click", () => duplicateProduct(+b.dataset.idx)));
+  }
+
+  async function deleteProduct(idx) {
+    const p = S.products[idx];
+    if (!p) return;
+    if (!confirm(`"${p.title || p.name}" delete karein?`)) return;
+
+    const url = gasUrl();
+    if (url) {
+      const btn = document.querySelector(`.adm-btn-del[data-idx="${idx}"]`);
+      if (btn) btn.textContent = "⏳";
+      try {
+        const data = await gasApi("deleteProduct", { id: p.id });
+        if (!data.ok) { showToast("Delete failed: " + (data.error || "Unknown"), "error"); if (btn) btn.textContent = "🗑️"; return; }
+        showToast("✅ Product deleted from Google Sheets");
+      } catch (err) {
+        showToast("Delete error: " + err.message, "error");
+        if (btn) btn.textContent = "🗑️";
+        return;
+      }
+    }
+
+    S.products.splice(idx, 1);
+    await bustCatalogCaches();
+    renderProducts();
+    if (!url) showToast("Product deleted (local). Connect Apps Script to sync.");
+  }
+
+  function duplicateProduct(idx) {
+    const p = S.products[idx];
+    if (!p) return;
+    const copy = JSON.parse(JSON.stringify(p));
+    copy.id    = slug(copy.title || "product") + "-copy-" + Date.now().toString(36);
+    copy.title = (copy.title || copy.name || "") + " (Copy)";
+    copy.name  = copy.title;
+    copy.status = "inactive";
+    copy.createdAt = new Date().toISOString();
+    copy.updatedAt = new Date().toISOString();
+    S.products.splice(idx + 1, 0, copy);
+    renderProducts();
+    showToast("Product duplicated — edit and save to publish.");
+    // Open the duplicate for editing
+    openProductForm(idx + 1);
   }
 
   function openProductForm(idx) {
-    S.pendingFiles.clear(); updateZipBtn();
     S.editType = "product"; S.editItem = idx >= 0 ? S.products[idx] : null; S.editIdx = idx;
     const item = S.editItem || {};
     const currentType = item.productType || item.type || "readymade";
@@ -667,12 +837,13 @@
         <div class="adm-cat-cb-grid">${catCheckboxes}</div>
       </div>
       <div class="adm-fg"><label>Price (₹)</label><input type="number" name="price" value="${item.price || ""}" min="0" placeholder="349"></div>
-      <div class="adm-fg"><label>Status</label><select name="status"><option value="active" ${item.status !== "inactive" ? "selected" : ""}>Active</option><option value="inactive" ${item.status === "inactive" ? "selected" : ""}>Inactive</option></select></div>
+      <div class="adm-fg"><label>Stock Quantity</label><input type="number" name="stock" value="${item.stock !== undefined ? item.stock : ""}" min="0" placeholder="0 = out of stock"></div>
+      <div class="adm-fg"><label>Status</label><select name="status"><option value="active" ${item.status !== "inactive" ? "selected" : ""}>Active</option><option value="inactive" ${item.status === "inactive" ? "selected" : ""}>Inactive</option><option value="out-of-stock" ${item.status === "out-of-stock" ? "selected" : ""}>Out of Stock</option></select></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> Featured Product</label></div>
       <div class="adm-fg adm-fg--full"><label>Short Description</label><textarea name="shortDescription" rows="2" placeholder="Brief product description...">${esc(item.shortDescription || "")}</textarea></div>
       <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "", "Main Image", "Cover photo jo shop mein dikhegi")}</div>
       <div class="adm-fg adm-fg--full">
-        <label>Saari Images <small>(URL type karo ya file upload karo — ek ek karke)</small></label>
+        <label>Saari Images <small>(upload karo — turant Cloudinary ya server par save hoti hain)</small></label>
         ${makeMultiImgPicker(item.images || [])}
       </div>
       <div class="adm-fg adm-fg--full"><label>Available Colors <small>(one per line)</small></label><textarea name="colors" rows="3" placeholder="Black &amp; Maroon&#10;Royal Blue &amp; Green">${(item.colors || []).join("\n")}</textarea></div>
@@ -720,7 +891,8 @@
     const ex = S.editItem || {};
     const pType = f.querySelector('[name="productType"]:checked')?.value || ex.productType || "readymade";
     const selectedCategories = Array.from(f.querySelectorAll('[name="categories"]:checked')).map(cb => cb.value);
-    const multiImgs = Array.from(f.querySelectorAll('[name="images[]"]')).map(i => i.value.trim()).filter(Boolean);
+    const multiImgs = Array.from(f.querySelectorAll('[name="images[]"]'))
+      .map(i => i.value.trim()).filter(u => u && !u.startsWith("⏳"));
     return {
       ...ex,
       id: ex.id || slug(v("title")) || uid(),
@@ -730,6 +902,7 @@
       productType: pType,
       type: pType,
       price: parseFloat(v("price")) || 0,
+      stock: v("stock") !== "" ? parseInt(v("stock"), 10) : (ex.stock !== undefined ? ex.stock : 0),
       status: v("status"), featured: cb("featured"),
       shortDescription: v("shortDescription"),
       image: v("image") || multiImgs[0] || "",
@@ -749,8 +922,12 @@
   ───────────────────────────────────────────── */
   function renderCategories() {
     const list = el("admCategoriesList");
-    if (!S.categories.length) { list.innerHTML = '<div class="adm-empty">No categories yet. Click "+ Add Category" to create one.</div>'; return; }
-    list.innerHTML = `<table class="adm-table">
+    if (!list) return;
+    if (!S.categories.length) {
+      list.innerHTML = sheetsConnectedBanner() + '<div class="adm-empty">No categories yet. Click "+ Add Category" to create one.</div>';
+      return;
+    }
+    list.innerHTML = sheetsConnectedBanner() + `<table class="adm-table">
       <thead><tr><th>Name</th><th>Slug / ID</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>${S.categories.map((c, i) => `
         <tr>
@@ -760,14 +937,35 @@
           <td><span class="adm-badge ${c.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${c.status || "active"}</span></td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
-            <button class="adm-btn-sm adm-btn-del" data-idx="${i}">🗑️</button>
+            <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openCategoryForm(+b.dataset.idx)));
-    list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => {
-      if (confirm("Delete this category?")) { S.categories.splice(+b.dataset.idx, 1); renderCategories(); showToast("Category deleted."); }
-    }));
+    list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => deleteCategory(+b.dataset.idx)));
+  }
+
+  async function deleteCategory(idx) {
+    const c = S.categories[idx];
+    if (!c) return;
+    if (!confirm(`"${c.name}" delete karein?`)) return;
+
+    const url = gasUrl();
+    if (url) {
+      try {
+        const data = await gasApi("deleteCategory", { id: c.id });
+        if (!data.ok) { showToast("Delete failed: " + (data.error || "Unknown"), "error"); return; }
+        showToast("✅ Category deleted from Google Sheets");
+      } catch (err) {
+        showToast("Delete error: " + err.message, "error");
+        return;
+      }
+    }
+
+    S.categories.splice(idx, 1);
+    await bustCatalogCaches();
+    renderCategories();
+    if (!url) showToast("Category deleted (local). Connect Apps Script to sync.");
   }
 
   function openCategoryForm(idx) {
@@ -805,7 +1003,7 @@
           <td>${g.featured ? "⭐" : "—"}</td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
-            <button class="adm-btn-sm adm-btn-del" data-idx="${i}">🗑️</button>
+            <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
@@ -824,7 +1022,7 @@
       <div class="adm-fg"><label>Category</label><input type="text" name="category" value="${esc(item.category || "")}" placeholder="e.g. Blouse"></div>
       <div class="adm-fg"><label>Layout</label><select name="layout"><option value="default" ${!item.layout || item.layout === "default" ? "selected" : ""}>Default</option><option value="tall" ${item.layout === "tall" ? "selected" : ""}>Tall</option><option value="wide" ${item.layout === "wide" ? "selected" : ""}>Wide</option></select></div>
       <div class="adm-fg adm-fg--check"><label><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> Featured</label></div>
-      <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "", "Image", "URL type karo ya file upload karo")}</div>
+      <div class="adm-fg adm-fg--full">${makeImgPicker("image", item.image || "", "Image", "URL type karo ya photo upload karo")}</div>
       <div class="adm-fg adm-fg--full"><label>Alt Text <small>(for accessibility)</small></label><input type="text" name="alt" value="${esc(item.alt || "")}" placeholder="Short image description"></div>
       <div class="adm-fg adm-fg--full"><label>Short Description</label><textarea name="shortDescription" rows="2">${esc(item.shortDescription || "")}</textarea></div>
       <div class="adm-fg adm-fg--full"><label>Tags <small>(one per line)</small></label><textarea name="tags" rows="2">${(item.tags || []).join("\n")}</textarea></div>
@@ -857,7 +1055,7 @@
           <td><span class="adm-badge ${n.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${n.status || "active"}</span></td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
-            <button class="adm-btn-sm adm-btn-del" data-idx="${i}">🗑️</button>
+            <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
@@ -1002,7 +1200,6 @@
           <div class="adm-fg"><label>Robots</label><select name="robots"><option value="index, follow" ${seo.robots !== "noindex, nofollow" ? "selected" : ""}>index, follow (Recommended)</option><option value="noindex, nofollow" ${seo.robots === "noindex, nofollow" ? "selected" : ""}>noindex, nofollow (Hide from Google)</option></select></div>
         </div>
       </div>`;
-    // Color picker sync
     const syncColor = (pickerId, textName, swatchId) => {
       const picker = el(pickerId);
       const text   = el("admThemeForm").querySelector(`[name="${textName}"]`);
@@ -1026,18 +1223,22 @@
      SETTINGS / CONFIG SECTION
   ───────────────────────────────────────────── */
   function renderConfigSection() {
-    const url = S.config.appsScriptUrl || "";
-    const connected = url && !url.includes("PASTE_");
+    const url       = S.config.appsScriptUrl || "";
+    const connected = url && !url.includes("PASTE_") && !url.includes("YOUR_");
+    const cldName   = S.config.cloudinaryCloudName   || "";
+    const cldPreset = S.config.cloudinaryUploadPreset || "";
+    const cldReady  = !!(cldName && cldPreset);
+
     el("admConfigForm").innerHTML = `
       <div class="adm-settings-section">
         <h3>🔐 Admin PIN</h3>
         <div class="adm-form-grid">
           <div class="adm-fg">
             <label>Manager PIN <small>(used to log in to this panel)</small></label>
-            <input type="text" name="managerPin" value="${esc(S.config.managerPin || "1234")}" placeholder="1234">
+            <input type="text" name="managerPin" value="" placeholder="New PIN (leave blank to keep current)">
           </div>
         </div>
-        <p class="adm-hint-text">⚠️ After changing the PIN and generating code, paste the new <code>data/config.json</code> into your repository. Your next login will use the new PIN.</p>
+        <p class="adm-hint-text">⚠️ Enter a new PIN only if you want to change it. Click <strong>Save Changes</strong> — PIN is stored securely on the server.</p>
       </div>
 
       <div class="adm-settings-section">
@@ -1045,12 +1246,12 @@
         <div class="adm-info-box" style="margin-bottom:14px">
           <p><strong>Status:</strong> <span style="color:${connected ? "#27ae60" : "#c0392b"};font-weight:700">${connected ? "🟢 Connected" : "⚡ Not Connected"}</span></p>
           <br>
-          <p>When connected, every customer order is automatically saved to your Google Sheet and you receive an email notification. Payment screenshots are stored in Google Drive.</p>
+          <p>When connected, every customer order is automatically saved to your Google Sheet and you receive an email notification. Products and categories are managed in real time — no more JSON files or GitHub commits needed.</p>
         </div>
         <div class="adm-form-grid">
           <div class="adm-fg" style="grid-column:1/-1">
             <label>Apps Script Web App URL</label>
-            <input type="url" name="appsScriptUrl" value="${esc(url.includes("PASTE_") ? "" : url)}" placeholder="https://script.google.com/macros/s/…/exec">
+            <input type="url" name="appsScriptUrl" value="${esc(url.includes("PASTE_") || url.includes("YOUR_") ? "" : url)}" placeholder="https://script.google.com/macros/s/…/exec">
             <p class="adm-hint-text">Paste the URL after deploying <code>apps-script/Code.gs</code> as a Google Apps Script Web App.</p>
           </div>
         </div>
@@ -1059,30 +1260,50 @@
           <ol>
             <li>Open <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → New Project</li>
             <li>Copy the entire content of <code>apps-script/Code.gs</code> into the editor</li>
-            <li>Fill in <code>SHEET_ID</code> (from your Google Sheet URL) and <code>OWNER_EMAIL</code></li>
             <li>Click <strong>Deploy → New deployment → Web App</strong></li>
             <li>Set "Execute as" = <strong>Me</strong> and "Who has access" = <strong>Anyone</strong></li>
+            <li>Run <code>setupProperties()</code> to set SHEET_ID, OWNER_EMAIL, MANAGER_PIN</li>
             <li>Copy the Web App URL and paste it above</li>
-            <li>Click <strong>Save Changes</strong> then <strong>📋 Generate Code</strong> and update <code>data/config.json</code></li>
+            <li>Click <strong>Save Changes</strong> below</li>
           </ol>
         </div>
       </div>
 
       <div class="adm-settings-section">
-        <h3>📋 How This Panel Works</h3>
-        <div class="adm-info-box">
-          <p>This admin panel loads your website data and lets you manage everything from one place. Since your site is hosted as static files, changes don't save automatically.</p>
+        <h3>🖼️ Image Hosting (Cloudinary)</h3>
+        <div class="adm-info-box" style="margin-bottom:14px">
+          <p><strong>Status:</strong> <span style="color:${cldReady ? "#27ae60" : "#c0392b"};font-weight:700">${cldReady ? "🟢 Configured" : "⚡ Not Configured"}</span></p>
           <br>
-          <p><strong>To apply any change:</strong></p>
+          <p>When configured, product photos upload directly to Cloudinary (free CDN) — no GitHub commits needed for images.</p>
+          <p style="margin-top:.5rem"><strong>Fallback:</strong> If not configured, photos upload to the server's <code>assets/</code> folder.</p>
+        </div>
+        <div class="adm-form-grid">
+          <div class="adm-fg">
+            <label>Cloudinary Cloud Name</label>
+            <input type="text" name="cloudinaryCloudName" value="${esc(cldName)}" placeholder="e.g. my-boutique-xyz">
+            <p class="adm-hint-text">Found at <a href="https://cloudinary.com/console" target="_blank">cloudinary.com/console</a> → Dashboard → Cloud name</p>
+          </div>
+          <div class="adm-fg">
+            <label>Unsigned Upload Preset</label>
+            <input type="text" name="cloudinaryUploadPreset" value="${esc(cldPreset)}" placeholder="e.g. rd_boutique_unsigned">
+            <p class="adm-hint-text">Settings → Upload → Upload presets → Add unsigned preset</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="adm-settings-section">
+        <h3>📋 How Products Now Work</h3>
+        <div class="adm-info-box">
+          <p>Products and categories are now managed via <strong>live API</strong>:</p>
+          <br>
           <ol>
-            <li>Make your edits in any section</li>
-            <li>Click <strong>"Save Changes"</strong> (saves in memory for this session)</li>
-            <li>Click <strong>"📋 Generate Code"</strong></li>
-            <li>Copy the code shown in the popup</li>
-            <li>Open the matching <code>data/</code> file in your project</li>
-            <li>Replace its entire content with your copied code</li>
-            <li>Restart the server — changes go live immediately</li>
+            <li>Open Products or Categories section</li>
+            <li>Add / Edit / Delete — changes save directly to Google Sheets</li>
+            <li>The website loads products from the API automatically (5-min cache)</li>
+            <li>No JSON files, no GitHub commits, no redeployment needed</li>
           </ol>
+          <br>
+          <p><strong>Gallery, Notifications, Website Settings, Theme</strong> still use the Generate Code → paste to file flow.</p>
         </div>
       </div>`;
   }
@@ -1118,9 +1339,10 @@
   }
 
   /* ─────────────────────────────────────────────
-     EDIT MODAL – SAVE
+     EDIT MODAL – SAVE (API-powered for products/categories)
   ───────────────────────────────────────────── */
-  function handleModalSave() {
+  async function handleModalSave() {
+    const modalSaveBtn = el("admModalSave");
     const collectors = { product: collectProductForm, category: collectCategoryForm, gallery: collectGalleryForm, notification: collectNotifForm };
     const arrayMap   = { product: "products", category: "categories", gallery: "gallery", notification: "notifications" };
     const renderers  = { product: renderProducts, category: renderCategories, gallery: renderGallery, notification: renderNotifications };
@@ -1130,13 +1352,46 @@
     const item = collect();
     if (!item.title && !item.name) { showToast("Please enter a name / title.", "error"); return; }
 
+    /* Products and categories: save to Apps Script */
+    if (S.editType === "product" || S.editType === "category") {
+      const url = gasUrl();
+      if (url) {
+        if (modalSaveBtn) { modalSaveBtn.textContent = "⏳ Saving…"; modalSaveBtn.disabled = true; }
+        try {
+          const isUpdate = S.editIdx >= 0;
+          const action   = S.editType === "product"
+            ? (isUpdate ? "updateProduct" : "addProduct")
+            : (isUpdate ? "updateCategory" : "addCategory");
+          const payloadKey = S.editType === "product" ? "product" : "category";
+
+          const data = await gasApi(action, { [payloadKey]: item });
+
+          if (!data.ok) {
+            showToast("Save failed: " + (data.error || "Unknown error"), "error");
+            if (modalSaveBtn) { modalSaveBtn.textContent = "Save"; modalSaveBtn.disabled = false; }
+            return;
+          }
+
+          if (!isUpdate && data.id) item.id = data.id;
+          showToast("✅ Saved to Google Sheets!");
+        } catch (err) {
+          showToast("Sheets save error: " + err.message + ". Saved locally only.", "error");
+        } finally {
+          if (modalSaveBtn) { modalSaveBtn.textContent = "Save"; modalSaveBtn.disabled = false; }
+        }
+      } else {
+        showToast("Saved locally. Connect Apps Script in Settings to sync to Sheets.");
+      }
+    }
+
+    /* Update local state */
     const arr = S[arrayMap[S.editType]];
     if (S.editIdx >= 0) arr[S.editIdx] = item;
     else arr.push(item);
 
+    await bustCatalogCaches();
     renderers[S.editType]?.();
     el("admEditModal").hidden = true;
-    showToast("Saved! Click \"Generate Code\" to export the updated file.");
   }
 
   /* ─────────────────────────────────────────────
@@ -1205,12 +1460,37 @@
     el("admCodeClose")?.addEventListener("click",   () => { el("admCodeModal").hidden = true; });
     el("admCodeModal")?.addEventListener("click",   e => { if (e.target === el("admCodeModal")) el("admCodeModal").hidden = true; });
 
-    // Products
+    // Products — Add + Sync (no Generate Code)
     el("btnAddProduct")?.addEventListener("click", () => openProductForm(-1));
+    el("btnSyncProducts")?.addEventListener("click", async () => {
+      const btn = el("btnSyncProducts");
+      if (btn) { btn.textContent = "⏳ Syncing…"; btn.disabled = true; }
+      try {
+        await bustCatalogCaches();
+        const fresh = await fetchJ("/api/products");
+        S.products = Array.isArray(fresh) ? fresh : S.products;
+        renderProducts();
+        showToast("✅ Products synced from Sheets");
+      } catch (e) { showToast("Sync failed: " + e.message, "error"); }
+      finally { if (btn) { btn.textContent = "🔄 Sync from Sheets"; btn.disabled = false; } }
+    });
+    // Keep generate code as fallback (button may not exist in older HTML)
     el("btnGenProducts")?.addEventListener("click", () => showCodeModal([{ name: "data/products.json", data: S.products }]));
 
-    // Categories
+    // Categories — Add + Sync
     el("btnAddCategory")?.addEventListener("click", () => openCategoryForm(-1));
+    el("btnSyncCategories")?.addEventListener("click", async () => {
+      const btn = el("btnSyncCategories");
+      if (btn) { btn.textContent = "⏳ Syncing…"; btn.disabled = true; }
+      try {
+        await bustCatalogCaches();
+        const fresh = await fetchJ("/api/categories");
+        S.categories = Array.isArray(fresh) ? fresh : S.categories;
+        renderCategories();
+        showToast("✅ Categories synced from Sheets");
+      } catch (e) { showToast("Sync failed: " + e.message, "error"); }
+      finally { if (btn) { btn.textContent = "🔄 Sync from Sheets"; btn.disabled = false; } }
+    });
     el("btnGenCategories")?.addEventListener("click", () => showCodeModal([{ name: "data/categories.json", data: S.categories }]));
 
     // Gallery
@@ -1243,22 +1523,52 @@
       showCodeModal([{ name: "data/settings.json", data: { ...S.settings, theme, seo, updatedAt: new Date().toISOString() } }]);
     });
 
-    // Config / Settings
-    el("btnSaveConfig")?.addEventListener("click", () => {
-      const f   = el("admConfigForm");
-      const url = fv(f, "appsScriptUrl");
-      S.config  = { ...S.config,
-        managerPin    : fv(f, "managerPin"),
-        appsScriptUrl : url || S.config.appsScriptUrl || "",
-      };
-      showToast("Settings saved! Click Generate Code to apply.");
+    // Config / Settings — save to server
+    el("btnSaveConfig")?.addEventListener("click", async () => {
+      const f          = el("admConfigForm");
+      const newPin     = fv(f, "managerPin");
+      const url        = fv(f, "appsScriptUrl");
+      const cldName    = fv(f, "cloudinaryCloudName");
+      const cldPreset  = fv(f, "cloudinaryUploadPreset");
+
+      const btn = el("btnSaveConfig");
+      if (btn) { btn.textContent = "⏳ Saving…"; btn.disabled = true; }
+
+      const payload = { pin: getAdminPin() };
+      if (url)       payload.appsScriptUrl            = url;
+      if (cldName)   payload.cloudinaryCloudName       = cldName;
+      if (cldPreset) payload.cloudinaryUploadPreset    = cldPreset;
+      if (newPin)    payload.newPin                    = newPin;
+
+      // Update local state optimistically
+      if (url)       S.config.appsScriptUrl            = url;
+      if (cldName)   S.config.cloudinaryCloudName       = cldName;
+      if (cldPreset) S.config.cloudinaryUploadPreset    = cldPreset;
+
+      try {
+        const res  = await fetch("/api/admin/save-config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("✅ Settings saved!");
+          renderConfigSection();
+        } else {
+          showToast("Save failed: " + (data.error || "Unknown"), "error");
+        }
+      } catch (err) {
+        showToast("Save error: " + err.message, "error");
+      } finally {
+        if (btn) { btn.textContent = "Save Changes"; btn.disabled = false; }
+      }
     });
     el("btnGenConfig")?.addEventListener("click", () => {
       const f   = el("admConfigForm");
       const url = fv(f, "appsScriptUrl");
       showCodeModal([{ name: "data/config.json", data: {
         ...S.config,
-        managerPin    : fv(f, "managerPin"),
         appsScriptUrl : url || S.config.appsScriptUrl || "",
       } }]);
     });

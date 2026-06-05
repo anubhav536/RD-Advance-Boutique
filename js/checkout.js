@@ -721,7 +721,7 @@ Please confirm this order. 🙏`;
   async function loadProduct() {
     const id = getParam("id");
     try {
-      const res      = await fetch("data/products.json", { cache: "no-store" });
+      const res      = await fetch("/api/products", { cache: "no-store" });
       const products = await res.json();
       const found    = (Array.isArray(products) ? products : []).find(p =>
         norm(p.id || p.slug || p.title || p.name) === norm(id)

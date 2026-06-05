@@ -77,7 +77,7 @@
 
     async function loadProducts() {
       try {
-        const res = await fetch("data/products.json", { cache: "no-store" });
+        const res = await fetch("/api/products", { cache: "no-store" });
         return await res.json();
       } catch { return []; }
     }

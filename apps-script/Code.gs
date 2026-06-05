@@ -1,44 +1,28 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// RD ADVANCE BOUTIQUE — Google Apps Script Order Backend (Hardened v2)
+// RD ADVANCE BOUTIQUE — Google Apps Script Backend (v3 — Full Catalog + Orders)
 //
-// SECURITY IMPROVEMENTS IN THIS VERSION:
-//  1. All sensitive values (MANAGER_PIN, OWNER_EMAIL, SHEET_ID) are read
-//     from Script Properties — never hardcoded in source.
-//  2. getOrders is PIN-protected; unauthenticated calls return 401.
-//  3. Brute-force protection: ≥10 failed PIN attempts locks auth for 1 hour.
-//  4. Duplicate-order protection: Order ID checked before any row append.
-//  5. Input validation on all required fields before processing.
-//  6. Screenshot payload capped at 4 MB (safe below Apps Script limits).
-//  7. LockService prevents concurrent writes / race conditions.
-//  8. Audit log (AuditLog sheet) records every action with outcome.
-//  9. All error paths use Logger.log() — no silent catches.
-// 10. Timestamps stored as ISO-8601 strings for reliable date sorting.
-// 11. Batch data reads — single getDataRange() per operation.
-// 12. Status updates PIN-gated and audit-logged with old → new values.
+// SECURITY:
+//  1. MANAGER_PIN, OWNER_EMAIL, SHEET_ID read from Script Properties only.
+//  2. All write/delete ops are PIN-protected.
+//  3. Brute-force protection (10 failures → 1-hour lock).
+//  4. LockService prevents concurrent writes.
+//  5. Input validation before any sheet write.
+//  6. Audit log for every significant action.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ─── NON-SENSITIVE DEFAULTS ─────────────────────────────────────────────────
-// Sensitive values (SHEET_ID, OWNER_EMAIL, MANAGER_PIN) must be set in:
-//   Apps Script Editor → Project Settings → Script Properties
-//
-// Optional Script Properties (can also be set here):
-//   DRIVE_FOLDER_ID — Google Drive folder ID for payment screenshots
-//   SITE_URL        — Your site's public URL (used in email links)
-const CONFIG =
+const CONFIG = {
   SHEET_NAME          : "Orders",
   AUDIT_SHEET_NAME    : "AuditLog",
+  PRODUCTS_SHEET_NAME : "Products",
+  CATEGORIES_SHEET_NAME: "Categories",
   STORE_NAME          : "RD Advance Boutique",
-
-  // Security limits
-  MAX_SCREENSHOT_BYTES: 4 * 1024 * 1024,  // 4 MB — safe ceiling for Apps Script
-  MAX_FAILED_AUTH     : 10,               // lock auth after N consecutive failures
-  AUTH_LOCK_WINDOW_MS : 60 * 60 * 1000,  // 1-hour brute-force window
-  LOCK_TIMEOUT_MS     : 30000,           // 30 s LockService wait
-
+  MAX_SCREENSHOT_BYTES: 4 * 1024 * 1024,
+  MAX_FAILED_AUTH     : 10,
+  AUTH_LOCK_WINDOW_MS : 60 * 60 * 1000,
+  LOCK_TIMEOUT_MS     : 30000,
 };
 
-// ─── SCRIPT PROPERTIES ─────────────────────────────────────────────────────
-// [SECURITY] Read sensitive values from Script Properties, not source code.
+// ─── SCRIPT PROPERTIES ───────────────────────────────────────────────────────
 
 function getProp(key) {
   return PropertiesService.getScriptProperties().getProperty(key) || "";
@@ -55,10 +39,7 @@ function requireProp(key) {
   return v;
 }
 
-// ─── BRUTE-FORCE–RESISTANT PIN VERIFICATION ────────────────────────────────
-// [SECURITY] Tracks consecutive failed attempts in Script Properties.
-// After MAX_FAILED_AUTH failures within AUTH_LOCK_WINDOW_MS, all auth is
-// rejected until the window expires — regardless of the PIN supplied.
+// ─── BRUTE-FORCE–RESISTANT PIN VERIFICATION ──────────────────────────────────
 
 const _FAIL_COUNT_KEY = "auth_fail_count";
 const _FAIL_TIME_KEY  = "auth_fail_time";
@@ -72,13 +53,11 @@ function verifyPin(pin) {
   const lastTime = parseInt(props.getProperty(_FAIL_TIME_KEY)  || "0", 10);
   let   count    = parseInt(props.getProperty(_FAIL_COUNT_KEY) || "0", 10);
 
-  // Reset counter when the brute-force window has expired
   if (now - lastTime > CONFIG.AUTH_LOCK_WINDOW_MS) {
     count = 0;
     props.setProperties({ [_FAIL_COUNT_KEY]: "0", [_FAIL_TIME_KEY]: String(now) });
   }
 
-  // Hard reject while locked
   if (count >= CONFIG.MAX_FAILED_AUTH) {
     Logger.log("Auth locked — too many failed attempts (" + count + ")");
     return false;
@@ -87,21 +66,19 @@ function verifyPin(pin) {
   const correct = String(pin) === String(requireProp("MANAGER_PIN"));
 
   if (!correct) {
-    // Record failure
     const newCount = count + 1;
     const updates  = { [_FAIL_COUNT_KEY]: String(newCount) };
-    if (count === 0) updates[_FAIL_TIME_KEY] = String(now); // start the window
+    if (count === 0) updates[_FAIL_TIME_KEY] = String(now);
     props.setProperties(updates);
     Logger.log("Failed PIN attempt #" + newCount);
   } else {
-    // Reset on success
     props.setProperties({ [_FAIL_COUNT_KEY]: "0" });
   }
 
   return correct;
 }
 
-// ─── RESPONSE HELPERS ───────────────────────────────────────────────────────
+// ─── RESPONSE HELPERS ────────────────────────────────────────────────────────
 
 function corsResponse(data) {
   return ContentService
@@ -110,21 +87,26 @@ function corsResponse(data) {
 }
 
 function unauthorized(reason) {
-  // [SECURITY] Generic "Unauthorized" message — don't leak internal detail
   Logger.log("Unauthorized: " + (reason || "no reason"));
   return corsResponse({ ok: false, error: "Unauthorized" });
 }
 
-// ─── HTTP ROUTER ────────────────────────────────────────────────────────────
+// ─── HTTP ROUTER ─────────────────────────────────────────────────────────────
 
 function doPost(e) {
   try {
     const body   = JSON.parse(e.postData.contents);
     const action = body.action || "";
 
-    if (action === "submitOrder")  return corsResponse(handleSubmitOrder(body));
-    if (action === "updateStatus") return corsResponse(handleUpdateStatus(body));
-    if (action === "verifyPin")    return corsResponse(handleVerifyPin(body));
+    if (action === "submitOrder")    return corsResponse(handleSubmitOrder(body));
+    if (action === "updateStatus")   return corsResponse(handleUpdateStatus(body));
+    if (action === "verifyPin")      return corsResponse(handleVerifyPin(body));
+    if (action === "addProduct")     return corsResponse(handleAddProduct(body));
+    if (action === "updateProduct")  return corsResponse(handleUpdateProduct(body));
+    if (action === "deleteProduct")  return corsResponse(handleDeleteProduct(body));
+    if (action === "addCategory")    return corsResponse(handleAddCategory(body));
+    if (action === "updateCategory") return corsResponse(handleUpdateCategory(body));
+    if (action === "deleteCategory") return corsResponse(handleDeleteCategory(body));
 
     Logger.log("doPost: unknown action '" + action + "'");
     return corsResponse({ ok: false, error: "Unknown action: " + action });
@@ -138,8 +120,11 @@ function doGet(e) {
   try {
     const action = e.parameter.action || "";
 
-    if (action === "getOrders") return handleGetOrders(e.parameter);
-    if (action === "ping")      return corsResponse({ ok: true, store: CONFIG.STORE_NAME });
+    if (action === "getOrders")    return handleGetOrders(e.parameter);
+    if (action === "getProducts")  return handleGetProducts(e.parameter);
+    if (action === "getProduct")   return handleGetProduct(e.parameter);
+    if (action === "getCategories") return handleGetCategories(e.parameter);
+    if (action === "ping")         return corsResponse({ ok: true, store: CONFIG.STORE_NAME });
 
     Logger.log("doGet: unknown action '" + action + "'");
     return corsResponse({ ok: false, error: "Unknown action: " + action });
@@ -149,7 +134,7 @@ function doGet(e) {
   }
 }
 
-// ─── SHEET INITIALISATION ───────────────────────────────────────────────────
+// ─── SHEET HEADERS ───────────────────────────────────────────────────────────
 
 const ORDER_HEADERS = [
   "Order ID", "Created Date", "Status",
@@ -163,6 +148,21 @@ const ORDER_HEADERS = [
 const AUDIT_HEADERS = [
   "Timestamp", "Action", "Order ID", "Detail", "Result",
 ];
+
+const PRODUCT_HEADERS = [
+  "id", "title", "slug", "shortDescription", "description",
+  "category", "productType", "price", "discountPrice", "stock",
+  "status", "featured", "image", "images", "colors", "sizes",
+  "features", "tags", "occasions", "outfitCategory",
+  "suggestedProducts", "compatibleWith",
+  "seoTitle", "seoDescription", "createdAt", "updatedAt"
+];
+
+const CATEGORY_HEADERS = [
+  "id", "name", "slug", "description", "status", "createdAt"
+];
+
+// ─── SHEET GETTERS ───────────────────────────────────────────────────────────
 
 function getOrderSheet() {
   const ss    = SpreadsheetApp.openById(requireProp("SHEET_ID"));
@@ -197,9 +197,36 @@ function getAuditSheet() {
   return sheet;
 }
 
-// ─── AUDIT LOGGING ──────────────────────────────────────────────────────────
-// [AUDIT] Every significant action is recorded with timestamp, action type,
-// order ID, a human-readable detail string, and SUCCESS / FAIL / DUPLICATE.
+function getProductSheet() {
+  const ss    = SpreadsheetApp.openById(requireProp("SHEET_ID"));
+  let   sheet = ss.getSheetByName(CONFIG.PRODUCTS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.PRODUCTS_SHEET_NAME);
+    sheet.appendRow(PRODUCT_HEADERS);
+    const hr = sheet.getRange(1, 1, 1, PRODUCT_HEADERS.length);
+    hr.setBackground("#1a0a12").setFontColor("#c9a45c").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 160);
+    sheet.setColumnWidth(2, 220);
+    sheet.setColumnWidth(5, 300);
+  }
+  return sheet;
+}
+
+function getCategorySheet() {
+  const ss    = SpreadsheetApp.openById(requireProp("SHEET_ID"));
+  let   sheet = ss.getSheetByName(CONFIG.CATEGORIES_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.CATEGORIES_SHEET_NAME);
+    sheet.appendRow(CATEGORY_HEADERS);
+    const hr = sheet.getRange(1, 1, 1, CATEGORY_HEADERS.length);
+    hr.setBackground("#0a1a0a").setFontColor("#c9a45c").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// ─── AUDIT LOGGING ───────────────────────────────────────────────────────────
 
 function writeAuditLog(action, orderId, detail, result) {
   try {
@@ -211,13 +238,11 @@ function writeAuditLog(action, orderId, detail, result) {
       result  || "",
     ]);
   } catch (err) {
-    // Audit failures must never crash the main flow — but we do log them
     Logger.log("AuditLog write failed: " + err.message);
   }
 }
 
-// ─── INPUT VALIDATION ───────────────────────────────────────────────────────
-// [SECURITY] Reject malformed requests before touching the spreadsheet.
+// ─── INPUT VALIDATION (ORDERS) ───────────────────────────────────────────────
 
 function validateOrderPayload(data) {
   const required = [
@@ -233,14 +258,11 @@ function validateOrderPayload(data) {
     }
   }
 
-  // Sanity-check phone — must have at least 7 digits after stripping formatting
   const digitsOnly = String(data.phone).replace(/[^\d]/g, "");
   if (digitsOnly.length < 7) {
     return { valid: false, error: "Invalid mobile number — must contain at least 7 digits." };
   }
 
-  // [SECURITY] Reject oversized screenshots to stay well below Apps Script
-  // request limits (~6 MB) and prevent abuse of Drive storage.
   if (data.screenshotBase64) {
     const approxBytes = (String(data.screenshotBase64).length * 3) / 4;
     if (approxBytes > CONFIG.MAX_SCREENSHOT_BYTES) {
@@ -255,7 +277,7 @@ function validateOrderPayload(data) {
   return { valid: true };
 }
 
-// ─── VERIFY PIN ENDPOINT ────────────────────────────────────────────────────
+// ─── VERIFY PIN ENDPOINT ─────────────────────────────────────────────────────
 
 function handleVerifyPin(body) {
   const ok = verifyPin(body.pin);
@@ -267,11 +289,9 @@ function handleVerifyPin(body) {
   return { ok: true };
 }
 
-// ─── SUBMIT ORDER ───────────────────────────────────────────────────────────
-// [SECURITY] Validation → duplicate check → LockService → write → audit.
+// ─── SUBMIT ORDER ─────────────────────────────────────────────────────────────
 
 function handleSubmitOrder(data) {
-  // 1. Validate payload
   const v = validateOrderPayload(data);
   if (!v.valid) {
     Logger.log("Order rejected (validation): " + v.error + " | orderId=" + (data.orderId || "N/A"));
@@ -279,8 +299,6 @@ function handleSubmitOrder(data) {
     return { ok: false, error: v.error };
   }
 
-  // 2. Acquire lock — prevents race conditions and duplicate rows
-  // [CONCURRENCY] Only one write can run at a time across all instances.
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(CONFIG.LOCK_TIMEOUT_MS);
@@ -291,42 +309,40 @@ function handleSubmitOrder(data) {
 
   try {
     const sheet   = getOrderSheet();
-    // 3. Single bulk read — used for both duplicate check and row count
-    //    [PERFORMANCE] One getDataRange() instead of repeated sheet scans.
     const allData = sheet.getDataRange().getValues();
     const headers = allData[0];
     const oidIdx  = headers.indexOf("Order ID");
     const stIdx   = headers.indexOf("Status");
 
-    // 4. Duplicate check
-    // [SECURITY] Prevent the same Order ID being appended more than once,
-    // even if a customer double-submits or retries after a network error.
     for (let i = 1; i < allData.length; i++) {
       if (String(allData[i][oidIdx]) === String(data.orderId)) {
         const existingStatus = allData[i][stIdx] || "Pending Verification";
         Logger.log("Duplicate order blocked: " + data.orderId);
         writeAuditLog("SUBMIT_ORDER", data.orderId, "Duplicate submission rejected", "DUPLICATE");
-        // Return success with existing state so checkout.js still shows the success screen
         return { ok: true, orderId: data.orderId, status: existingStatus, duplicate: true };
       }
     }
 
-    // 5. Save screenshot to Drive (non-fatal if it fails)
     let screenshotUrl = "";
     if (data.screenshotBase64) {
       try {
         screenshotUrl = saveScreenshotToDrive(data.orderId, data.screenshotBase64);
       } catch (err) {
         Logger.log("Drive screenshot upload failed for " + data.orderId + ": " + err.message);
-        // Continue — order is still saved; screenshot is best-effort
       }
     }
 
-    // 6. Determine initial status
     const status = (data.paymentMethod === "UPI") ? "Pending Verification" : "Confirmed – COD";
 
-    // 7. Build and append row
-    // [DATE] Store ISO-8601 timestamp so date comparisons and sorting are reliable.
+    // Decrement stock if product ID provided
+    if (data.productId) {
+      try {
+        decrementStock(data.productId, data.quantity || 1);
+      } catch (err) {
+        Logger.log("Stock decrement failed for " + data.productId + ": " + err.message);
+      }
+    }
+
     const row = [
       data.orderId       || "",
       new Date().toISOString(),
@@ -352,7 +368,6 @@ function handleSubmitOrder(data) {
     sheet.appendRow(row);
     styleNewRow(sheet, status);
 
-    // 8. Audit log
     writeAuditLog(
       "SUBMIT_ORDER",
       data.orderId,
@@ -360,7 +375,6 @@ function handleSubmitOrder(data) {
       "SUCCESS"
     );
 
-    // 9. Email notification (non-fatal)
     try {
       sendOrderNotification(data, status, screenshotUrl);
     } catch (err) {
@@ -370,14 +384,37 @@ function handleSubmitOrder(data) {
     return { ok: true, orderId: data.orderId, status };
 
   } finally {
-    // Always release the lock, even if an exception occurs above
     lock.releaseLock();
   }
 }
 
-// ─── GET ORDERS (AUTH-REQUIRED) ─────────────────────────────────────────────
-// [SECURITY] Orders are private business data. A PIN must be supplied as a
-// query parameter (?pin=…) — missing or wrong PIN returns Unauthorized.
+// ─── STOCK DECREMENT ─────────────────────────────────────────────────────────
+
+function decrementStock(productId, qty) {
+  const sheet   = getProductSheet();
+  const allData = sheet.getDataRange().getValues();
+  if (allData.length <= 1) return;
+
+  const headers  = allData[0];
+  const idIdx    = headers.indexOf("id");
+  const stockIdx = headers.indexOf("stock");
+  const statusIdx = headers.indexOf("status");
+
+  for (let i = 1; i < allData.length; i++) {
+    if (String(allData[i][idIdx]) === String(productId)) {
+      const current = parseInt(allData[i][stockIdx], 10) || 0;
+      const newStock = Math.max(0, current - (qty || 1));
+      sheet.getRange(i + 1, stockIdx + 1).setValue(newStock);
+      if (newStock === 0) {
+        sheet.getRange(i + 1, statusIdx + 1).setValue("out-of-stock");
+      }
+      Logger.log("Stock decremented for " + productId + ": " + current + " → " + newStock);
+      return;
+    }
+  }
+}
+
+// ─── GET ORDERS (AUTH-REQUIRED) ──────────────────────────────────────────────
 
 function handleGetOrders(params) {
   if (!verifyPin(params.pin)) {
@@ -386,7 +423,6 @@ function handleGetOrders(params) {
     return unauthorized("PIN required to fetch orders");
   }
 
-  // [PERFORMANCE] Single bulk read; filter and sort in memory.
   const sheet   = getOrderSheet();
   const allData = sheet.getDataRange().getValues();
   if (allData.length <= 1) {
@@ -398,7 +434,6 @@ function handleGetOrders(params) {
     const obj = {};
     headers.forEach((h, j) => { obj[h] = row[j]; });
     obj._row = i + 2;
-    // Parse Selected Options JSON stored as string
     try { obj["Selected Options"] = JSON.parse(obj["Selected Options"]); } catch (_) {}
     return obj;
   });
@@ -411,9 +446,7 @@ function handleGetOrders(params) {
   return corsResponse({ ok: true, orders: filtered });
 }
 
-// ─── UPDATE STATUS (AUTH-REQUIRED) ──────────────────────────────────────────
-// [SECURITY] PIN required. Old status is captured before the write so the
-// audit log records the full transition (e.g. "Pending → Verified").
+// ─── UPDATE STATUS (AUTH-REQUIRED) ───────────────────────────────────────────
 
 function handleUpdateStatus(body) {
   const { orderId, status, pin } = body;
@@ -428,8 +461,6 @@ function handleUpdateStatus(body) {
     return { ok: false, error: "orderId and status are required fields." };
   }
 
-  // [CONCURRENCY] Lock for status updates too — prevents two admins updating
-  // the same row simultaneously and corrupting the sheet.
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(CONFIG.LOCK_TIMEOUT_MS);
@@ -442,7 +473,7 @@ function handleUpdateStatus(body) {
     const sheet   = getOrderSheet();
     const allData = sheet.getDataRange().getValues();
     const headers = allData[0];
-    const oidCol  = headers.indexOf("Order ID") + 1;  // 1-based for getRange
+    const oidCol  = headers.indexOf("Order ID") + 1;
     const stCol   = headers.indexOf("Status")   + 1;
 
     for (let i = 1; i < allData.length; i++) {
@@ -471,7 +502,7 @@ function handleUpdateStatus(body) {
   }
 }
 
-// ─── ROW STYLING ────────────────────────────────────────────────────────────
+// ─── ROW STYLING (ORDERS) ────────────────────────────────────────────────────
 
 const STATUS_COLORS = {
   "Pending Verification" : "#fff3cd",
@@ -493,7 +524,7 @@ function styleRowAt(sheet, rowNum, status) {
        .setBackground(STATUS_COLORS[status] || "#ffffff");
 }
 
-// ─── DRIVE SCREENSHOT STORAGE ───────────────────────────────────────────────
+// ─── DRIVE SCREENSHOT STORAGE ────────────────────────────────────────────────
 
 function saveScreenshotToDrive(orderId, base64Data) {
   const match = base64Data.match(/^data:([^;]+);base64,(.+)$/);
@@ -504,7 +535,6 @@ function saveScreenshotToDrive(orderId, base64Data) {
   const bytes    = Utilities.base64Decode(match[2]);
   const blob     = Utilities.newBlob(bytes, mimeType, orderId + "-payment." + ext);
 
-  // Prefer DRIVE_FOLDER_ID from Script Properties, then CONFIG, then auto-create
   const folderId = getProp("DRIVE_FOLDER_ID");
   let folder;
   if (folderId) {
@@ -520,7 +550,6 @@ function saveScreenshotToDrive(orderId, base64Data) {
 }
 
 // ─── EMAIL NOTIFICATION ──────────────────────────────────────────────────────
-// [CONFIG] OWNER_EMAIL read from Script Properties — never hardcoded.
 
 function sendOrderNotification(data, status, screenshotUrl) {
   const ownerEmail = requireProp("OWNER_EMAIL");
@@ -572,24 +601,314 @@ function sendOrderNotification(data, status, screenshotUrl) {
   );
 }
 
+// ─── PRODUCTS: HELPERS ───────────────────────────────────────────────────────
+
+const PRODUCT_JSON_FIELDS = [
+  "images", "colors", "sizes", "features", "tags",
+  "occasions", "suggestedProducts", "compatibleWith"
+];
+
+function rowsToProductObjects(headers, rows) {
+  return rows.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ""; });
+    PRODUCT_JSON_FIELDS.forEach(f => {
+      const v = obj[f];
+      if (typeof v === "string" && v.trim()) {
+        try { obj[f] = JSON.parse(v); }
+        catch (_) { obj[f] = v.split("\n").map(s => s.trim()).filter(Boolean); }
+      } else if (!Array.isArray(v)) {
+        obj[f] = [];
+      }
+    });
+    obj.featured      = obj.featured === true || obj.featured === "TRUE" || obj.featured === "true";
+    obj.price         = parseFloat(obj.price)         || 0;
+    obj.discountPrice = parseFloat(obj.discountPrice) || 0;
+    obj.stock         = parseInt(obj.stock, 10)        || 0;
+    return obj;
+  });
+}
+
+function productObjectToRow(headers, obj) {
+  return headers.map(h => {
+    const v = obj[h];
+    if (PRODUCT_JSON_FIELDS.includes(h)) return Array.isArray(v) ? JSON.stringify(v) : (v || "[]");
+    if (typeof v === "boolean") return v;
+    return v !== undefined && v !== null ? String(v) : "";
+  });
+}
+
+function makeProductId(title) {
+  return title.toLowerCase()
+    .replace(/[^a-z0-9\s]+/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 60);
+}
+
+// ─── PRODUCTS: GET ALL (public) ───────────────────────────────────────────────
+
+function handleGetProducts(params) {
+  const sheet   = getProductSheet();
+  const allData = sheet.getDataRange().getValues();
+  if (allData.length <= 1) return corsResponse({ ok: true, products: [] });
+
+  const headers  = allData[0];
+  let   products = rowsToProductObjects(headers, allData.slice(1));
+
+  if (params.status && params.status !== "all") {
+    products = products.filter(p => p.status === params.status);
+  }
+
+  return corsResponse({ ok: true, products });
+}
+
+// ─── PRODUCTS: GET ONE (public) ───────────────────────────────────────────────
+
+function handleGetProduct(params) {
+  if (!params.id) return corsResponse({ ok: false, error: "id is required" });
+
+  const sheet   = getProductSheet();
+  const allData = sheet.getDataRange().getValues();
+  if (allData.length <= 1) return corsResponse({ ok: false, error: "Product not found" });
+
+  const headers  = allData[0];
+  const idIdx    = headers.indexOf("id");
+  const slugIdx  = headers.indexOf("slug");
+
+  for (let i = 1; i < allData.length; i++) {
+    const rowId   = String(allData[i][idIdx]);
+    const rowSlug = String(allData[i][slugIdx]);
+    if (rowId === params.id || rowSlug === params.id) {
+      const product = rowsToProductObjects(headers, [allData[i]])[0];
+      return corsResponse({ ok: true, product });
+    }
+  }
+
+  return corsResponse({ ok: false, error: "Product not found" });
+}
+
+// ─── PRODUCTS: ADD (PIN-protected) ────────────────────────────────────────────
+
+function handleAddProduct(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("ADD_PRODUCT", "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.product || !body.product.title) return { ok: false, error: "Product title is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet   = getProductSheet();
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    const idIdx   = headers.indexOf("id");
+
+    const product = body.product;
+    let baseId = product.id || makeProductId(product.title);
+    let finalId = baseId;
+    const existing = allData.slice(1).map(r => String(r[idIdx]));
+    let suffix = 1;
+    while (existing.includes(finalId)) { finalId = baseId + "-" + (suffix++); }
+
+    product.id        = finalId;
+    product.slug      = product.slug || finalId;
+    product.createdAt = product.createdAt || new Date().toISOString();
+    product.updatedAt = new Date().toISOString();
+
+    sheet.appendRow(productObjectToRow(headers, product));
+    writeAuditLog("ADD_PRODUCT", product.id, "Added: " + product.title, "SUCCESS");
+    return { ok: true, id: product.id };
+  } finally { lock.releaseLock(); }
+}
+
+// ─── PRODUCTS: UPDATE (PIN-protected) ────────────────────────────────────────
+
+function handleUpdateProduct(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("UPDATE_PRODUCT", "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.product || !body.product.id) return { ok: false, error: "Product id is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet   = getProductSheet();
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    const idIdx   = headers.indexOf("id");
+
+    const product = body.product;
+    product.updatedAt = new Date().toISOString();
+
+    for (let i = 1; i < allData.length; i++) {
+      if (String(allData[i][idIdx]) === String(product.id)) {
+        sheet.getRange(i + 1, 1, 1, headers.length)
+             .setValues([productObjectToRow(headers, product)]);
+        writeAuditLog("UPDATE_PRODUCT", product.id, "Updated: " + product.title, "SUCCESS");
+        return { ok: true };
+      }
+    }
+
+    Logger.log("handleUpdateProduct: not found — " + product.id);
+    return { ok: false, error: "Product not found" };
+  } finally { lock.releaseLock(); }
+}
+
+// ─── PRODUCTS: DELETE (PIN-protected) ────────────────────────────────────────
+
+function handleDeleteProduct(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("DELETE_PRODUCT", body.id || "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.id) return { ok: false, error: "id is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet   = getProductSheet();
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    const idIdx   = headers.indexOf("id");
+
+    for (let i = 1; i < allData.length; i++) {
+      if (String(allData[i][idIdx]) === String(body.id)) {
+        sheet.deleteRow(i + 1);
+        writeAuditLog("DELETE_PRODUCT", body.id, "Deleted product", "SUCCESS");
+        return { ok: true };
+      }
+    }
+
+    return { ok: false, error: "Product not found" };
+  } finally { lock.releaseLock(); }
+}
+
+// ─── CATEGORIES: GET ALL (public) ─────────────────────────────────────────────
+
+function handleGetCategories(params) {
+  const sheet   = getCategorySheet();
+  const allData = sheet.getDataRange().getValues();
+  if (allData.length <= 1) return corsResponse({ ok: true, categories: [] });
+
+  const headers    = allData[0];
+  const categories = allData.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i]; });
+    return obj;
+  });
+
+  return corsResponse({ ok: true, categories });
+}
+
+// ─── CATEGORIES: ADD (PIN-protected) ──────────────────────────────────────────
+
+function handleAddCategory(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("ADD_CATEGORY", "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.category || !body.category.name) return { ok: false, error: "Category name is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet = getCategorySheet();
+    const cat   = body.category;
+    if (!cat.id)   cat.id   = cat.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!cat.slug) cat.slug = cat.id;
+    cat.createdAt = cat.createdAt || new Date().toISOString();
+
+    const row = CATEGORY_HEADERS.map(h => cat[h] !== undefined ? String(cat[h]) : "");
+    sheet.appendRow(row);
+    writeAuditLog("ADD_CATEGORY", cat.id, "Added: " + cat.name, "SUCCESS");
+    return { ok: true, id: cat.id };
+  } finally { lock.releaseLock(); }
+}
+
+// ─── CATEGORIES: UPDATE (PIN-protected) ───────────────────────────────────────
+
+function handleUpdateCategory(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("UPDATE_CATEGORY", "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.category || !body.category.id) return { ok: false, error: "Category id is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet   = getCategorySheet();
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    const idIdx   = headers.indexOf("id");
+    const cat     = body.category;
+
+    for (let i = 1; i < allData.length; i++) {
+      if (String(allData[i][idIdx]) === String(cat.id)) {
+        const row = CATEGORY_HEADERS.map(h => cat[h] !== undefined ? String(cat[h]) : "");
+        sheet.getRange(i + 1, 1, 1, headers.length).setValues([row]);
+        writeAuditLog("UPDATE_CATEGORY", cat.id, "Updated: " + cat.name, "SUCCESS");
+        return { ok: true };
+      }
+    }
+
+    return { ok: false, error: "Category not found" };
+  } finally { lock.releaseLock(); }
+}
+
+// ─── CATEGORIES: DELETE (PIN-protected) ───────────────────────────────────────
+
+function handleDeleteCategory(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("DELETE_CATEGORY", body.id || "", "Unauthorized attempt", "FAIL");
+    return { ok: false, error: "Unauthorized" };
+  }
+  if (!body.id) return { ok: false, error: "id is required" };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(CONFIG.LOCK_TIMEOUT_MS); }
+  catch (e) { return { ok: false, error: "Server busy — please retry" }; }
+
+  try {
+    const sheet   = getCategorySheet();
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    const idIdx   = headers.indexOf("id");
+
+    for (let i = 1; i < allData.length; i++) {
+      if (String(allData[i][idIdx]) === String(body.id)) {
+        sheet.deleteRow(i + 1);
+        writeAuditLog("DELETE_CATEGORY", body.id, "Deleted category", "SUCCESS");
+        return { ok: true };
+      }
+    }
+
+    return { ok: false, error: "Category not found" };
+  } finally { lock.releaseLock(); }
+}
+
 // ─── SCRIPT PROPERTIES SETUP HELPER ─────────────────────────────────────────
-// Run this function once from the Apps Script editor to initialise all
-// required Script Properties in one go. Fill in the values below, run it,
-// then delete the values from this function (they are safely stored).
-//
-// HOW TO USE:
-//   1. Fill in the values below.
-//   2. In the Apps Script editor, select "setupProperties" from the function
-//      dropdown and click ▶ Run.
-//   3. Delete or blank-out the values below — they are now in Script Properties.
 
 function setupProperties() {
   PropertiesService.getScriptProperties().setProperties({
-    MANAGER_PIN    : "CHANGE_THIS_TO_YOUR_PIN",      // ← replace before running
-    SHEET_ID       : "YOUR_GOOGLE_SHEET_ID",          // ← from sheet URL /d/SHEET_ID/edit
-    OWNER_EMAIL    : "your@email.com",                // ← your notification email
-    DRIVE_FOLDER_ID: "",                              // ← optional Drive folder ID
-    SITE_URL       : "",                              // ← optional: your site's public URL
+    MANAGER_PIN    : "CHANGE_THIS_TO_YOUR_PIN",
+    SHEET_ID       : "YOUR_GOOGLE_SHEET_ID",
+    OWNER_EMAIL    : "your@email.com",
+    DRIVE_FOLDER_ID: "",
+    SITE_URL       : "",
   });
   Logger.log("Script Properties set successfully.");
 }
