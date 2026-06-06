@@ -46,8 +46,8 @@
   ───────────────────────────────────────────── */
   async function loadAll() {
     const [cfg, set, pro, cat, gal, notif] = await Promise.all([
-      fetchJ("/api/config/public"), fetchJ("data/settings.json"),
-      fetchJ("/api/products"),      fetchJ("/api/categories"),
+      fetchJ("data/config.json"),   fetchJ("data/settings.json"),
+      fetchJ("data/products.json"), fetchJ("data/categories.json"),
       fetchJ("data/gallery.json"),  fetchJ("data/notifications.json"),
     ]);
     S.config        = cfg   || {};
@@ -88,51 +88,23 @@
   /* ─────────────────────────────────────────────
      LOGIN / LOGOUT
   ───────────────────────────────────────────── */
- async function handleLogin(e) {
-  e.preventDefault();
+  function handleLogin(e) {
+    e.preventDefault();
+    const pin = el("mgPin").value.trim();
+    if (!pin) return;
 
-  const pin = el("mgPin").value.trim();
-  if (!pin) return;
-
-  try {
-    const url = gasUrl();
-
-    if (!url) {
-      throw new Error("Apps Script URL missing");
-    }
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: JSON.stringify({
-        action: "verifyPin",
-        pin: pin
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.ok) {
+    const correct = String(pin) === String(S.config.managerPin || "1234");
+    if (correct) {
       sessionStorage.setItem("rdAdminPin", pin);
-
       el("mgLoginScreen").hidden = true;
       el("mgApp").hidden = false;
       el("mgLoginErr").hidden = true;
-
       showSection("dashboard");
     } else {
       el("mgLoginErr").hidden = false;
       el("mgPin").select();
     }
-
-  } catch (err) {
-    console.error(err);
-    el("mgLoginErr").hidden = false;
-    el("mgPin").select();
   }
-}
 
   function handleLogout() {
     sessionStorage.removeItem("rdAdminPin");
@@ -211,32 +183,10 @@
   /* ─────────────────────────────────────────────
      CONNECTION STATUS
   ───────────────────────────────────────────── */
-  function gasUrl() {
-    const u = S.config.appsScriptUrl || "";
-    return (!u || u.includes("PASTE_") || u.includes("YOUR_")) ? null : u;
-  }
+  function gasUrl() { return null; }
 
   function getAdminPin() {
     return sessionStorage.getItem("rdAdminPin") || "";
-  }
-
-  /* Call the Apps Script web app — POST for writes, GET for reads */
-  async function gasApi(action, payload) {
-    const url = gasUrl();
-    if (!url) throw new Error("Apps Script URL not configured. Go to Settings and add the URL.");
-    const pin = getAdminPin();
-    if (payload !== undefined) {
-      const res = await fetch(url, {
-        method : "POST",
-        headers: { "Content-Type": "text/plain" },
-        body   : JSON.stringify({ action, pin, ...payload }),
-      });
-      return await res.json();
-    } else {
-      const params = new URLSearchParams({ action, pin });
-      const res = await fetch(url + "?" + params, { cache: "no-store" });
-      return await res.json();
-    }
   }
 
   /* Upload image: Cloudinary unsigned (preferred) or server /upload */
@@ -265,23 +215,16 @@
     throw new Error(d.error || "Server upload failed");
   }
 
-  /* Bust server-side and client-side caches after catalog changes */
-  async function bustCatalogCaches() {
-    const pin = getAdminPin();
-    try { await fetch("/api/admin/cache-bust", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin }) }); }
-    catch (_) {}
+  function bustCatalogCaches() {
     if (window.RDApi) { window.RDApi.bustProducts(); window.RDApi.bustCategories(); }
   }
 
-  function updateConnectionStatus(connected) {
+  function updateConnectionStatus() {
     const badge = el("mgConnectionBadge");
     if (!badge) return;
-    badge.textContent = connected ? "🟢 Google Sheets" : "⚡ Local Only";
-    badge.className   = "mg-connection-badge " +
-      (connected ? "mg-connection-badge--live" : "mg-connection-badge--local");
-    badge.title = connected
-      ? "Orders are synced with your Google Sheet"
-      : "Google Sheets not connected — showing this device's orders only";
+    badge.textContent = "📱 WhatsApp Orders";
+    badge.className   = "mg-connection-badge mg-connection-badge--local";
+    badge.title       = "Orders received via WhatsApp — stored on this device";
   }
 
   async function renderOrders() {
@@ -290,28 +233,8 @@
     el("mgErrorState").hidden    = true;
     el("mgOrdersList").innerHTML = "";
 
-    const url       = gasUrl();
-    const connected = !!url;
-    updateConnectionStatus(connected);
-
-    if (connected) {
-      try {
-        const pin  = encodeURIComponent(getAdminPin());
-        const res  = await fetch(url + "?action=getOrders&pin=" + pin, { cache: "no-store" });
-        const data = await res.json();
-        if (data.ok) {
-          S.orders = data.orders || [];
-        } else {
-          throw new Error(data.error || "Unknown error from Apps Script");
-        }
-      } catch (err) {
-        S.orders = loadLocalOrders();
-        el("mgErrorMsg").textContent = "Google Sheets sync failed: " + err.message + ". Showing local orders.";
-        el("mgErrorState").hidden = false;
-      }
-    } else {
-      S.orders = loadLocalOrders();
-    }
+    updateConnectionStatus();
+    S.orders = loadLocalOrders();
 
     el("mgLoadingState").hidden = true;
     updateOrderStats();
@@ -425,37 +348,12 @@
 </div>`;
   }
 
-  async function updateOrderStatus(orderId, newStatus) {
+  function updateOrderStatus(orderId, newStatus) {
     const idx = S.orders.findIndex(o => o["Order ID"] === orderId);
     if (idx >= 0) S.orders[idx]["Status"] = newStatus;
     updateOrderStats();
     renderOrderList();
-
-    const url = gasUrl();
-    if (url) {
-      try {
-        const res  = await fetch(url, {
-          method : "POST",
-          headers: { "Content-Type": "text/plain" },
-          body   : JSON.stringify({
-            action  : "updateStatus",
-            orderId,
-            status  : newStatus,
-            pin     : getAdminPin(),
-          }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          showToast("Status updated in Google Sheets ✅");
-        } else {
-          showToast("Local update done. Sheets error: " + (data.error || "Unknown"), "error");
-        }
-      } catch (err) {
-        showToast("Local update done. Sheets sync failed.", "error");
-      }
-    } else {
-      showToast("Status updated to: " + newStatus);
-    }
+    showToast("Status updated: " + newStatus);
   }
 
   /* ─────────────────────────────────────────────
@@ -693,12 +591,8 @@
   ───────────────────────────────────────────── */
 
   function sheetsConnectedBanner() {
-    const connected = !!gasUrl();
-    return `<div class="adm-api-status ${connected ? "adm-api-status--live" : "adm-api-status--warn"}">
-      ${connected
-        ? "🟢 <strong>Google Sheets mein save hota hai</strong> — Changes direct Sheets mein jaate hain. Refresh karne par automatically load honge."
-        : "⚠️ <strong>Apps Script connected nahi hai.</strong> Changes abhi sirf is session mein save honge. Settings mein jaake Apps Script URL add karein."
-      }
+    return `<div class="adm-api-status adm-api-status--warn">
+      📋 <strong>JSON mode:</strong> Product/category add karne ke baad <strong>"Generate JSON"</strong> button dabao aur code copy karke <code>data/products.json</code> mein paste karo, phir GitHub par commit karo.
     </div>`;
   }
 
@@ -783,30 +677,14 @@
     list.querySelectorAll(".adm-btn-dup").forEach(b => b.addEventListener("click", () => duplicateProduct(+b.dataset.idx)));
   }
 
-  async function deleteProduct(idx) {
+  function deleteProduct(idx) {
     const p = S.products[idx];
     if (!p) return;
     if (!confirm(`"${p.title || p.name}" delete karein?`)) return;
-
-    const url = gasUrl();
-    if (url) {
-      const btn = document.querySelector(`.adm-btn-del[data-idx="${idx}"]`);
-      if (btn) btn.textContent = "⏳";
-      try {
-        const data = await gasApi("deleteProduct", { id: p.id });
-        if (!data.ok) { showToast("Delete failed: " + (data.error || "Unknown"), "error"); if (btn) btn.textContent = "🗑️"; return; }
-        showToast("✅ Product deleted from Google Sheets");
-      } catch (err) {
-        showToast("Delete error: " + err.message, "error");
-        if (btn) btn.textContent = "🗑️";
-        return;
-      }
-    }
-
     S.products.splice(idx, 1);
-    await bustCatalogCaches();
+    bustCatalogCaches();
     renderProducts();
-    if (!url) showToast("Product deleted (local). Connect Apps Script to sync.");
+    showToast("Product deleted. \"Generate JSON\" dabao aur commit karo.");
   }
 
   function duplicateProduct(idx) {
@@ -965,27 +843,14 @@
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => deleteCategory(+b.dataset.idx)));
   }
 
-  async function deleteCategory(idx) {
+  function deleteCategory(idx) {
     const c = S.categories[idx];
     if (!c) return;
     if (!confirm(`"${c.name}" delete karein?`)) return;
-
-    const url = gasUrl();
-    if (url) {
-      try {
-        const data = await gasApi("deleteCategory", { id: c.id });
-        if (!data.ok) { showToast("Delete failed: " + (data.error || "Unknown"), "error"); return; }
-        showToast("✅ Category deleted from Google Sheets");
-      } catch (err) {
-        showToast("Delete error: " + err.message, "error");
-        return;
-      }
-    }
-
     S.categories.splice(idx, 1);
-    await bustCatalogCaches();
+    bustCatalogCaches();
     renderCategories();
-    if (!url) showToast("Category deleted (local). Connect Apps Script to sync.");
+    showToast("Category deleted. \"Generate JSON\" dabao aur commit karo.");
   }
 
   function openCategoryForm(idx) {
@@ -1243,8 +1108,6 @@
      SETTINGS / CONFIG SECTION
   ───────────────────────────────────────────── */
   function renderConfigSection() {
-    const url       = S.config.appsScriptUrl || "";
-    const connected = url && !url.includes("PASTE_") && !url.includes("YOUR_");
     const cldName   = S.config.cloudinaryCloudName   || "";
     const cldPreset = S.config.cloudinaryUploadPreset || "";
     const cldReady  = !!(cldName && cldPreset);
@@ -1254,39 +1117,11 @@
         <h3>🔐 Admin PIN</h3>
         <div class="adm-form-grid">
           <div class="adm-fg">
-            <label>Manager PIN <small>(used to log in to this panel)</small></label>
-            <input type="text" name="managerPin" value="" placeholder="New PIN (leave blank to keep current)">
+            <label>New Manager PIN <small>(leave blank to keep current)</small></label>
+            <input type="text" name="managerPin" value="" placeholder="New PIN">
           </div>
         </div>
-        <p class="adm-hint-text">⚠️ Enter a new PIN only if you want to change it. Click <strong>Save Changes</strong> — PIN is updated via Apps Script and stored in Script Properties (works on GitHub Pages).</p>
-      </div>
-
-      <div class="adm-settings-section">
-        <h3>🔗 Google Sheets Integration</h3>
-        <div class="adm-info-box" style="margin-bottom:14px">
-          <p><strong>Status:</strong> <span style="color:${connected ? "#27ae60" : "#c0392b"};font-weight:700">${connected ? "🟢 Connected" : "⚡ Not Connected"}</span></p>
-          <br>
-          <p>When connected, every customer order is automatically saved to your Google Sheet and you receive an email notification. Products and categories are managed in real time — no more JSON files or GitHub commits needed.</p>
-        </div>
-        <div class="adm-form-grid">
-          <div class="adm-fg" style="grid-column:1/-1">
-            <label>Apps Script Web App URL</label>
-            <input type="url" name="appsScriptUrl" value="${esc(url.includes("PASTE_") || url.includes("YOUR_") ? "" : url)}" placeholder="https://script.google.com/macros/s/…/exec">
-            <p class="adm-hint-text">Paste the URL after deploying <code>apps-script/Code.gs</code> as a Google Apps Script Web App.</p>
-          </div>
-        </div>
-        <div class="adm-info-box adm-info-box--steps">
-          <p><strong>📋 Setup Steps (one time):</strong></p>
-          <ol>
-            <li>Open <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → New Project</li>
-            <li>Copy the entire content of <code>apps-script/Code.gs</code> into the editor</li>
-            <li>Click <strong>Deploy → New deployment → Web App</strong></li>
-            <li>Set "Execute as" = <strong>Me</strong> and "Who has access" = <strong>Anyone</strong></li>
-            <li>Run <code>setupProperties()</code> to set SHEET_ID, OWNER_EMAIL, MANAGER_PIN</li>
-            <li>Copy the Web App URL and paste it above</li>
-            <li>Click <strong>Save Changes</strong> below</li>
-          </ol>
-        </div>
+        <p class="adm-hint-text">⚠️ PIN change karne ke baad <strong>Save Changes</strong> dabao, phir <strong>Generate Config JSON</strong> dabao aur <code>data/config.json</code> mein paste karke GitHub commit karo.</p>
       </div>
 
       <div class="adm-settings-section">
@@ -1372,46 +1207,20 @@
     const item = collect();
     if (!item.title && !item.name) { showToast("Please enter a name / title.", "error"); return; }
 
-    /* Products and categories: save to Apps Script */
-    if (S.editType === "product" || S.editType === "category") {
-      const url = gasUrl();
-      if (url) {
-        if (modalSaveBtn) { modalSaveBtn.textContent = "⏳ Saving…"; modalSaveBtn.disabled = true; }
-        try {
-          const isUpdate = S.editIdx >= 0;
-          const action   = S.editType === "product"
-            ? (isUpdate ? "updateProduct" : "addProduct")
-            : (isUpdate ? "updateCategory" : "addCategory");
-          const payloadKey = S.editType === "product" ? "product" : "category";
-
-          const data = await gasApi(action, { [payloadKey]: item });
-
-          if (!data.ok) {
-            showToast("Save failed: " + (data.error || "Unknown error"), "error");
-            if (modalSaveBtn) { modalSaveBtn.textContent = "Save"; modalSaveBtn.disabled = false; }
-            return;
-          }
-
-          if (!isUpdate && data.id) item.id = data.id;
-          showToast("✅ Saved to Google Sheets!");
-        } catch (err) {
-          showToast("Sheets save error: " + err.message + ". Saved locally only.", "error");
-        } finally {
-          if (modalSaveBtn) { modalSaveBtn.textContent = "Save"; modalSaveBtn.disabled = false; }
-        }
-      } else {
-        showToast("Saved locally. Connect Apps Script in Settings to sync to Sheets.");
-      }
-    }
-
-    /* Update local state */
+      /* Update local state */
     const arr = S[arrayMap[S.editType]];
     if (S.editIdx >= 0) arr[S.editIdx] = item;
     else arr.push(item);
 
-    await bustCatalogCaches();
+    bustCatalogCaches();
     renderers[S.editType]?.();
     el("admEditModal").hidden = true;
+
+    if (S.editType === "product") {
+      showToast("✅ Saved! Ab \"Generate JSON\" dabao → copy karo → data/products.json mein paste karo → GitHub commit karo.");
+    } else if (S.editType === "category") {
+      showToast("✅ Saved! Ab \"Generate JSON\" dabao → copy karo → data/categories.json mein paste karo → GitHub commit karo.");
+    }
   }
 
   /* ─────────────────────────────────────────────
@@ -1480,36 +1289,33 @@
     el("admCodeClose")?.addEventListener("click",   () => { el("admCodeModal").hidden = true; });
     el("admCodeModal")?.addEventListener("click",   e => { if (e.target === el("admCodeModal")) el("admCodeModal").hidden = true; });
 
-    // Products — Add + Sync (no Generate Code)
+    // Products — Add + Generate JSON
     el("btnAddProduct")?.addEventListener("click", () => openProductForm(-1));
     el("btnSyncProducts")?.addEventListener("click", async () => {
       const btn = el("btnSyncProducts");
-      if (btn) { btn.textContent = "⏳ Syncing…"; btn.disabled = true; }
+      if (btn) { btn.textContent = "⏳ Reloading…"; btn.disabled = true; }
       try {
-        await bustCatalogCaches();
-        const fresh = await fetchJ("/api/products");
+        const fresh = await fetchJ("data/products.json");
         S.products = Array.isArray(fresh) ? fresh : S.products;
         renderProducts();
-        showToast("✅ Products synced from Sheets");
-      } catch (e) { showToast("Sync failed: " + e.message, "error"); }
-      finally { if (btn) { btn.textContent = "🔄 Sync from Sheets"; btn.disabled = false; } }
+        showToast("✅ Products reloaded from data/products.json");
+      } catch (e) { showToast("Reload failed: " + e.message, "error"); }
+      finally { if (btn) { btn.textContent = "🔄 Reload"; btn.disabled = false; } }
     });
-    // Keep generate code as fallback (button may not exist in older HTML)
     el("btnGenProducts")?.addEventListener("click", () => showCodeModal([{ name: "data/products.json", data: S.products }]));
 
-    // Categories — Add + Sync
+    // Categories — Add + Generate JSON
     el("btnAddCategory")?.addEventListener("click", () => openCategoryForm(-1));
     el("btnSyncCategories")?.addEventListener("click", async () => {
       const btn = el("btnSyncCategories");
-      if (btn) { btn.textContent = "⏳ Syncing…"; btn.disabled = true; }
+      if (btn) { btn.textContent = "⏳ Reloading…"; btn.disabled = true; }
       try {
-        await bustCatalogCaches();
-        const fresh = await fetchJ("/api/categories");
+        const fresh = await fetchJ("data/categories.json");
         S.categories = Array.isArray(fresh) ? fresh : S.categories;
         renderCategories();
-        showToast("✅ Categories synced from Sheets");
-      } catch (e) { showToast("Sync failed: " + e.message, "error"); }
-      finally { if (btn) { btn.textContent = "🔄 Sync from Sheets"; btn.disabled = false; } }
+        showToast("✅ Categories reloaded from data/categories.json");
+      } catch (e) { showToast("Reload failed: " + e.message, "error"); }
+      finally { if (btn) { btn.textContent = "🔄 Reload"; btn.disabled = false; } }
     });
     el("btnGenCategories")?.addEventListener("click", () => showCodeModal([{ name: "data/categories.json", data: S.categories }]));
 
@@ -1543,51 +1349,23 @@
       showCodeModal([{ name: "data/settings.json", data: { ...S.settings, theme, seo, updatedAt: new Date().toISOString() } }]);
     });
 
-    // Config / Settings — PIN change via Apps Script; other settings update local state
-    el("btnSaveConfig")?.addEventListener("click", async () => {
-      const f          = el("admConfigForm");
-      const newPin     = fv(f, "managerPin");
-      const url        = fv(f, "appsScriptUrl");
-      const cldName    = fv(f, "cloudinaryCloudName");
-      const cldPreset  = fv(f, "cloudinaryUploadPreset");
+    // Config / Settings — update local state + show code modal to persist
+    el("btnSaveConfig")?.addEventListener("click", () => {
+      const f         = el("admConfigForm");
+      const newPin    = fv(f, "managerPin");
+      const cldName   = fv(f, "cloudinaryCloudName");
+      const cldPreset = fv(f, "cloudinaryUploadPreset");
 
-      const btn = el("btnSaveConfig");
-      if (btn) { btn.textContent = "⏳ Saving…"; btn.disabled = true; }
+      if (newPin) S.config.managerPin = newPin;
+      if (cldName)   S.config.cloudinaryCloudName    = cldName;
+      if (cldPreset) S.config.cloudinaryUploadPreset = cldPreset;
 
-      try {
-        // PIN change — always goes through Apps Script
-        if (newPin) {
-          const gasOk = gasUrl();
-          if (!gasOk) throw new Error("Apps Script URL not configured — cannot change PIN.");
-          const data = await gasApi("updatePin", { newPin });
-          if (!data.ok) throw new Error(data.error || "PIN update failed");
-          sessionStorage.setItem("rdAdminPin", newPin);
-          showToast("✅ PIN updated successfully!");
-        }
-
-        // Update non-PIN settings in local state
-        if (url)       S.config.appsScriptUrl         = url;
-        if (cldName)   S.config.cloudinaryCloudName    = cldName;
-        if (cldPreset) S.config.cloudinaryUploadPreset = cldPreset;
-
-        if (url || cldName || cldPreset) {
-          showToast(newPin ? "✅ Settings saved!" : "✅ Settings updated in memory. Use \"Generate Config JSON\" to persist permanently.");
-        }
-
-        renderConfigSection();
-      } catch (err) {
-        showToast("Save error: " + err.message, "error");
-      } finally {
-        if (btn) { btn.textContent = "Save Changes"; btn.disabled = false; }
-      }
+      showToast("✅ Settings updated. \"Generate Config JSON\" dabao aur data/config.json mein paste karo.");
+      renderConfigSection();
     });
     el("btnGenConfig")?.addEventListener("click", () => {
-      const f   = el("admConfigForm");
-      const url = fv(f, "appsScriptUrl");
-      showCodeModal([{ name: "data/config.json", data: {
-        ...S.config,
-        appsScriptUrl : url || S.config.appsScriptUrl || "",
-      } }]);
+      const { managerPin, ...safeConfig } = S.config;
+      showCodeModal([{ name: "data/config.json", data: { ...safeConfig, managerPin: S.config.managerPin || "" } }]);
     });
 
     // Orders

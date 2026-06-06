@@ -543,40 +543,6 @@ Please confirm this order. 🙏`;
   }
 
   /* ─────────────────────────────────────────────
-     GOOGLE APPS SCRIPT — SUBMIT ORDER
-  ───────────────────────────────────────────── */
-  function submitToAppsScript(order, screenshot) {
-    const url = appConfig.appsScriptUrl;
-    if (!url || url.includes("PASTE_")) return;
-    const payload = {
-      action          : "submitOrder",
-      orderId         : order.orderId,
-      createdAt       : order.createdAt,
-      productId       : order.productId,
-      productName     : order.productName,
-      productUrl      : order.productUrl,
-      quantity        : order.quantity,
-      selectedOptions : order.selectedOptions,
-      customerName    : order.customerName,
-      phone           : order.phone,
-      address         : order.address,
-      city            : order.city,
-      state           : order.state,
-      pincode         : order.pincode,
-      paymentMethod   : order.paymentMethod,
-      utrNumber       : order.utrNumber,
-      amountPaid      : order.amountPaid,
-      notes           : order.notes,
-      screenshotBase64: screenshot || "",
-    };
-    fetch(url, {
-      method : "POST",
-      headers: { "Content-Type": "text/plain" },
-      body   : JSON.stringify(payload),
-    }).catch(() => {});
-  }
-
-  /* ─────────────────────────────────────────────
      STEP INDICATOR
   ───────────────────────────────────────────── */
   function setStep(n) {
@@ -608,7 +574,6 @@ Please confirm this order. 🙏`;
 
     try {
       storeLocally(pendingOrder);
-      submitToAppsScript(pendingOrder, screenshotData);
       const waMessage = buildWAMessage(pendingOrder);
       const waUrl = "https://wa.me/" + (appConfig.ownerPhone || "917693849472") +
                     "?text=" + encodeURIComponent(waMessage);
@@ -616,7 +581,7 @@ Please confirm this order. 🙏`;
       showSuccess(pendingOrder);
     } catch (err) {
       btn.disabled    = false;
-      btn.textContent = "✅ Confirm Order";
+      btn.textContent = "✅ Confirm & Send to RD Advance Boutique";
       showError("Something went wrong. Please try again or contact us on WhatsApp. (" + err.message + ")");
     }
   }
@@ -701,7 +666,7 @@ Please confirm this order. 🙏`;
   ───────────────────────────────────────────── */
   async function loadConfig() {
     try {
-      const res = await fetch("/api/config/public", { cache: "no-store" });
+      const res = await fetch("data/config.json", { cache: "no-store" });
       appConfig = await res.json();
       if (appConfig.upiId) {
         const upiEl = el("cfgUpiId");
@@ -721,7 +686,7 @@ Please confirm this order. 🙏`;
   async function loadProduct() {
     const id = getParam("id");
     try {
-      const res      = await fetch("/api/products", { cache: "no-store" });
+      const res      = await fetch("data/products.json", { cache: "no-store" });
       const products = await res.json();
       const found    = (Array.isArray(products) ? products : []).find(p =>
         norm(p.id || p.slug || p.title || p.name) === norm(id)
