@@ -549,7 +549,7 @@
 
     // Load products
     productGrid.innerHTML = '<p class="shop-loading">Loading products…</p>';
-    loadStaticJson("/api/products", []).then(data => {
+    loadStaticJson("data/products.json", []).then(data => {
       allProducts = Array.isArray(data) ? data : [];
       renderCategoryChips("all");
       renderProductGrid();
@@ -731,7 +731,7 @@
 
     grid.innerHTML = '<p class="shop-loading">Loading categories…</p>';
 
-    loadStaticJson("/api/categories", []).then(cats => {
+    loadStaticJson("data/categories.json", []).then(cats => {
       const active = cats.filter(c => c.status !== "inactive");
       if (!active.length) { grid.closest(".cat-browse-section").hidden = true; return; }
 

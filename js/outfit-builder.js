@@ -448,7 +448,7 @@ Kripya is outfit order ko confirm karke payment aur delivery ke baare mein batae
   async function init() {
     /* Load products */
     try {
-      const res = await fetch("/api/products", { cache: "no-store" });
+      const res = await fetch("data/products.json", { cache: "no-store" });
       const data = await res.json();
       S.allProducts = Array.isArray(data) ? data.filter(p => p.status !== "inactive") : [];
     } catch (_) {
