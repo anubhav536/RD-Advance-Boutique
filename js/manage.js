@@ -1258,7 +1258,7 @@
             <input type="text" name="managerPin" value="" placeholder="New PIN (leave blank to keep current)">
           </div>
         </div>
-        <p class="adm-hint-text">⚠️ Enter a new PIN only if you want to change it. Click <strong>Save Changes</strong> — PIN is stored securely on the server.</p>
+        <p class="adm-hint-text">⚠️ Enter a new PIN only if you want to change it. Click <strong>Save Changes</strong> — PIN is updated via Apps Script and stored in Script Properties (works on GitHub Pages).</p>
       </div>
 
       <div class="adm-settings-section">
@@ -1543,7 +1543,7 @@
       showCodeModal([{ name: "data/settings.json", data: { ...S.settings, theme, seo, updatedAt: new Date().toISOString() } }]);
     });
 
-    // Config / Settings — save to server
+    // Config / Settings — PIN change via Apps Script; other settings update local state
     el("btnSaveConfig")?.addEventListener("click", async () => {
       const f          = el("admConfigForm");
       const newPin     = fv(f, "managerPin");
@@ -1554,30 +1554,27 @@
       const btn = el("btnSaveConfig");
       if (btn) { btn.textContent = "⏳ Saving…"; btn.disabled = true; }
 
-      const payload = { pin: getAdminPin() };
-      if (url)       payload.appsScriptUrl            = url;
-      if (cldName)   payload.cloudinaryCloudName       = cldName;
-      if (cldPreset) payload.cloudinaryUploadPreset    = cldPreset;
-      if (newPin)    payload.newPin                    = newPin;
-
-      // Update local state optimistically
-      if (url)       S.config.appsScriptUrl            = url;
-      if (cldName)   S.config.cloudinaryCloudName       = cldName;
-      if (cldPreset) S.config.cloudinaryUploadPreset    = cldPreset;
-
       try {
-        const res  = await fetch("/api/admin/save-config", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          showToast("✅ Settings saved!");
-          renderConfigSection();
-        } else {
-          showToast("Save failed: " + (data.error || "Unknown"), "error");
+        // PIN change — always goes through Apps Script
+        if (newPin) {
+          const gasOk = gasUrl();
+          if (!gasOk) throw new Error("Apps Script URL not configured — cannot change PIN.");
+          const data = await gasApi("updatePin", { newPin });
+          if (!data.ok) throw new Error(data.error || "PIN update failed");
+          sessionStorage.setItem("rdAdminPin", newPin);
+          showToast("✅ PIN updated successfully!");
         }
+
+        // Update non-PIN settings in local state
+        if (url)       S.config.appsScriptUrl         = url;
+        if (cldName)   S.config.cloudinaryCloudName    = cldName;
+        if (cldPreset) S.config.cloudinaryUploadPreset = cldPreset;
+
+        if (url || cldName || cldPreset) {
+          showToast(newPin ? "✅ Settings saved!" : "✅ Settings updated in memory. Use \"Generate Config JSON\" to persist permanently.");
+        }
+
+        renderConfigSection();
       } catch (err) {
         showToast("Save error: " + err.message, "error");
       } finally {

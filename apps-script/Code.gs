@@ -101,6 +101,7 @@ function doPost(e) {
     if (action === "submitOrder")    return corsResponse(handleSubmitOrder(body));
     if (action === "updateStatus")   return corsResponse(handleUpdateStatus(body));
     if (action === "verifyPin")      return corsResponse(handleVerifyPin(body));
+    if (action === "updatePin")      return corsResponse(handleUpdatePin(body));
     if (action === "addProduct")     return corsResponse(handleAddProduct(body));
     if (action === "updateProduct")  return corsResponse(handleUpdateProduct(body));
     if (action === "deleteProduct")  return corsResponse(handleDeleteProduct(body));
@@ -286,6 +287,20 @@ function handleVerifyPin(body) {
     return { ok: false, error: "Incorrect PIN" };
   }
   writeAuditLog("VERIFY_PIN", "", "Successful PIN verification", "SUCCESS");
+  return { ok: true };
+}
+
+function handleUpdatePin(body) {
+  if (!verifyPin(body.pin)) {
+    writeAuditLog("UPDATE_PIN", "", "Failed PIN attempt on updatePin", "FAIL");
+    return { ok: false, error: "Incorrect current PIN" };
+  }
+  const newPin = String(body.newPin || "").trim();
+  if (!newPin) return { ok: false, error: "New PIN is required" };
+  if (newPin.length < 4) return { ok: false, error: "PIN must be at least 4 characters" };
+  PropertiesService.getScriptProperties().setProperty("MANAGER_PIN", newPin);
+  PropertiesService.getScriptProperties().setProperty("auth_fail_count", "0");
+  writeAuditLog("UPDATE_PIN", "", "Manager PIN updated successfully", "SUCCESS");
   return { ok: true };
 }
 

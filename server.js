@@ -63,50 +63,9 @@ const upload = multer({
 app.use(express.static('.', { dotfiles: 'ignore' }));
 app.use('/data/config.json', (req, res) => res.status(403).json({ error: 'Forbidden' }));
 
-// ─── PUBLIC CONFIG (no PIN) ───────────────────────────────────────────────────
+// ─── PUBLIC CONFIG ────────────────────────────────────────────────────────────
 app.get('/api/config/public', (req, res) => {
-  const cfg = readConfig();
-  const { managerPin, ...publicCfg } = cfg;
-  res.json(publicCfg);
-});
-
-// ─── ADMIN PIN VERIFY ─────────────────────────────────────────────────────────
-app.post('/api/admin/verify-pin', (req, res) => {
-  const { pin } = req.body;
-  const cfg     = readConfig();
-  if (pin === String(cfg.managerPin || '1234')) {
-    res.json({ ok: true });
-  } else {
-    res.status(401).json({ ok: false, error: 'Incorrect PIN' });
-  }
-});
-
-// ─── ADMIN CONFIG SAVE ────────────────────────────────────────────────────────
-// Saves appsScriptUrl, cloudinary settings, etc. to data/config.json
-app.post('/api/admin/save-config', (req, res) => {
-  const { pin, ...updates } = req.body;
-  const cfg = readConfig();
-  if (pin !== String(cfg.managerPin || '1234')) {
-    return res.status(401).json({ ok: false, error: 'Unauthorized' });
-  }
-  // Handle PIN change (newPin field updates managerPin)
-  if (updates.newPin && String(updates.newPin).trim()) {
-    cfg.managerPin = String(updates.newPin).trim();
-  }
-  const allowed = [
-    'appsScriptUrl', 'storeName', 'ownerPhone',
-    'upiId', 'upiName', 'upiPhone',
-    'cloudinaryCloudName', 'cloudinaryUploadPreset',
-  ];
-  allowed.forEach(k => { if (updates[k] !== undefined) cfg[k] = updates[k]; });
-  try {
-    fs.writeFileSync('data/config.json', JSON.stringify(cfg, null, 2));
-    cacheInvalidate('products');
-    cacheInvalidate('categories');
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: e.message });
-  }
+  res.json(readConfig());
 });
 
 // ─── PRODUCTS PROXY ───────────────────────────────────────────────────────────
@@ -161,11 +120,6 @@ app.get('/api/categories', async (req, res) => {
 
 // ─── CACHE BUST (called after admin saves a product/category) ─────────────────
 app.post('/api/admin/cache-bust', (req, res) => {
-  const { pin } = req.body;
-  const cfg = readConfig();
-  if (pin !== String(cfg.managerPin || '1234')) {
-    return res.status(401).json({ ok: false, error: 'Unauthorized' });
-  }
   cacheInvalidate('products');
   cacheInvalidate('categories');
   res.json({ ok: true });

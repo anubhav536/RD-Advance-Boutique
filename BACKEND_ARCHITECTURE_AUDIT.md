@@ -277,23 +277,29 @@ POST /api/payment/verify    ← UPI verification
 
 ### Current Authentication Architecture
 
-**There is no server-side authentication.** The admin panel at `manage.html` uses a purely client-side PIN check:
+**Admin authentication uses Google Apps Script.** The admin panel at `manage.html` sends the PIN to the GAS backend for verification:
 
 ```javascript
-// js/manage.js lines 90-101
+// js/manage.js — handleLogin()
 async function handleLogin(e) {
   const pin = el("mgPin").value.trim();
-  if (pin === String(S.config.managerPin || "1234")) {   // reads from data/config.json
-    el("mgLoginScreen").hidden = true;
-    el("mgApp").hidden = false;                          // just toggles CSS visibility
+  const data = await fetch(gasUrl, {
+    method: "POST",
+    body: JSON.stringify({ action: "verifyPin", pin })
+  }).then(r => r.json());
+  if (data.ok) {
+    sessionStorage.setItem("rdAdminPin", pin);  // stored for subsequent GAS calls
+    // show admin UI
   }
 }
 ```
 
-**What this means:**
-- The "login" only hides/shows HTML elements in the DOM — no actual session is created
-- Any user can open DevTools console and type: `document.getElementById('mgLoginScreen').hidden = true` to bypass the login screen entirely
-- The PIN (`1234`) is stored in `data/config.json` which is publicly readable
+**Key properties:**
+- The PIN is verified server-side by Apps Script against `MANAGER_PIN` in Script Properties — never stored in `data/config.json`
+- Apps Script has brute-force protection (10 failures → 1-hour lock)
+- Subsequent admin operations (add/edit/delete product, update order, change PIN) all pass the PIN to GAS which re-verifies it before writing
+- PIN changes go through GAS `updatePin` action which also updates Script Properties
+- Works on GitHub Pages — no Express server required for login
 
 ### users.json — Unused Credentials
 
