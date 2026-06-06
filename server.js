@@ -59,9 +59,7 @@ const upload = multer({
 });
 
 // ─── STATIC FILES ─────────────────────────────────────────────────────────────
-// Serve everything EXCEPT data/config.json (blocked below)
 app.use(express.static('.', { dotfiles: 'ignore' }));
-app.use('/data/config.json', (req, res) => res.status(403).json({ error: 'Forbidden' }));
 
 // ─── PUBLIC CONFIG ────────────────────────────────────────────────────────────
 app.get('/api/config/public', (req, res) => {

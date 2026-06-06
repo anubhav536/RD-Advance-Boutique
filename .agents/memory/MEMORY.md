@@ -1,3 +1,4 @@
 - [CSS hidden override fix](css-hidden-fix.md) — `display:flex` in CSS overrides HTML `hidden` attr; always add `[hidden]{display:none!important}` at top of any CSS file that uses flex/grid on elements toggled with `hidden`.
 - [Checkout product type detection](checkout-type-detection.md) — `category` field is most reliable for type detection; check it before `productType`/`type` to avoid mismatch when productType="boutique" but category="Sarees".
-- [Catalog API migration](catalog-api-migration.md) — Products + categories migrated from static JSON to /api/products and /api/categories proxy; Apps Script CRUD + server 30s cache + client 5min sessionStorage cache (window.RDApi). Admin PIN stored in sessionStorage after login, used for GAS write ops.
+- [Config.json blocked by server](config-json-block.md) — server.js had a 403 block on /data/config.json (old GAS security measure); removing it is required for client-side PIN auth to work.
+- [Pure static JSON mode](static-json-mode.md) — GAS fully removed; products/categories from data/*.json directly; orders in localStorage; PIN in data/config.json; admin edits → Generate JSON → paste → GitHub commit.
