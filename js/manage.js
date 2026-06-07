@@ -189,6 +189,16 @@
     return sessionStorage.getItem("rdAdminPin") || "";
   }
 
+  /* Convert device filename → assets/IMG_name.jpg format */
+  function getAssetPath(file) {
+    const ext  = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")).toLowerCase() : ".jpg";
+    const base = file.name.slice(0, file.name.lastIndexOf(".") || file.name.length)
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_-]/g, "");
+    const clean = base || ("IMG_" + Date.now());
+    return "assets/" + clean + ext;
+  }
+
   /* Upload image: Cloudinary unsigned (preferred) or server /upload */
   async function uploadImage(file) {
     const cloudName   = S.config.cloudinaryCloudName   || "";
@@ -409,19 +419,21 @@
     const picker = urlInp?.closest(".adm-img-picker");
     const prev   = picker?.querySelector(".adm-img-preview");
 
-    // Show optimistic preview via objectURL immediately
-    const objURL = URL.createObjectURL(file);
-    if (urlInp) urlInp.value = "⏳ Uploading…";
+    const assetPath = getAssetPath(file);          // assets/IMG_1234.jpg
+    const objURL    = URL.createObjectURL(file);
+
+    // Set assets/ path immediately — works even if server upload fails
+    if (urlInp) urlInp.value = assetPath;
     if (prev)   { prev.src = objURL; prev.hidden = false; }
 
     try {
       const url = await uploadImage(file);
+      // Server upload succeeded — server already saved to assets/ with same name
       if (urlInp) urlInp.value = url;
       if (prev)   prev.src = url;
     } catch (err) {
-      // Fallback: keep objectURL (works for current session preview)
-      if (urlInp) urlInp.value = objURL;
-      showToast("Photo local mein saved — cloud upload failed: " + err.message, "error");
+      // Path already set to assets/IMG_name.jpg — user copies file to assets/ folder manually
+      showToast(`📁 Path set: ${assetPath} — is photo ko assets/ folder mein daalo`, "warn");
     }
   }
 
@@ -429,9 +441,12 @@
   async function handleRowFileUpload(file, row) {
     const urlInp = row.querySelector("input[type=text]");
     const thumb  = row.querySelector(".adm-multi-img-thumb");
-    const objURL = URL.createObjectURL(file);
 
-    if (urlInp) urlInp.value = "⏳ Uploading…";
+    const assetPath = getAssetPath(file);          // assets/IMG_1234.jpg
+    const objURL    = URL.createObjectURL(file);
+
+    // Set assets/ path immediately
+    if (urlInp) urlInp.value = assetPath;
     if (thumb)  { thumb.src = objURL; thumb.hidden = false; }
 
     try {
@@ -439,8 +454,7 @@
       if (urlInp) urlInp.value = url;
       if (thumb)  thumb.src = url;
     } catch (err) {
-      if (urlInp) urlInp.value = objURL;
-      showToast("Photo local mein saved — cloud upload failed: " + err.message, "error");
+      showToast(`📁 Path set: ${assetPath} — is photo ko assets/ folder mein daalo`, "warn");
     }
   }
 
