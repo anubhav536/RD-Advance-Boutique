@@ -3926,7 +3926,7 @@ iframe {
   font-size: clamp(1.35rem, 2vw, 1.85rem);
 }
 
-.detail-price-row span {
+.detail-price-row span:not(.cod-badge) {
   color: rgba(54,34,30,0.55);
   text-decoration: line-through;
 }
