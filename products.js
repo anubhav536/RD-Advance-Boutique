@@ -2,7 +2,7 @@
   "use strict";
 
   const DATA_SOURCES = {
-    products: "/api/products",
+    products: "data/products.json",
     gallery: "data/gallery.json"
   };
 
