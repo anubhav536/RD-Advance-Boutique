@@ -600,13 +600,77 @@
     if (btn) { btn.disabled = false; updateZipBtn(); }
   }
 
+  /* Download ALL product + gallery images as ZIP for GitHub commit */
+  async function downloadAllProductImagesZip() {
+    const btn = el("admAllImgsZip");
+    if (btn) { btn.textContent = "⏳ Images fetch ho rahi hain…"; btn.disabled = true; }
+    try {
+      if (typeof JSZip === "undefined") throw new Error("JSZip load nahi hua");
+      const zip = new JSZip();
+      const folder = zip.folder("assets");
+
+      // Collect all unique local image paths from products + gallery
+      const allPaths = new Set();
+      [...(S.products || []), ...(S.gallery || [])].forEach(item => {
+        const imgs = (item.images && item.images.length) ? item.images : (item.image ? [item.image] : []);
+        imgs.forEach(p => { if (p && p.startsWith("assets/")) allPaths.add(p); });
+      });
+
+      if (!allPaths.size) { showToast("Koi local image nahi mili products mein", "warn"); return; }
+
+      let done = 0;
+      const total = allPaths.size;
+      const errors = [];
+
+      await Promise.all([...allPaths].map(async imgPath => {
+        try {
+          const res = await fetch(imgPath);
+          if (!res.ok) throw new Error(res.status);
+          const blob = await res.blob();
+          const filename = imgPath.replace(/^assets\//, "");
+          folder.file(filename, blob);
+        } catch (e) {
+          errors.push(imgPath);
+        }
+        done++;
+        if (btn) btn.textContent = `⏳ ${done}/${total} images…`;
+      }));
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "rd-boutique-all-images.zip";
+      a.click();
+
+      const msg = errors.length
+        ? `✅ ZIP ready (${total - errors.length}/${total} images) — ${errors.length} missing thi`
+        : `✅ Saari ${total} images ZIP mein — GitHub ke assets/ folder mein commit karo`;
+      showToast(msg);
+    } catch (err) {
+      showToast("❌ ZIP error: " + err.message, "error");
+    }
+    if (btn) { btn.textContent = "📦 Saari Images Download (ZIP for GitHub)"; btn.disabled = false; }
+  }
+
   /* ─────────────────────────────────────────────
      PRODUCTS
   ───────────────────────────────────────────── */
 
   function sheetsConnectedBanner() {
-    return `<div class="adm-api-status adm-api-status--warn">
-      📋 <strong>JSON mode:</strong> Product/category add karne ke baad <strong>"Generate JSON"</strong> button dabao aur code copy karke <code>data/products.json</code> mein paste karo, phir GitHub par commit karo.
+    return `<div class="adm-api-status adm-api-status--warn" style="display:flex;flex-direction:column;gap:.75rem;">
+      <div>
+        📋 <strong>JSON mode — 2 kaam zaroori hain GitHub Pages ke liye:</strong>
+        <ol style="margin:.5rem 0 0 1.2rem;line-height:1.9">
+          <li><strong>JSON:</strong> "Generate JSON" dabao → copy karo → <code>data/products.json</code> mein paste karo → GitHub commit karo</li>
+          <li><strong>Photos:</strong> Neeche wala button dabao → ZIP download karo → ZIP ke andar ka <code>assets/</code> folder GitHub repo mein commit karo</li>
+        </ol>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <button id="admAllImgsZip" class="adm-btn adm-btn--sm" type="button" style="background:#166534;color:#fff;border:none;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-weight:600">
+          📦 Saari Product Images Download (ZIP for GitHub)
+        </button>
+        <span style="font-size:.78rem;color:#555">⚠️ Yeh step miss kiya toh GitHub Pages pe images nahi dikhti</span>
+      </div>
     </div>`;
   }
 
@@ -1297,6 +1361,7 @@
     el("admModalCancel")?.addEventListener("click", () => { el("admEditModal").hidden = true; });
     el("admModalSave")?.addEventListener("click",   handleModalSave);
     el("admZipDownload")?.addEventListener("click", downloadImagesZip);
+    document.addEventListener("click", e => { if (e.target?.id === "admAllImgsZip") downloadAllProductImagesZip(); });
     el("admEditModal")?.addEventListener("click",   e => { if (e.target === el("admEditModal")) el("admEditModal").hidden = true; });
 
     // Code modal
