@@ -719,6 +719,7 @@
         <td class="adm-actions">
           <button class="adm-btn-sm adm-btn-edit"  data-idx="${origIdx}">✏️</button>
           <button class="adm-btn-sm adm-btn-dup"   data-idx="${origIdx}" title="Duplicate">⧉</button>
+          <button class="adm-btn-sm adm-btn-json"  data-idx="${origIdx}" title="Copy this product's JSON">📋</button>
           <button class="adm-btn-sm adm-btn-del"   data-idx="${origIdx}">🗑️</button>
         </td>
       </tr>`;
@@ -753,6 +754,7 @@
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openProductForm(+b.dataset.idx)));
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => deleteProduct(+b.dataset.idx)));
     list.querySelectorAll(".adm-btn-dup").forEach(b => b.addEventListener("click", () => duplicateProduct(+b.dataset.idx)));
+    list.querySelectorAll(".adm-btn-json").forEach(b => b.addEventListener("click", () => showSingleItemJson("product", +b.dataset.idx)));
   }
 
   function deleteProduct(idx) {
@@ -913,11 +915,13 @@
           <td><span class="adm-badge ${c.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${c.status || "active"}</span></td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
+            <button class="adm-btn-sm adm-btn-json" data-idx="${i}" title="Is category ka JSON copy karo">📋</button>
             <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openCategoryForm(+b.dataset.idx)));
+    list.querySelectorAll(".adm-btn-json").forEach(b => b.addEventListener("click", () => showSingleItemJson("category", +b.dataset.idx)));
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => deleteCategory(+b.dataset.idx)));
   }
 
@@ -966,11 +970,13 @@
           <td>${g.featured ? "⭐" : "—"}</td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
+            <button class="adm-btn-sm adm-btn-json" data-idx="${i}" title="Is item ka JSON copy karo">📋</button>
             <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openGalleryForm(+b.dataset.idx)));
+    list.querySelectorAll(".adm-btn-json").forEach(b => b.addEventListener("click", () => showSingleItemJson("gallery", +b.dataset.idx)));
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => {
       if (confirm("Delete this gallery item?")) { S.gallery.splice(+b.dataset.idx, 1); renderGallery(); showToast("Gallery item deleted."); }
     }));
@@ -1018,11 +1024,13 @@
           <td><span class="adm-badge ${n.status !== "inactive" ? "adm-badge--green" : "adm-badge--grey"}">${n.status || "active"}</span></td>
           <td class="adm-actions">
             <button class="adm-btn-sm adm-btn-edit" data-idx="${i}">✏️ Edit</button>
+            <button class="adm-btn-sm adm-btn-json" data-idx="${i}" title="Is notification ka JSON copy karo">📋</button>
             <button class="adm-btn-sm adm-btn-del"  data-idx="${i}">🗑️</button>
           </td>
         </tr>`).join("")}
       </tbody></table>`;
     list.querySelectorAll(".adm-btn-edit").forEach(b => b.addEventListener("click", () => openNotifForm(+b.dataset.idx)));
+    list.querySelectorAll(".adm-btn-json").forEach(b => b.addEventListener("click", () => showSingleItemJson("notification", +b.dataset.idx)));
     list.querySelectorAll(".adm-btn-del").forEach(b => b.addEventListener("click", () => {
       if (confirm("Delete this notification?")) { S.notifications.splice(+b.dataset.idx, 1); renderNotifications(); showToast("Notification deleted."); }
     }));
@@ -1244,6 +1252,49 @@
   /* ─────────────────────────────────────────────
      CODE OUTPUT MODAL
   ───────────────────────────────────────────── */
+  /* Show JSON for a single item (product/category/gallery/notification) */
+  function showSingleItemJson(type, idx) {
+    const maps = {
+      product:      { arr: S.products,      file: "data/products.json",      label: "Product" },
+      category:     { arr: S.categories,    file: "data/categories.json",    label: "Category" },
+      gallery:      { arr: S.gallery,       file: "data/gallery.json",       label: "Gallery item" },
+      notification: { arr: S.notifications, file: "data/notifications.json", label: "Notification" },
+    };
+    const m = maps[type];
+    if (!m) return;
+    const item = m.arr[idx];
+    if (!item) return;
+    const name  = item.title || item.name || ("Item #" + (idx + 1));
+    const json  = JSON.stringify(item, null, 2);
+    const modal = el("admCodeModal");
+    el("admCodeBody").innerHTML = `
+      <div class="adm-code-file">
+        <div class="adm-code-file-header">
+          <span class="adm-code-filename">📋 <strong>${esc(name)}</strong> — ${esc(m.label)} JSON</span>
+          <button class="adm-code-copy-btn" id="singleJsonCopyBtn">📋 Copy</button>
+        </div>
+        <textarea class="adm-code-ta" readonly rows="18">${esc(json)}</textarea>
+      </div>
+      <div class="adm-code-instructions" style="margin-top:.75rem">
+        <strong>✅ GitHub pe kaise lagaao:</strong>
+        <ol style="margin:.5rem 0 0 1.2rem;line-height:1.9;font-size:.88rem">
+          <li>Copy button dabao</li>
+          <li>GitHub pe <code>${esc(m.file)}</code> file kholo</li>
+          <li>Is item ko <strong>ID se dhundho</strong>: <code>${esc(item.id || item.slug || "")}</code></li>
+          <li>Agar pehle se hai toh <strong>replace</strong> karo, naya hai toh array ke end mein <strong>paste</strong> karo (last <code>}</code> ke baad <code>,</code> lagaao phir paste karo)</li>
+          <li>Commit karo — done ✅</li>
+        </ol>
+      </div>`;
+    modal.hidden = false;
+    el("singleJsonCopyBtn")?.addEventListener("click", () => {
+      const ta = el("admCodeBody").querySelector(".adm-code-ta");
+      const btn = el("singleJsonCopyBtn");
+      navigator.clipboard.writeText(ta.value)
+        .then(() => { btn.textContent = "✅ Copied!"; setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000); })
+        .catch(() => { ta.select(); document.execCommand("copy"); btn.textContent = "✅ Copied!"; setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000); });
+    });
+  }
+
   function showCodeModal(files) {
     let html = "";
     files.forEach((f, i) => {
